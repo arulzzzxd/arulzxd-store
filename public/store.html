@@ -449,11 +449,7 @@
                 </div>
 
                 <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 items-start">
-                    <div class="bg-cyberCard rounded-xl border border-cyberBorder p-3 animate-pulse space-y-3">
-                        <div class="bg-slate-800 h-36 rounded-lg w-full"></div>
-                        <div class="h-4 bg-slate-800 rounded w-3/4"></div>
-                        <div class="h-4 bg-slate-800 rounded w-1/2"></div>
-                    </div>
+                    <!-- DIUBAH: DIBUAT RENDER INSTAN TANPA SKELETON ANIMATION -->
                 </div>
 
                 <div id="emptyState" class="hidden text-center py-16 bg-cyberCard rounded-xl border border-cyberBorder mt-2">
@@ -1408,7 +1404,7 @@
                         delete REVIEWS_CACHE[productId];
                         resetReviewForm();
                         await loadProductReviews(productId, true);
-                        await renderProduk();
+                        renderProduk();
                     } else {
                         throw new Error(result.message || 'Gagal menghapus ulasan.');
                     }
@@ -1571,7 +1567,7 @@
                     delete REVIEWS_CACHE[productId];
                     resetReviewForm();
                     await loadProductReviews(productId, true);
-                    await renderProduk();
+                    renderProduk();
                 } else {
                     throw new Error(result.message || 'Gagal mengirim ulasan');
                 }
@@ -1644,7 +1640,7 @@
                 }
 
                 generateKategoriButtons();
-                await renderProduk();
+                renderProduk();
             } catch (error) {
                 console.error('Fetch Error:', error);
                 if (statusElem) {
@@ -1762,7 +1758,8 @@
             renderProduk();
         }
 
-        async function renderProduk() {
+        // FUNGSI RENDER PRODUK DIREVISI: SANGAT CEPAT TANPA AFK DELAY / LOADING TINGGI
+        function renderProduk() {
             const grid = document.getElementById('productGrid');
             const emptyState = document.getElementById('emptyState');
             const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -1784,33 +1781,7 @@
 
             emptyState.classList.add('hidden');
 
-            const productsWithRatings = await Promise.all(filtered.map(async (produk) => {
-                const pId = produk.Id || produk._id;
-                
-                if (REVIEWS_CACHE[pId]) {
-                    return {
-                        ...produk,
-                        averageRating: REVIEWS_CACHE[pId].averageRating || 0,
-                        totalReviews: REVIEWS_CACHE[pId].totalReviews || 0
-                    };
-                }
-
-                try {
-                    const res = await fetch(`/api/reviews/${pId}`);
-                    if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
-                        const data = await res.json();
-                        REVIEWS_CACHE[pId] = data;
-                        return {
-                            ...produk,
-                            averageRating: data.averageRating || 0,
-                            totalReviews: data.totalReviews || 0
-                        };
-                    }
-                } catch (e) {}
-                return { ...produk, averageRating: 0, totalReviews: 0 };
-            }));
-
-            grid.innerHTML = productsWithRatings.map((produk) => {
+            grid.innerHTML = filtered.map((produk) => {
                 const originalIndex = DATA_PRODUK.findIndex(p => (p.Id || p._id) === (produk.Id || produk._id));
                 const badgeHtml = (produk.badge && produk.badge.trim() !== "") 
                     ? `<span class="absolute top-2 left-2 bg-cyberCyan text-cyberDark font-cyber text-[9px] font-black px-1.5 py-0.5 rounded shadow-glowCyanSm z-10 uppercase tracking-wider">${produk.badge}</span>` 
@@ -1854,6 +1825,9 @@
                 const deskripsiTeks = produk.deskripsi || 'Tidak ada deskripsi.';
                 const isLong = deskripsiTeks.length > maxChar;
 
+                const pId = produk.Id || produk._id;
+                const cachedRev = REVIEWS_CACHE[pId] || { averageRating: 5.0, totalReviews: 0 };
+
                 return `
                     <div class="bg-cyberCard rounded-xl border border-cyberBorder overflow-hidden shadow-md hover:border-cyberCyan/60 hover:shadow-glowCyanSm transition duration-300 flex flex-col group cursor-pointer" onclick="openProductDetailModal('${produk.Id || produk._id}')">
                         <div class="relative bg-cyberDark pt-[100%] overflow-hidden flex-shrink-0">
@@ -1895,8 +1869,8 @@
                                 </div>
 
                                 <div class="flex items-center justify-between pt-1 border-t border-cyberBorder/30">
-                                    ${renderStarRating(produk.averageRating)}
-                                    <span class="text-[10px] text-slate-400">(${produk.totalReviews} ulasan)</span>
+                                    ${renderStarRating(cachedRev.averageRating)}
+                                    <span class="text-[10px] text-slate-400">(${cachedRev.totalReviews} ulasan)</span>
                                 </div>
                                 
                                 <div class="pt-1 border-t border-cyberBorder/50">
