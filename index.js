@@ -47,7 +47,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'arulzxd-super-secret-jwt-key-999';
 // SCHEMAS & MODELS (V2)
 // ====================================================
 
-// USER SCHEMA V2 (Tanpa Role & Apikey)
+// USER SCHEMA V2 (Tanpa Role & Apikey, dengan Fitur Saldo Permanen)
 const userSchemaV2 = new mongoose.Schema({
     username: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
@@ -57,6 +57,7 @@ const userSchemaV2 = new mongoose.Schema({
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     avatar: { type: String, default: 'https://arulz-xd.my.id/files/X1F0Cn.png' }, 
+    saldo: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -132,6 +133,8 @@ const transactionSchemaV2 = new mongoose.Schema({
     amount: { type: Number, required: true },
     paymentNumber: { type: String, default: null }, 
     paymentMethod: { type: String, default: "QRIS" },
+    type: { type: String, enum: ['PURCHASE', 'DEPOSIT'], default: 'PURCHASE' },
+    userEmail: { type: String, default: null },
     status: { type: String, default: "pending" }, 
     itemDetails: {
         nama: String,
@@ -677,6 +680,183 @@ function verifyPaywuzSignature(rawBody, receivedSignature, apikey) {
     }
 }
 
+// ====================================================
+// FITUR DEPOSIT PAYWUZ & PEMBAYARAN SALDO
+// ====================================================
+
+// ENDPOINT KREAT DEPOSIT DEPOSIT SALDO VIA PAYWUZ (MINIMAL 1000)
+app.post('/api/deposit', checkAuthSession, async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ status: false, message: 'Silakan login terlebih dahulu untuk deposit.' });
+        }
+
+        const amount = Number(req.body.amount);
+        if (isNaN(amount) || amount < 1000) {
+            return res.status(400).json({ status: false, message: 'Deposit minimal adalah Rp 1.000!' });
+        }
+
+        const orderId = `DEP-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+        const paywuzRes = await axiosPaywuzWithRetry({
+            method: 'post',
+            url: `${PAYWUZ_BASE_URL}/transactions`,
+            data: {
+                orderId,
+                amount: amount,
+                paymentMethod: "QRIS",
+                feeByMerchant: false
+            },
+            headers: PAYWUZ_HEADERS
+        });
+
+        const transactionData = paywuzRes.data?.data || paywuzRes.data;
+        const qrisNumber = transactionData.paymentNumber || transactionData.qrString || transactionData.qrUrl;
+
+        const safeNum = (val) => {
+            const num = Number(val);
+            return (!isNaN(num) && num > 0) ? num : null;
+        };
+
+        const feeFlatIdr = Number(transactionData.feeFlatIdr) || 290;
+        const feePercentBps = Number(transactionData.feePercentBps) || 70;
+        const calculatedFee = feeFlatIdr + Math.ceil((amount * feePercentBps) / 10000);
+
+        let finalAmount = safeNum(transactionData.grossAmount) || 
+                          safeNum(transactionData.totalAmount) || 
+                          safeNum(transactionData.total);
+
+        if (!finalAmount) {
+            const feeVal = safeNum(transactionData.fee) || safeNum(transactionData.feeAdmin) || calculatedFee;
+            finalAmount = amount + feeVal;
+        }
+
+        const expiredAt = new Date(Date.now() + 15 * 60 * 1000);
+
+        const newTrx = new TransactionV2({
+            orderId,
+            amount: finalAmount,
+            paymentNumber: qrisNumber,
+            paymentMethod: "QRIS",
+            type: "DEPOSIT",
+            userEmail: req.user.email.toLowerCase().trim(),
+            status: (transactionData.status || "pending").toLowerCase(),
+            itemDetails: {
+                nama: `Deposit Saldo Rp ${amount.toLocaleString('id-ID')}`,
+                harga: amount,
+                buyer: req.user.email
+            },
+            expiredAt: expiredAt
+        });
+
+        await newTrx.save();
+
+        return res.json({
+            status: true,
+            data: newTrx
+        });
+
+    } catch (error) {
+        console.error("Error Create Deposit TRX:", error.response?.data || error.message);
+        return res.status(500).json({
+            status: false,
+            message: error.response?.data?.message || error.message || "Gagal membuat invoice deposit QRIS"
+        });
+    }
+});
+
+// ENDPOINT PEMBAYARAN MEMBELI PRODUK DENGAN SALDO DEPOSIT
+app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ status: false, message: "Silakan login terlebih dahulu untuk bertransaksi." });
+        }
+
+        const { productId, qty } = req.body;
+        const buyQty = Number(qty) || 1;
+
+        if (!productId) {
+            return res.status(400).json({ status: false, message: "Product ID wajib diisi!" });
+        }
+
+        const dbProduct = await ProductV2.findOne({
+            $or: [{ Id: productId }, { _id: mongoose.Types.ObjectId.isValid(productId) ? productId : null }]
+        });
+
+        if (!dbProduct) {
+            return res.status(404).json({ status: false, message: "Produk tidak ditemukan di database." });
+        }
+
+        if (dbProduct.stok < buyQty) {
+            return res.status(400).json({ status: false, message: "Stok produk tidak mencukupi!" });
+        }
+
+        const unitPrice = dbProduct.harga_diskon || dbProduct.harga;
+        const totalPrice = unitPrice * buyQty;
+
+        const user = await UserV2.findById(req.user.id || req.user._id);
+
+        if (!user) {
+            return res.status(404).json({ status: false, message: "Data akun tidak ditemukan." });
+        }
+
+        const currentBalance = user.saldo || 0;
+
+        if (currentBalance < totalPrice) {
+            return res.status(400).json({ 
+                status: false, 
+                insufficientBalance: true,
+                message: "Saldo tidak tersedia, silahkan deposit!" 
+            });
+        }
+
+        // POTONG SALDO USER & SIMPAN PERMANEN DI MONGODB
+        user.saldo = currentBalance - totalPrice;
+        await user.save();
+
+        // UPDATE STOK DAN PEMBELI PRODUK
+        await updateProductStockAndSold(dbProduct.nama, buyQty, false);
+        await recordProductBuyer(dbProduct.nama, user.email);
+
+        const orderId = `SALDO-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+        const newTransaction = new TransactionV2({
+            orderId,
+            amount: totalPrice,
+            paymentMethod: "SALDO",
+            status: "success",
+            type: "PURCHASE",
+            userEmail: user.email,
+            itemDetails: {
+                nama: dbProduct.nama,
+                harga: unitPrice,
+                kategori: dbProduct.kategori,
+                gambar: Array.isArray(dbProduct.gambar) ? dbProduct.gambar[0] : dbProduct.gambar,
+                link: dbProduct.link,
+                buyer: user.email,
+                qty: buyQty
+            },
+            productLink: dbProduct.link,
+            expiredAt: new Date()
+        });
+
+        await newTransaction.save();
+
+        return res.json({
+            status: true,
+            message: "Pembayaran berhasil menggunakan Saldo!",
+            data: {
+                orderId: orderId,
+                productLink: dbProduct.link,
+                remainingBalance: user.saldo
+            }
+        });
+
+    } catch (err) {
+        console.error("Error Pay with balance:", err);
+        return res.status(500).json({ status: false, message: "Terjadi kesalahan server saat memproses transaksi saldo." });
+    }
+});
+
 app.post('/transactions', async (req, res) => {
     try {
         const { orderId, amount, itemDetails, qty } = req.body;
@@ -746,6 +926,7 @@ app.post('/transactions', async (req, res) => {
             amount: finalAmount,
             paymentNumber: qrisNumber,
             paymentMethod: "QRIS",
+            type: "PURCHASE",
             status: (transactionData.status || "pending").toLowerCase(),
             itemDetails: {
                 ...itemDetails,
@@ -875,7 +1056,7 @@ app.post('/transactions/:orderId/cancel', async (req, res) => {
         }
 
         if (["paid", "settlement", "success"].includes(prevStatus)) {
-            if (localTrx.itemDetails && localTrx.itemDetails.nama) {
+            if (localTrx.itemDetails && localTrx.itemDetails.nama && localTrx.type !== 'DEPOSIT') {
                 const qtyPurchased = localTrx.itemDetails.qty || 1;
                 await updateProductStockAndSold(localTrx.itemDetails.nama, qtyPurchased, true);
             }
@@ -901,6 +1082,7 @@ app.post('/transactions/:orderId/cancel', async (req, res) => {
     }
 });
 
+// WEBHOOK UPDATE STATUS TRANSAKSI & PENAMBAHAN SALDO OTOMATIS
 app.post('/webhook', async (req, res) => {
     try {
         const signature = req.headers['x-paywuz-signature'];
@@ -939,7 +1121,17 @@ app.post('/webhook', async (req, res) => {
                 if (isPaidEvent && !["paid", "settlement", "success"].includes(prevStatus)) {
                     console.log(`⚡ [TRANSACTION.PAID] Order ID ${orderId} Lunas!`);
 
-                    if (localTrx.itemDetails && localTrx.itemDetails.nama) {
+                    // JIKA TRANSAKSI ADALAH DEPOSIT SALDO
+                    if (localTrx.type === 'DEPOSIT' && localTrx.userEmail) {
+                        const depositAmount = localTrx.itemDetails?.harga || localTrx.amount;
+                        await UserV2.findOneAndUpdate(
+                            { email: localTrx.userEmail.toLowerCase().trim() },
+                            { $inc: { saldo: depositAmount } }
+                        );
+                        console.log(`💰 [SALDO ADDED] Saldo user ${localTrx.userEmail} bertambah sebesar Rp ${depositAmount.toLocaleString('id-ID')}`);
+                    } 
+                    // JIKA TRANSAKSI PEMBELIAN PRODUK biasa
+                    else if (localTrx.itemDetails && localTrx.itemDetails.nama) {
                         const qtyPurchased = localTrx.itemDetails.qty || 1;
                         await updateProductStockAndSold(localTrx.itemDetails.nama, qtyPurchased, false);
 
@@ -947,7 +1139,7 @@ app.post('/webhook', async (req, res) => {
                         await recordProductBuyer(localTrx.itemDetails.nama, buyerIdentifier);
                     }
 
-                    if (!localTrx.productLink && localTrx.itemDetails?.nama) {
+                    if (!localTrx.productLink && localTrx.itemDetails?.nama && localTrx.type !== 'DEPOSIT') {
                         const dbProduct = await ProductV2.findOne({ 
                             nama: { $regex: new RegExp(`^${localTrx.itemDetails.nama.trim()}$`, 'i') } 
                         }).lean();
@@ -955,7 +1147,7 @@ app.post('/webhook', async (req, res) => {
                     }
                 } 
                 else if (isCancelEvent && ["paid", "settlement", "success"].includes(prevStatus)) {
-                    if (localTrx.itemDetails && localTrx.itemDetails.nama) {
+                    if (localTrx.type !== 'DEPOSIT' && localTrx.itemDetails && localTrx.itemDetails.nama) {
                         const qtyPurchased = localTrx.itemDetails.qty || 1;
                         await updateProductStockAndSold(localTrx.itemDetails.nama, qtyPurchased, true);
                     }
@@ -1014,6 +1206,7 @@ app.get('/api/user/transactions', async (req, res) => {
             transactions = await TransactionV2.find({
                 $or: [
                     { "itemDetails.buyer": uIdent },
+                    { userEmail: uIdent },
                     { orderId: { $in: orderIds } }
                 ]
             }).sort({ createdAt: -1 }).lean();
@@ -1383,34 +1576,6 @@ app.get('/reset-password/:token', async (req, res) => {
     }
 });
 
-app.post('/reset-password/:token', async (req, res) => {
-    try {
-        const { password, confirmPassword } = req.body;
-
-        if (password !== confirmPassword) {
-            return sendSweetAlert(res, 'warning', 'Tidak Cocok', 'Password dan konfirmasi password tidak cocok!', '/login');
-        }
-
-        const user = await UserV2.findOne({ 
-            resetPasswordToken: req.params.token, 
-            resetPasswordExpires: { $gt: Date.now() } 
-        });
-
-        if (!user) {
-            return sendSweetAlert(res, 'error', 'Gagal', 'Link reset password tidak valid atau sudah kedaluwarsa.', '/login');
-        }
-
-        user.password = await bcrypt.hash(password, 10);
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
-        await user.save();
-
-        return sendSweetAlert(res, 'success', 'Berhasil!', 'Password berhasil diubah! Silakan login dengan password baru Anda.', '/login');
-    } catch (err) {
-        res.status(500).send("Gagal menyimpan password baru.");
-    }
-});
-
 const GITHUB_CLIENT_ID = 'Ov23li23q78AeREkbepJ';
 const GITHUB_CLIENT_SECRET = 'd14fef7651a10f50524b7bdd0a50a199fa81065b';
 const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || "https://arulzxd.biz.id/auth/github/callback";
@@ -1654,7 +1819,8 @@ app.get('/api/user-status', async (req, res) => {
                     name: activeUser.username,
                     username: activeUser.username,
                     email: activeUser.email,
-                    avatar: activeUser.avatar
+                    avatar: activeUser.avatar,
+                    saldo: activeUser.saldo || 0
                 }
             });
         } catch (err) {
