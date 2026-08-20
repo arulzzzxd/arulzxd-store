@@ -32,6 +32,44 @@ app.set('trust proxy', 1);
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://arulz-xd-owner:Haqqi0213@cluster0.fgxhxqm.mongodb.net/?appName=Cluster0';
 
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000, // Mempercepat failover/timeout
+    };
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => m);
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
+  return cached.conn;
+}
+
+// Middleware untuk memastikan database terhubung sebelum memproses setiap request
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('❌ Gagal koneksi ke MongoDB:', err);
+    res.status(500).json({ error: 'Database connection error' });
+  }
+});
+
+
 mongoose.connect(MONGODB_URI)
     .then(() => console.log('📦 [Store App] Berhasil terhubung ke MongoDB!'))
     .catch(err => console.error('❌ [Store App] Gagal koneksi ke MongoDB:', err));
