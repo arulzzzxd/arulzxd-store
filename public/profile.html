@@ -55,7 +55,6 @@
             display: block;
         }
 
-        /* BOTTOM NAVIGATION STYLE */
         .bottom-nav-container {
             position: fixed;
             bottom: 20px;
@@ -137,14 +136,20 @@
                 <input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="uploadAvatar(this)">
             </div>
 
-            <div>
-                <h2 id="profileUsername" class="text-xl font-bold font-cyber text-white">Loading...</h2>
+            <div class="space-y-1">
+                <div class="flex items-center justify-center gap-2">
+                    <h2 id="profileUsername" class="text-xl font-bold font-cyber text-white">Loading...</h2>
+                    <button onclick="editUsernameModal()" title="Edit Username" class="text-cyberCyan hover:text-cyan-300 text-xs">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                </div>
                 <p id="profileEmail" class="text-xs text-slate-400 font-mono mt-0.5">-</p>
+                <p id="profileJoined" class="text-[11px] text-cyberCyan font-semibold font-mono pt-1">Terdaftar sejak: -</p>
             </div>
         </div>
 
-        <!-- WIDGET SALDO & DEPOSIT -->
-        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl space-y-4 relative overflow-hidden">
+        <!-- WIDGET SALDO (TERPISAH) -->
+        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl relative overflow-hidden">
             <div class="flex items-center justify-between">
                 <div>
                     <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-widest block">Saldo Akun Anda</span>
@@ -154,25 +159,56 @@
                     <i class="fa-solid fa-wallet"></i>
                 </div>
             </div>
+        </div>
 
-            <hr class="border-cyberBorder/60">
-
-            <div class="space-y-3">
+        <!-- WIDGET DEPOSIT (TERPISAH) -->
+        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl space-y-4">
+            <div class="flex items-center justify-between">
                 <label class="block text-xs font-bold font-cyber text-slate-300 uppercase tracking-wider">
-                    <i class="fa-solid fa-circle-plus text-cyberCyan"></i> Deposit Saldo via Paywuz
+                    <i class="fa-solid fa-circle-plus text-cyberCyan"></i> Deposit Saldo Instan
                 </label>
-                
-                <div class="flex items-center gap-2">
-                    <div class="relative flex-1">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-xs font-bold text-slate-400">Rp</span>
-                        <input type="number" id="depositAmountInput" min="1000" placeholder="Minimal 1000" 
-                               class="w-full pl-9 pr-3 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-bold font-cyber transition">
-                    </div>
-                    <button onclick="processDepositPaywuz()" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-extrabold px-5 py-2.5 rounded-xl text-xs transition shadow-glowCyan flex items-center gap-1.5 uppercase tracking-wider">
-                        <i class="fa-solid fa-bolt"></i> Top Up
-                    </button>
+                <span class="text-[10px] text-slate-400 font-mono">Minimal Rp 1.000</span>
+            </div>
+
+            <!-- PILIHAN NOMINAL PRESET DEPOSIT -->
+            <div class="grid grid-cols-4 gap-2">
+                <button onclick="setDepositAmount(1000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">1.000</button>
+                <button onclick="setDepositAmount(2000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">2.000</button>
+                <button onclick="setDepositAmount(5000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">5.000</button>
+                <button onclick="setDepositAmount(10000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">10.000</button>
+                <button onclick="setDepositAmount(15000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">15.000</button>
+                <button onclick="setDepositAmount(20000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">20.000</button>
+                <button onclick="setDepositAmount(30000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">30.000</button>
+                <button onclick="setDepositAmount(50000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">50.000</button>
+            </div>
+
+            <!-- INPUT NOMINAL MANUAL -->
+            <div class="flex items-center gap-2 pt-2">
+                <div class="relative flex-1">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-xs font-bold text-slate-400">Rp</span>
+                    <input type="number" id="depositAmountInput" min="1000" placeholder="Ketik nominal sendiri..." 
+                           class="w-full pl-9 pr-3 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-bold font-cyber transition">
                 </div>
-                <p class="text-[10px] text-slate-500 font-mono">* Deposit minimal Rp 1.000. Saldo tersimpan permanen & dapat digunakan untuk membeli produk.</p>
+                <button onclick="processDeposit()" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-extrabold px-5 py-2.5 rounded-xl text-xs transition shadow-glowCyan flex items-center gap-1.5 uppercase tracking-wider">
+                    <i class="fa-solid fa-bolt"></i> Top Up
+                </button>
+            </div>
+
+            <!-- PANDUAN DEPOSIT DILENGKAPI DI BAWAH DEPOSIT -->
+            <div class="mt-4 pt-4 border-t border-cyberBorder/60 space-y-2">
+                <h4 class="text-xs font-bold font-cyber text-cyberCyan flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-question"></i> Panduan Deposit Saldo
+                </h4>
+                <div class="text-[11px] text-slate-300 space-y-2 leading-relaxed">
+                    <div>
+                        <p class="font-bold text-slate-200">Bagaimana cara isi saldo?</p>
+                        <p class="text-slate-400">Pilih atau masukkan nominal minimal Rp1.000, klik tombol QRIS, dan lakukan scan menggunakan aplikasi e-wallet / mobile banking Anda.</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-200">Apakah saldo langsung masuk?</p>
+                        <p class="text-slate-400">Ya, sistem payment gateway mendeteksi pembayaran secara otomatis 100% instan dalam hitungan detik.</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -182,7 +218,7 @@
 
     </div>
 
-    <!-- MODAL POPUP QRIS DEPOSIT PAYWUZ -->
+    <!-- MODAL POPUP QRIS DEPOSIT -->
     <div id="depositModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="bg-cyberCard w-full max-w-md rounded-2xl border border-cyberCyan/40 p-5 space-y-4 text-center relative shadow-glowCyan">
             <button onclick="closeDepositModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg">
@@ -204,13 +240,18 @@
                 <i class="fa-solid fa-spinner fa-spin text-cyberCyan"></i> Menunggu Pembayaran...
             </p>
 
-            <button onclick="closeDepositModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2 rounded-xl border border-cyberBorder">
-                Tutup / Selesai
-            </button>
+            <div class="flex items-center gap-2">
+                <button onclick="cancelDepositTransaction()" class="w-1/2 bg-red-950/60 hover:bg-red-900/80 border border-red-800/60 text-red-400 text-xs font-bold py-2.5 rounded-xl transition">
+                    Batalkan Transaksi
+                </button>
+                <button onclick="closeDepositModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2.5 rounded-xl border border-cyberBorder transition">
+                    Tutup Modal
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION BAR (DASHBOARD, TOKO, RIWAYAT, LOGIN/PROFILE) -->
+    <!-- BOTTOM NAVIGATION BAR -->
     <nav class="bottom-nav-container">
         <a href="/dashboard" class="nav-item" id="nav-dashboard">
             <i class="fa-solid fa-border-all"></i>
@@ -242,6 +283,10 @@
             }).format(angka);
         }
 
+        function setDepositAmount(val) {
+            document.getElementById('depositAmountInput').value = val;
+        }
+
         async function loadUserProfile() {
             try {
                 const res = await fetch('/api/user-status');
@@ -253,17 +298,100 @@
                     document.getElementById('profileUsername').innerText = data.user.username;
                     document.getElementById('profileEmail').innerText = data.user.email || 'Email terdaftar';
                     document.getElementById('profileSaldo').innerText = formatRupiah(data.user.saldo || 0);
+                    
+                    if (data.user.createdAt) {
+                        const joinedDate = new Date(data.user.createdAt).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'Long',
+                            year: 'numeric'
+                        });
+                        document.getElementById('profileJoined').innerText = `Terdaftar sejak: ${joinedDate}`;
+                    } else {
+                        document.getElementById('profileJoined').innerText = `Terdaftar sejak: 12 Agustus 2026`;
+                    }
 
                     if (data.user.avatar) document.getElementById('profileAvatar').src = data.user.avatar;
                     if (authBtn) authBtn.href = '/profile';
                     if (authLabel) authLabel.innerText = 'Profil';
+
+                    checkActiveDepositTransaction();
                 } else {
                     window.location.href = '/login';
                 }
             } catch(e) {}
         }
 
-        async function processDepositPaywuz() {
+        async function editUsernameModal() {
+            const currentUsername = document.getElementById('profileUsername').innerText;
+
+            const { value: newUsername } = await Swal.fire({
+                title: 'PERBARUI USERNAME',
+                input: 'text',
+                inputValue: currentUsername,
+                inputPlaceholder: 'Masukkan username baru...',
+                showCancelButton: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'cyber-swal' }
+            });
+
+            if (newUsername && newUsername.trim() !== '' && newUsername !== currentUsername) {
+                try {
+                    const res = await fetch('/api/user/update-username', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: newUsername.trim() })
+                    });
+                    const result = await res.json();
+                    if (result.status) {
+                        document.getElementById('profileUsername').innerText = result.username;
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'BERHASIL',
+                            text: 'Username berhasil diperbarui!',
+                            timer: 1500,
+                            showConfirmButton: false,
+                            customClass: { popup: 'cyber-swal' }
+                        });
+                    } else {
+                        throw new Error(result.message || 'Gagal mengubah username');
+                    }
+                } catch(err) {
+                    Swal.fire({ icon: 'error', title: 'GAGAL', text: err.message, customClass: { popup: 'cyber-swal' } });
+                }
+            }
+        }
+
+        async function checkActiveDepositTransaction() {
+            const activeDepId = localStorage.getItem('active_deposit_order_id');
+            if (!activeDepId) return;
+
+            try {
+                const res = await fetch(`/transactions/${activeDepId}`);
+                const result = await res.json();
+
+                if (result.data && result.data.status === 'pending') {
+                    currentDepOrderId = result.data.orderId;
+                    document.getElementById('depTotalAmountText').innerText = formatRupiah(result.data.amount);
+                    document.getElementById('depOrderIdText').innerText = currentDepOrderId;
+
+                    const qContainer = document.getElementById('depQrcodeContainer');
+                    qContainer.innerHTML = '';
+                    new QRCode(qContainer, {
+                        text: result.data.paymentNumber,
+                        width: 260,
+                        height: 260
+                    });
+
+                    document.getElementById('depositModal').classList.remove('hidden');
+                    startDepositPolling();
+                } else {
+                    localStorage.removeItem('active_deposit_order_id');
+                }
+            } catch(e) {}
+        }
+
+        async function processDeposit() {
             const amountInput = document.getElementById('depositAmountInput');
             const amount = parseInt(amountInput.value);
 
@@ -279,7 +407,7 @@
 
             Swal.fire({
                 title: 'MEMPROSES DEPOSIT...',
-                text: 'Membuat QRIS Paywuz',
+                text: 'Menyiapkan QRIS Pembayaran',
                 allowOutsideClick: false,
                 didOpen: () => { Swal.showLoading(); },
                 customClass: { popup: 'cyber-swal' }
@@ -297,6 +425,8 @@
 
                 if (result.status && result.data) {
                     currentDepOrderId = result.data.orderId;
+                    localStorage.setItem('active_deposit_order_id', currentDepOrderId);
+
                     document.getElementById('depTotalAmountText').innerText = formatRupiah(result.data.amount);
                     document.getElementById('depOrderIdText').innerText = currentDepOrderId;
 
@@ -330,8 +460,11 @@
                 try {
                     const res = await fetch(`/transactions/${currentDepOrderId}`);
                     const result = await res.json();
-                    if (result.data && ["settlement", "success", "paid", "settled"].includes((result.data.status || "").toLowerCase())) {
+                    const status = (result.data?.status || "").toLowerCase();
+
+                    if (["settlement", "success", "paid", "settled"].includes(status)) {
                         clearInterval(depPollInterval);
+                        localStorage.removeItem('active_deposit_order_id');
                         closeDepositModal();
                         Swal.fire({
                             icon: 'success',
@@ -340,9 +473,52 @@
                             customClass: { popup: 'cyber-swal' }
                         });
                         loadUserProfile();
+                    } else if (["cancelled", "failed", "expired"].includes(status)) {
+                        clearInterval(depPollInterval);
+                        localStorage.removeItem('active_deposit_order_id');
+                        closeDepositModal();
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'TRANSAKSI BATAL',
+                            text: 'Transaksi deposit telah dibatalkan atau kedaluwarsa.',
+                            customClass: { popup: 'cyber-swal' }
+                        });
                     }
                 } catch(e) {}
             }, 3000);
+        }
+
+        async function cancelDepositTransaction() {
+            if (!currentDepOrderId) return;
+
+            const confirmRes = await Swal.fire({
+                title: 'BATALKAN DEPOSIT?',
+                text: 'Apakah Anda yakin ingin membatalkan transaksi deposit ini?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Batalkan',
+                cancelButtonText: 'Kembali',
+                customClass: { popup: 'cyber-swal' }
+            });
+
+            if (confirmRes.isConfirmed) {
+                try {
+                    await fetch(`/transactions/${currentDepOrderId}/cancel`, { method: 'POST' });
+                } catch(e) {}
+                
+                if (depPollInterval) clearInterval(depPollInterval);
+                localStorage.removeItem('active_deposit_order_id');
+                closeDepositModal();
+
+                Swal.fire({
+                    icon: 'info',
+                    title: 'DIBATALKAN',
+                    text: 'Transaksi deposit berhasil dibatalkan.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    customClass: { popup: 'cyber-swal' }
+                });
+            }
         }
 
         function closeDepositModal() {
