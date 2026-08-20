@@ -1,4 +1,4 @@
-const express = require('express');
+Const express = require('express');
 const fileUpload = require('express-fileupload');
 const session = require('express-session');
 const mongoose = require('mongoose');
@@ -1411,9 +1411,9 @@ app.post('/reset-password/:token', async (req, res) => {
     }
 });
 
-const GITHUB_CLIENT_ID = 'Ov23linJtLUZuyJVXpXZ';
-const GITHUB_CLIENT_SECRET = '99834867b22a9f173a64b492e55d4e8f5ef9e9eb';
-const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || "https://arulz-xd.my.id/auth/github/callback";
+const GITHUB_CLIENT_ID = 'Ov23li23q78AeREkbepJ';
+const GITHUB_CLIENT_SECRET = 'd14fef7651a10f50524b7bdd0a50a199fa81065b';
+const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || "https://arulzxd.biz.id/auth/github/callback";
 
 const d = "613783942158";
 const e = "-63q31341ivgrlulq8";
@@ -1423,7 +1423,7 @@ const id = "googleusercontent.com";
 
 const GOOGLE_CLIENT_ID = `${d}${e}${f}${cl}${id}`;
 const GOOGLE_CLIENT_SECRET = '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';
-const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "https://arulz-xd.my.id/auth/google/callback";
+const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "https://arulzxd.biz.id/auth/google/callback";
 
 /* ==================== ENDPOINT AUTH GITHUB ==================== */
 app.get('/auth/github', (req, res) => {
