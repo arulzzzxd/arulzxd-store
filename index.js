@@ -1,4 +1,4 @@
-const express = require('express');
+Const express = require('express');
 const fileUpload = require('express-fileupload');
 const session = require('express-session');
 const mongoose = require('mongoose');
@@ -38,13 +38,17 @@ app.set('trust proxy', 1);
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://arulz-xd-owner:Haqqi0213@cluster0.fgxhxqm.mongodb.net/?appName=Cluster0'; 
 
 mongoose.connect(MONGODB_URI)
-    .then(() => console.log('📦 Berhasil terhubung ke MongoDB!'))
-    .catch(err => console.error('❌ Gagal koneksi ke MongoDB:', err));
+    .then(() => console.log('📦 Berhasil terhubung ke Database Utama!'))
+    .catch(err => console.error('❌ Gagal koneksi ke Database:', err));
 
 const JWT_SECRET = process.env.JWT_SECRET || 'arulzxd-super-secret-jwt-key-999';
 
-// USER SCHEMA (Role & Apikey telah dihapus)
-const userSchema = new mongoose.Schema({
+// ====================================================
+// SCHEMAS & MODELS (V2)
+// ====================================================
+
+// USER SCHEMA V2 (Tanpa Role & Apikey)
+const userSchemaV2 = new mongoose.Schema({
     username: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
     password: { type: String, default: null },
@@ -56,7 +60,99 @@ const userSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+const UserV2 = mongoose.models.UserV2 || mongoose.model('UserV2', userSchemaV2);
+
+// PRODUCT SCHEMA V2
+const productSchemaV2 = new mongoose.Schema({
+    Id: { type: String, required: true, unique: true, trim: true },
+    nama: { type: String, required: true, trim: true },
+    harga: { type: Number, required: true },
+    harga_diskon: { type: Number, default: null },
+    kategori: { type: String, required: true },
+    badge: { type: String, default: "" },
+    terjual: { type: Number, default: 0 },
+    stok: { type: Number, default: 0 },
+    gambar: { 
+        type: [String], 
+        default: ["https://arulz-xd.my.id/files/X1F0Cn.png"] 
+    },    
+    deskripsi: { type: String, default: "" },
+    link: { type: String, required: true },
+    purchasedBy: [{ type: String }],
+    createdAt: { type: Date, default: Date.now }
+});
+
+const ProductV2 = mongoose.models.ProductV2 || mongoose.model('ProductV2', productSchemaV2);
+
+// REVIEW SCHEMA V2
+const reviewSchemaV2 = new mongoose.Schema({
+    productId: { type: String, required: true, index: true },
+    userId: { type: String, default: null, index: true },
+    username: { type: String, required: true },
+    userAvatar: { type: String, default: 'https://arulz-xd.my.id/files/X1F0Cn.png' },
+    rating: { type: Number, required: true, min: 1, max: 5 },
+    comment: { type: String, required: true, trim: true },
+    media: [{
+        type: { type: String, enum: ['image', 'video'] },
+        url: String
+    }],
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+reviewSchemaV2.index({ productId: 1, userId: 1 }, { unique: true, sparse: true });
+const ReviewV2 = mongoose.models.ReviewV2 || mongoose.model('ReviewV2', reviewSchemaV2);
+
+// CACHE SCHEMA V2
+const cacheSchemaV2 = new mongoose.Schema({
+    key: { type: String, required: true, unique: true },
+    data: { type: mongoose.Schema.Types.Mixed, required: true },
+    createdAt: { type: Date, default: Date.now, expires: 60 } 
+});
+
+const CacheV2 = mongoose.models.CacheV2 || mongoose.model('CacheV2', cacheSchemaV2);
+
+// VOUCHER SCHEMA V2
+const voucherSchemaV2 = new mongoose.Schema({
+    code: { type: String, required: true, unique: true, uppercase: true },
+    discount: { type: Number, required: true },
+    type: { type: String, enum: ['percentage', 'fixed'], default: 'percentage' },
+    expiredAt: { type: Date, required: true },
+    usageLimit: { type: Number, default: 20 },
+    usedCount: { type: Number, default: 0 },
+    usedBy: [{ type: String }],
+    createdAt: { type: Date, default: Date.now }
+});
+
+const VoucherV2 = mongoose.models.VoucherV2 || mongoose.model('VoucherV2', voucherSchemaV2);
+
+// TRANSACTION SCHEMA V2
+const transactionSchemaV2 = new mongoose.Schema({
+    orderId: { type: String, required: true, unique: true },
+    amount: { type: Number, required: true },
+    paymentNumber: { type: String, default: null }, 
+    paymentMethod: { type: String, default: "QRIS" },
+    status: { type: String, default: "pending" }, 
+    itemDetails: {
+        nama: String,
+        harga: Number,
+        harga_diskon: Number,
+        kategori: String,
+        gambar: String,
+        link: String,
+        buyer: String
+    },
+    productLink: { type: String, default: null },
+    createdAt: { type: Date, default: Date.now },
+    expiredAt: { type: Date, required: true },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+const TransactionV2 = mongoose.models.TransactionV2 || mongoose.model('TransactionV2', transactionSchemaV2);
+
+// ====================================================
+// MIDDLEWARES & UTILS
+// ====================================================
 
 app.use(session({
     secret: 'arulzxd_secret_session_key_99', 
@@ -88,6 +184,17 @@ const checkAuthSession = (req, res, next) => {
 };
 
 app.use(checkAuthSession);
+
+function getUserIdentifier(req) {
+    if (req.user) {
+        return (req.user.email || req.user.username || req.user._id || "").toString().toLowerCase().trim();
+    }
+    const bodyIdentifier = req.body?.username || req.body?.email || req.body?.userIdentifier;
+    if (bodyIdentifier) {
+        return bodyIdentifier.toString().toLowerCase().trim();
+    }
+    return req.ip; 
+}
 
 const uploadavatar = multer({ 
     limits: { fileSize: 4 * 1024 * 1024 },
@@ -124,7 +231,7 @@ app.post('/api/user/update-avatar', checkAuthSession, (req, res) => {
             const avatarDataUrl = `data:${mimeType};base64,${base64}`;
 
             const userIdToUpdate = req.user.id || req.user._id;
-            const updatedUser = await User.findByIdAndUpdate(
+            const updatedUser = await UserV2.findByIdAndUpdate(
                 userIdToUpdate,
                 { $set: { avatar: avatarDataUrl } },
                 { new: true, runValidators: true }
@@ -162,24 +269,6 @@ app.post('/api/user/update-avatar', checkAuthSession, (req, res) => {
         }
     });
 });
-
-const reviewSchema = new mongoose.Schema({
-    productId: { type: String, required: true, index: true },
-    userId: { type: String, default: null, index: true },
-    username: { type: String, required: true },
-    userAvatar: { type: String, default: 'https://arulz-xd.my.id/files/X1F0Cn.png' },
-    rating: { type: Number, required: true, min: 1, max: 5 },
-    comment: { type: String, required: true, trim: true },
-    media: [{
-        type: { type: String, enum: ['image', 'video'] },
-        url: String
-    }],
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
-});
-
-reviewSchema.index({ productId: 1, userId: 1 }, { unique: true, sparse: true });
-const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
 
 const uploadReviewMedia = multer({
     limits: { fileSize: 10 * 1024 * 1024 }, 
@@ -223,7 +312,7 @@ app.post('/api/reviews', checkAuthSession, (req, res) => {
                 userId = (req.user.id || req.user._id || req.user.email || req.user.username).toString();
             }
 
-            const product = await Product.findOne({
+            const product = await ProductV2.findOne({
                 $or: [{ Id: productId }, { _id: mongoose.Types.ObjectId.isValid(productId) ? productId : null }]
             });
 
@@ -254,7 +343,7 @@ app.post('/api/reviews', checkAuthSession, (req, res) => {
                 }
             }
 
-            let existingReview = await Review.findOne({ productId, userId });
+            let existingReview = await ReviewV2.findOne({ productId, userId });
 
             if (existingReview) {
                 existingReview.rating = Number(rating);
@@ -271,7 +360,7 @@ app.post('/api/reviews', checkAuthSession, (req, res) => {
                     data: existingReview
                 });
             } else {
-                const newReview = new Review({
+                const newReview = new ReviewV2({
                     productId,
                     userId,
                     username,
@@ -300,7 +389,7 @@ app.post('/api/reviews', checkAuthSession, (req, res) => {
 app.get('/api/reviews/:productId', async (req, res) => {
     try {
         const { productId } = req.params;
-        const reviews = await Review.find({ productId }).sort({ createdAt: -1 });
+        const reviews = await ReviewV2.find({ productId }).sort({ createdAt: -1 });
 
         let averageRating = 0;
         if (reviews.length > 0) {
@@ -328,7 +417,7 @@ app.delete('/api/reviews/:reviewId', checkAuthSession, async (req, res) => {
             return res.status(400).json({ status: false, message: 'ID ulasan tidak valid!' });
         }
 
-        const review = await Review.findById(reviewId);
+        const review = await ReviewV2.findById(reviewId);
 
         if (!review) {
             return res.status(404).json({ status: false, message: 'Ulasan tidak ditemukan!' });
@@ -348,7 +437,7 @@ app.delete('/api/reviews/:reviewId', checkAuthSession, async (req, res) => {
             return res.status(403).json({ status: false, message: 'Anda tidak memiliki hak akses untuk menghapus ulasan ini!' });
         }
 
-        await Review.findByIdAndDelete(reviewId);
+        await ReviewV2.findByIdAndDelete(reviewId);
 
         return res.json({ status: true, message: 'Ulasan berhasil dihapus!' });
 
@@ -384,58 +473,6 @@ async function axiosPaywuzWithRetry(config, maxRetries = 3, delayMs = 1500) {
     }
 }
 
-const cacheSchema = new mongoose.Schema({
-    key: { type: String, required: true, unique: true },
-    data: { type: mongoose.Schema.Types.Mixed, required: true },
-    createdAt: { type: Date, default: Date.now, expires: 60 } 
-});
-
-const CacheModel = mongoose.models.Cache || mongoose.model('Cache', cacheSchema);
-
-const voucherSchema = new mongoose.Schema({
-    code: { type: String, required: true, unique: true, uppercase: true },
-    discount: { type: Number, required: true },
-    type: { type: String, enum: ['percentage', 'fixed'], default: 'percentage' },
-    expiredAt: { type: Date, required: true },
-    usageLimit: { type: Number, default: 20 },
-    usedCount: { type: Number, default: 0 },
-    usedBy: [{ type: String }],
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Voucher = mongoose.models.Voucher || mongoose.model('Voucher', voucherSchema);
-
-const productSchema = new mongoose.Schema({
-    Id: { type: String, required: true, unique: true, trim: true },
-    nama: { type: String, required: true, trim: true },
-    harga: { type: Number, required: true },
-    harga_diskon: { type: Number, default: null },
-    kategori: { type: String, required: true },
-    badge: { type: String, default: "" },
-    terjual: { type: Number, default: 0 },
-    stok: { type: Number, default: 0 },
-    gambar: { 
-        type: [String], 
-        default: ["https://arulz-xd.my.id/files/X1F0Cn.png"] 
-    },    
-    deskripsi: { type: String, default: "" },
-    link: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
-
-function getUserIdentifier(req) {
-    if (req.user) {
-        return (req.user.email || req.user.username || req.user._id || "").toString().toLowerCase().trim();
-    }
-    const bodyIdentifier = req.body?.username || req.body?.email || req.body?.userIdentifier;
-    if (bodyIdentifier) {
-        return bodyIdentifier.toString().toLowerCase().trim();
-    }
-    return req.ip; 
-}
-
 app.post('/api/vouchers/claim', async (req, res) => {
     try {
         const code = req.body.code;
@@ -446,7 +483,7 @@ app.post('/api/vouchers/claim', async (req, res) => {
         const cleanCode = code.trim().toUpperCase();
         const userIdentifier = getUserIdentifier(req);
 
-        const voucher = await Voucher.findOne({ code: cleanCode });
+        const voucher = await VoucherV2.findOne({ code: cleanCode });
 
         if (!voucher) {
             return res.status(404).json({ status: false, message: 'Kode voucher tidak ditemukan!' });
@@ -512,7 +549,7 @@ app.get('/api/vouchers/:code', async (req, res) => {
         }
 
         const userIdentifier = getUserIdentifier(req);
-        const voucher = await Voucher.findOne({ code: code.trim().toUpperCase() });
+        const voucher = await VoucherV2.findOne({ code: code.trim().toUpperCase() });
         if (!voucher) {
             return res.status(404).json({ status: false, message: 'Kode voucher tidak ditemukan!' });
         }
@@ -558,7 +595,7 @@ app.get('/api/vouchers/:code', async (req, res) => {
 async function recordProductBuyer(productName, userIdentifier) {
     if (!productName || !userIdentifier) return;
     try {
-        await Product.findOneAndUpdate(
+        await ProductV2.findOneAndUpdate(
             { nama: { $regex: new RegExp(`^${productName.trim()}$`, 'i') } },
             { $addToSet: { purchasedBy: userIdentifier.toString().toLowerCase().trim() } }
         );
@@ -571,7 +608,7 @@ async function updateProductStockAndSold(productName, qtyChange = 1, isRollback 
     try {
         if (!productName) return null;
 
-        const product = await Product.findOne({ 
+        const product = await ProductV2.findOne({ 
             nama: { $regex: new RegExp(`^${productName.trim()}$`, 'i') } 
         });
 
@@ -597,19 +634,19 @@ async function updateProductStockAndSold(productName, qtyChange = 1, isRollback 
 
 async function setCache(key, data) {
     try {
-        await CacheModel.findOneAndUpdate(
+        await CacheV2.findOneAndUpdate(
             { key },
             { data, createdAt: new Date() },
             { upsert: true, new: true }
         );
     } catch (e) {
-        console.error("Gagal simpan cache MongoDB:", e.message);
+        console.error("Gagal simpan cache Database:", e.message);
     }
 }
 
 async function getCache(key) {
     try {
-        const cached = await CacheModel.findOne({ key });
+        const cached = await CacheV2.findOne({ key });
         return cached ? cached.data : null;
     } catch (e) {
         return null;
@@ -618,32 +655,9 @@ async function getCache(key) {
 
 async function deleteCache(key) {
     try {
-        await CacheModel.deleteOne({ key });
+        await CacheV2.deleteOne({ key });
     } catch (e) {}
 }
-
-const transactionSchema = new mongoose.Schema({
-    orderId: { type: String, required: true, unique: true },
-    amount: { type: Number, required: true },
-    paymentNumber: { type: String, default: null }, 
-    paymentMethod: { type: String, default: "QRIS" },
-    status: { type: String, default: "pending" }, 
-    itemDetails: {
-        nama: String,
-        harga: Number,
-        harga_diskon: Number,
-        kategori: String,
-        gambar: String,
-        link: String,
-        buyer: String
-    },
-    productLink: { type: String, default: null },
-    createdAt: { type: Date, default: Date.now },
-    expiredAt: { type: Date, required: true },
-    updatedAt: { type: Date, default: Date.now }
-});
-
-const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);
 
 function verifyPaywuzSignature(rawBody, receivedSignature, apikey) {
     if (!receivedSignature) return false;
@@ -676,7 +690,7 @@ app.post('/transactions', async (req, res) => {
             });
         }
 
-        const existingTrx = await Transaction.findOne({ orderId });
+        const existingTrx = await TransactionV2.findOne({ orderId });
         if (existingTrx) {
             return res.json({ status: true, data: existingTrx });
         }
@@ -718,7 +732,7 @@ app.post('/transactions', async (req, res) => {
 
         let pLink = itemDetails?.link || null;
         if (!pLink && itemDetails?.nama) {
-            const dbProduct = await Product.findOne({ 
+            const dbProduct = await ProductV2.findOne({ 
                 nama: { $regex: new RegExp(`^${itemDetails.nama.trim()}$`, 'i') }
             }).lean();
             if (dbProduct) pLink = dbProduct.link;
@@ -727,7 +741,7 @@ app.post('/transactions', async (req, res) => {
         const expiredAt = new Date(Date.now() + 15 * 60 * 1000);
         const buyerIdentifier = getUserIdentifier(req);
 
-        const newTransaction = new Transaction({
+        const newTransaction = new TransactionV2({
             orderId,
             amount: finalAmount,
             paymentNumber: qrisNumber,
@@ -772,7 +786,7 @@ app.get('/transactions/:orderId', async (req, res) => {
             return res.json({ data: cachedData });
         }
 
-        let localTrx = await Transaction.findOne({ orderId });
+        let localTrx = await TransactionV2.findOne({ orderId });
 
         if (!localTrx) {
             return res.status(404).json({ 
@@ -803,7 +817,7 @@ app.get('/transactions/:orderId', async (req, res) => {
         const isSuccess = ["settlement", "success", "paid", "settled"].includes(currentStatus);
 
         if (isSuccess && !localTrx.productLink && localTrx.itemDetails?.nama) {
-            const dbProduct = await Product.findOne({
+            const dbProduct = await ProductV2.findOne({
                 nama: { $regex: new RegExp(`^${localTrx.itemDetails.nama.trim()}$`, 'i') }
             }).lean();
             if (dbProduct && dbProduct.link) {
@@ -828,7 +842,7 @@ app.get('/transactions/:orderId', async (req, res) => {
 
     } catch (error) {
         console.error("Error Status TRX:", error.message);
-        const localTrx = await Transaction.findOne({ orderId: req.params.orderId });
+        const localTrx = await TransactionV2.findOne({ orderId: req.params.orderId });
         if (localTrx) {
             return res.json({ data: localTrx });
         }
@@ -842,7 +856,7 @@ app.get('/transactions/:orderId', async (req, res) => {
 app.post('/transactions/:orderId/cancel', async (req, res) => {
     try {
         const { orderId } = req.params;
-        const localTrx = await Transaction.findOne({ orderId });
+        const localTrx = await TransactionV2.findOne({ orderId });
 
         if (!localTrx) {
             return res.status(404).json({ status: false, message: "Transaksi tidak ditemukan" });
@@ -912,7 +926,7 @@ app.post('/webhook', async (req, res) => {
         }
 
         if (orderId && status) {
-            let localTrx = await Transaction.findOne({ orderId });
+            let localTrx = await TransactionV2.findOne({ orderId });
 
             if (localTrx) {
                 const prevStatus = localTrx.status.toLowerCase();
@@ -934,7 +948,7 @@ app.post('/webhook', async (req, res) => {
                     }
 
                     if (!localTrx.productLink && localTrx.itemDetails?.nama) {
-                        const dbProduct = await Product.findOne({ 
+                        const dbProduct = await ProductV2.findOne({ 
                             nama: { $regex: new RegExp(`^${localTrx.itemDetails.nama.trim()}$`, 'i') } 
                         }).lean();
                         if (dbProduct) localTrx.productLink = dbProduct.link;
@@ -988,7 +1002,7 @@ app.post('/api/store/manual-order', async (req, res) => {
 });
 
 // ====================================================
-// ENDPOINT RIWAYAT TRANSAKSI DARI MONGODB
+// ENDPOINT RIWAYAT TRANSAKSI DARI DATABASE
 // ====================================================
 app.get('/api/user/transactions', async (req, res) => {
     try {
@@ -997,18 +1011,18 @@ app.get('/api/user/transactions', async (req, res) => {
 
         if (req.user) {
             const uIdent = (req.user.email || req.user.username || "").toLowerCase().trim();
-            transactions = await Transaction.find({
+            transactions = await TransactionV2.find({
                 $or: [
                     { "itemDetails.buyer": uIdent },
                     { orderId: { $in: orderIds } }
                 ]
             }).sort({ createdAt: -1 }).lean();
         } else if (orderIds.length > 0) {
-            transactions = await Transaction.find({
+            transactions = await TransactionV2.find({
                 orderId: { $in: orderIds }
             }).sort({ createdAt: -1 }).lean();
         } else {
-            transactions = await Transaction.find().sort({ createdAt: -1 }).limit(15).lean();
+            transactions = await TransactionV2.find().sort({ createdAt: -1 }).limit(15).lean();
         }
 
         return res.json({ status: true, transactions: transactions });
@@ -1025,7 +1039,7 @@ app.use(passport.session());
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
     try {
-        const user = await User.findById(id);
+        const user = await UserV2.findById(id);
         done(null, user);
     } catch (err) {
         done(err, null);
@@ -1035,7 +1049,7 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new LocalStrategy({ usernameField: 'username', passwordField: 'password' }, 
     async (usernameOrEmail, password, done) => {
         try {
-            const user = await User.findOne({
+            const user = await UserV2.findOne({
                 $or: [
                     { username: usernameOrEmail }, 
                     { email: usernameOrEmail.toLowerCase() }
@@ -1060,12 +1074,68 @@ passport.use(new LocalStrategy({ usernameField: 'username', passwordField: 'pass
     }
 ));
 
+function sendSweetAlert(res, icon, title, text, redirectUrl) {
+    return res.send(`
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Notification</title>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+            <style>
+                body {
+                    background-color: #0b0f19;
+                    font-family: 'Plus Jakarta Sans', sans-serif;
+                }
+                .swal2-popup {
+                    background: #111827 !important;
+                    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                    border-radius: 16px !important;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+                }
+                .swal2-title {
+                    color: #ffffff !important;
+                    font-weight: 700 !important;
+                }
+                .swal2-html-container {
+                    color: #9ca3af !important;
+                }
+                .swal2-confirm {
+                    background: linear-gradient(to right, #0891b2, #06b6d4) !important;
+                    color: #0f172a !important;
+                    font-weight: 700 !important;
+                    border-radius: 12px !important;
+                    padding: 10px 24px !important;
+                }
+            </style>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: '${icon}',
+                    title: '${title}',
+                    text: '${text}',
+                    confirmButtonText: 'OKE',
+                    scrollbarPadding: false
+                }).then(() => {
+                    window.location = '${redirectUrl}';
+                });
+            </script>
+        </body>
+        </html>
+    `);
+}
+
+// --- LOGIN ROUTE (LOCAL AUTH VIA USER V2) ---
 app.post('/auth/login', (req, res, next) => {
     passport.authenticate('local', async (err, user, info) => { 
         if (err) return next(err);
 
         if (!user) {
-            return res.redirect('/login');
+            const pesanGagal = info && info.message ? info.message : 'Username atau password salah.';
+            return sendSweetAlert(res, 'error', 'Gagal Masuk', pesanGagal, '/login');
         }
 
         req.logIn(user, async (err) => { 
@@ -1099,6 +1169,430 @@ app.post('/auth/login', (req, res, next) => {
     })(req, res, next);
 });
 
+// --- REGISTER ROUTE (LOCAL AUTH VIA USER V2) ---
+app.post('/auth/register', async (req, res) => {
+    try {
+        const username = req.body.username;
+        const email = req.body.email;
+        const password = req.body.password;
+
+        if (!username || !email || !password) {
+            return sendSweetAlert(res, 'error', 'Pendaftaran Gagal', 'Semua data wajib diisi!', '/login');
+        }
+
+        const cleanUsername = username.trim();
+        const cleanEmail = email.toLowerCase().trim();
+
+        const existingUser = await UserV2.findOne({ 
+            $or: [{ username: cleanUsername }, { email: cleanEmail }] 
+        });
+
+        if (existingUser) {
+            return sendSweetAlert(res, 'warning', 'Sudah Terdaftar', 'Username atau Email sudah terdaftar!', '/login');
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const defaultAvatar = 'https://arulz-xd.my.id/files/X1F0Cn.png';
+
+        const newUser = new UserV2({
+            username: cleanUsername,
+            email: cleanEmail,
+            password: hashedPassword,
+            provider: 'local',
+            avatar: defaultAvatar
+        });
+        await newUser.save();
+
+        const userPayload = {
+            id: newUser._id,
+            username: newUser.username,
+            name: newUser.username,
+            email: newUser.email,
+            avatar: defaultAvatar
+        };
+
+        const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '7d' });
+
+        res.cookie('auth_session', token, {
+            maxAge: 7 * 24 * 60 * 60 * 1000, 
+            httpOnly: true,
+            secure: true, 
+            sameSite: 'lax'
+        });
+
+        req.logIn(newUser, (err) => {
+            if (err) return res.redirect('/login');
+            return sendSweetAlert(res, 'success', 'Berhasil!', 'Pendaftaran berhasil! Selamat datang.', '/dashboard');
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Terjadi error internal saat pendaftaran.');
+    }
+});
+
+app.post('/auth/forgot-password', async (req, res) => {
+    try {
+        const email = req.body.email;
+        if (!email) {
+            return sendSweetAlert(res, 'error', 'Wajib Diisi', 'Email wajib diisi!', '/login');
+        }
+
+        const user = await UserV2.findOne({ email: email.toLowerCase().trim() });
+        if (!user) {
+            return sendSweetAlert(res, 'error', 'Tidak Ditemukan', 'Email tersebut tidak terdaftar di sistem kami.', '/login');
+        }
+
+        if (user.provider !== 'local') {
+            return sendSweetAlert(res, 'error', 'Metode Login OAuth', `Akun ini mendaftar via ${user.provider.toUpperCase()}, tidak memerlukan reset password.`, '/login');
+        }
+
+        const resetToken = crypto.randomBytes(20).toString('hex');
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpires = Date.now() + 3600000; 
+        await user.save();
+
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, 
+            auth: {
+                user: 'supportarulzxd@gmail.com',
+                pass: 'matsgyapivykobdv'
+            },
+            tls: { rejectUnauthorized: false }
+        });
+
+        const host = req.get('host');
+        const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+        const resetUrl = `${protocol}://${host}/reset-password/${resetToken}`;
+
+        const mailOptions = {
+            from: '"Support ArulzXD" <supportarulzxd@gmail.com>',
+            to: user.email,
+            subject: 'Permintaan Reset Kata Sandi',
+            html: `
+<div style="background-color: #0b0f19; padding: 40px 20px; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; min-height: 100%;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 550px; background-color: #111827; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);">
+        <tr>
+            <td style="padding: 32px 32px 24px 32px; text-align: center;">
+                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; tracking-tight: -0.025em;">
+                    Arulz<span style="color: #22d3ee;">XD</span> Store
+                </h1>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0 32px 24px 32px;">
+                <div style="height: 1px; background: linear-gradient(to right, transparent, rgba(6, 182, 212, 0.2), transparent);"></div>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0 32px 32px 32px; color: #9ca3af; font-size: 14px; line-height: 24px;">
+                <p style="margin: 0 0 16px 0; color: #ffffff; font-size: 16px; font-weight: 600;">Halo ${user.username},</p>
+                <p style="margin: 0 0 16px 0;">Kami menerima permintaan untuk mengatur ulang kata sandi akun ArulzXD Store Anda.</p>
+                <p style="margin: 0 0 24px 0;">Silakan klik tombol di bawah ini untuk membuat kata sandi baru:</p>
+                
+                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                    <tr>
+                        <td align="center" bgcolor="#06b6d4" style="border-radius: 12px;">
+                            <a href="${resetUrl}" target="_blank" style="display: inline-block; padding: 14px 28px; font-size: 14px; font-weight: 700; color: #0f172a; text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em;">Reset Kata Sandi</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0 32px 32px 32px; color: #6b7280; font-size: 12px; line-height: 20px;">
+                <p style="margin: 0 0 12px 0; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+                    <strong style="color: #ef4444;">Penting:</strong> Link ini hanya berlaku selama <span style="color: #9ca3af; font-weight: 600;">1 jam</span> demi keamanan akun Anda.
+                </p>
+                <p style="margin: 0;">Jika Anda tidak merasa meminta reset password ini, Anda dapat mengabaikan email ini dengan aman.</p>
+            </td>
+        </tr>
+    </table>
+</div>
+`
+        };
+
+        await transporter.sendMail(mailOptions);
+        return sendSweetAlert(res, 'success', 'Sukses!', 'Link reset password telah dikirim ke email Anda.', '/login');
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Gagal memproses lupa password.');
+    }
+});
+
+app.get('/reset-password/:token', async (req, res) => {
+    try {
+        const user = await UserV2.findOne({ 
+            resetPasswordToken: req.params.token, 
+            resetPasswordExpires: { $gt: Date.now() } 
+        });
+
+        if (!user) {
+            return sendSweetAlert(res, 'error', 'Link Kadaluwarsa', 'Link reset password tidak valid atau sudah kedaluwarsa. Silakan minta link baru.', '/login');
+        }
+
+        res.send(`
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Buat Password Baru - ArulzXD Store</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <style>
+            body { background-color: #0b0f19; }
+            .solid-card { background: #111827; border: 1px solid rgba(255, 255, 255, 0.08); }
+        </style>
+    </head>
+    <body class="flex flex-col items-center justify-center min-h-screen p-4 antialiased text-gray-200">
+        <div class="solid-card p-8 rounded-2xl shadow-lg w-full max-w-md relative overflow-hidden">
+            <div class="text-center mb-6 relative z-10">
+                <h1 class="text-xl font-extrabold tracking-tight text-white mb-1">
+                    Atur Ulang <span class="text-cyan-400">Kata Sandi</span>
+                </h1>
+                <p class="text-xs text-gray-400">Silakan masukkan kata sandi baru Anda yang aman.</p>
+            </div>
+
+            <form action="/reset-password/${req.params.token}" method="POST" class="space-y-4 relative z-10">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">Password Baru</label>
+                    <input id="new-password" type="password" name="password" required placeholder="••••••••" 
+                        class="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 font-medium transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">Konfirmasi Password Baru</label>
+                    <input id="confirm-password" type="password" name="confirmPassword" required placeholder="••••••••" 
+                        class="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 font-medium transition">
+                </div>
+
+                <button type="submit" class="w-full mt-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-slate-950 font-bold py-3 rounded-xl text-sm tracking-wide uppercase">Simpan Password Baru</button>
+            </form>
+        </div>
+    </body>
+    </html>
+`);
+
+    } catch (err) {
+        res.status(500).send("Error server.");
+    }
+});
+
+app.post('/reset-password/:token', async (req, res) => {
+    try {
+        const { password, confirmPassword } = req.body;
+
+        if (password !== confirmPassword) {
+            return sendSweetAlert(res, 'warning', 'Tidak Cocok', 'Password dan konfirmasi password tidak cocok!', '/login');
+        }
+
+        const user = await UserV2.findOne({ 
+            resetPasswordToken: req.params.token, 
+            resetPasswordExpires: { $gt: Date.now() } 
+        });
+
+        if (!user) {
+            return sendSweetAlert(res, 'error', 'Gagal', 'Link reset password tidak valid atau sudah kedaluwarsa.', '/login');
+        }
+
+        user.password = await bcrypt.hash(password, 10);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        return sendSweetAlert(res, 'success', 'Berhasil!', 'Password berhasil diubah! Silakan login dengan password baru Anda.', '/login');
+    } catch (err) {
+        res.status(500).send("Gagal menyimpan password baru.");
+    }
+});
+
+const GITHUB_CLIENT_ID = 'Ov23linJtLUZuyJVXpXZ';
+const GITHUB_CLIENT_SECRET = '99834867b22a9f173a64b492e55d4e8f5ef9e9eb';
+const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || "https://arulz-xd.my.id/auth/github/callback";
+
+const d = "613783942158";
+const e = "-63q31341ivgrlulq8";
+const f = "ha0m4uqmnoa6kq0";
+const cl = ".apps.";
+const id = "googleusercontent.com";
+
+const GOOGLE_CLIENT_ID = `${d}${e}${f}${cl}${id}`;
+const GOOGLE_CLIENT_SECRET = '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';
+const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "https://arulz-xd.my.id/auth/google/callback";
+
+/* ==================== ENDPOINT AUTH GITHUB ==================== */
+app.get('/auth/github', (req, res) => {
+    const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_CALLBACK_URL}&scope=user:email`;
+    res.redirect(url);
+});
+
+app.get('/auth/github/callback', async (req, res) => {
+    const { code } = req.query;
+    if (!code) return res.send('Authentication failed: No code provided');
+
+    try {
+        const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {
+            client_id: GITHUB_CLIENT_ID,
+            client_secret: GITHUB_CLIENT_SECRET,
+            code: code
+        }, { headers: { accept: 'application/json' } });
+
+        const accessToken = tokenResponse.data.access_token;
+        if (!accessToken) return res.send('Authentication failed: Invalid access token');
+
+        const userResponse = await axios.get('https://api.github.com/user', {
+            headers: { Authorization: `token ${accessToken}` }
+        });
+
+        const userData = userResponse.data;
+        let userEmail = userData.email;
+
+        if (!userEmail) {
+            try {
+                const emailsResponse = await axios.get('https://api.github.com/user/emails', {
+                    headers: { Authorization: `token ${accessToken}` }
+                });
+                const primaryEmailObj = emailsResponse.data.find(e => e.primary && e.verified) || emailsResponse.data[0];
+                if (primaryEmailObj) {
+                    userEmail = primaryEmailObj.email;
+                }
+            } catch (emailErr) {
+                console.error('Gagal mengambil private email:', emailErr.message);
+            }
+        }
+
+        const finalEmail = (userEmail || `${userData.login}@github.com`).toLowerCase().trim();
+        const currentUsername = (userData.login || finalEmail.split('@')[0]).toLowerCase().trim();
+
+        let dbUser = await UserV2.findOne({ email: finalEmail });
+
+        if (!dbUser) {
+            dbUser = new UserV2({
+                username: currentUsername,
+                email: finalEmail,
+                provider: 'github',
+                providerId: String(userData.id),
+                avatar: userData.avatar_url || 'https://arulz-xd.my.id/files/X1F0Cn.png'
+            });
+
+            await dbUser.save();
+        } else {
+            if (userData.avatar_url && dbUser.avatar !== userData.avatar_url) {
+                dbUser.avatar = userData.avatar_url;
+                await dbUser.save();
+            }
+        }
+
+        const userPayload = {
+            id: dbUser._id,
+            username: dbUser.username,
+            email: dbUser.email,
+            name: userData.name || dbUser.username,
+            avatar: dbUser.avatar
+        };
+
+        const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '7d' });
+
+        res.cookie('auth_session', token, {
+            maxAge: 7 * 24 * 60 * 60 * 1000, 
+            httpOnly: true,
+            secure: true, 
+            sameSite: 'lax'
+        });
+
+        res.redirect('/dashboard');
+    } catch (error) {
+        console.error(error);
+        res.send('Login Error: ' + error.message);
+    }
+});
+
+/* ==================== ENDPOINT AUTH GOOGLE ==================== */
+app.get('/auth/google', (req, res) => {
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_CALLBACK_URL}&response_type=code&scope=profile email`;
+    res.redirect(url);
+});
+
+app.get('/auth/google/callback', async (req, res) => {
+    const { code } = req.query;
+    if (!code) return res.send('Authentication failed: No code provided');
+
+    try {
+        const params = new URLSearchParams({
+            client_id: GOOGLE_CLIENT_ID,
+            client_secret: GOOGLE_CLIENT_SECRET,
+            code: code,
+            grant_type: 'authorization_code',
+            redirect_uri: GOOGLE_CALLBACK_URL
+        });
+
+        const tokenResponse = await axios.post(
+            'https://oauth2.googleapis.com/token',
+            params.toString(),
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }
+        );
+
+        const accessToken = tokenResponse.data.access_token;
+        const userResponse = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: { Authorization: `Bearer ${accessToken}` }
+        });
+
+        const userData = userResponse.data;
+        const email = userData.email.toLowerCase().trim();
+        const currentUsername = (userData.login || email.split('@')[0]).toLowerCase().trim();
+
+        let dbUser = await UserV2.findOne({ email: email });
+
+        if (!dbUser) {
+            dbUser = new UserV2({
+                username: currentUsername,
+                email: email,
+                provider: 'google',
+                providerId: String(userData.id),
+                avatar: userData.picture || 'https://arulz-xd.my.id/files/X1F0Cn.png'
+            });
+
+            await dbUser.save();
+        } else {
+            if (userData.picture && dbUser.avatar !== userData.picture) {
+                dbUser.avatar = userData.picture;
+                await dbUser.save();
+            }
+        }
+
+        const userPayload = {
+            id: dbUser._id,
+            username: dbUser.username,
+            email: dbUser.email,
+            name: userData.name || dbUser.username,
+            avatar: dbUser.avatar
+        };
+
+        const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '7d' });
+
+        res.cookie('auth_session', token, {
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            secure: true,
+            sameSite: 'lax'
+        });
+
+        res.redirect('/dashboard');
+    } catch (error) {
+        console.error('Google Auth Callback Error:', error.response?.data || error.message);
+        res.send('Login Error: ' + (error.response?.data?.error_description || error.message));
+    }
+});
+
 app.get('/login', (req, res) => {
     if (req.user) {
         return res.redirect('/profile'); 
@@ -1108,7 +1602,7 @@ app.get('/login', (req, res) => {
 
 // ROUTING NAVIGASI UTAMA STORE
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'store.html'));
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 app.get('/dashboard', (req, res) => {
@@ -1128,10 +1622,10 @@ app.get('/profile', checkAuthSession, (req, res) => {
 
 app.get('/database/produk', async (req, res) => {
     try {
-        const produk = await Product.find({}).sort({ createdAt: -1 });
+        const produk = await ProductV2.find({}).sort({ createdAt: -1 });
         res.json(produk);
     } catch (err) {
-        console.error("Gagal mengambil data produk dari MongoDB:", err);
+        console.error("Gagal mengambil data produk dari Database:", err);
         res.status(500).json({ error: "Gagal memuat data produk" });
     }
 });
@@ -1151,7 +1645,7 @@ app.get('/auth/logout', (req, res, next) => {
 app.get('/api/user-status', async (req, res) => {
     if (req.user) {
         try {
-            const freshUser = await User.findById(req.user.id || req.user._id);
+            const freshUser = await UserV2.findById(req.user.id || req.user._id);
             const activeUser = freshUser || req.user;
 
             res.json({
