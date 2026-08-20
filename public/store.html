@@ -449,7 +449,7 @@
                 </div>
 
                 <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 items-start">
-                    <!-- DIUBAH: DIBUAT RENDER INSTAN TANPA SKELETON ANIMATION -->
+                    <!-- RENDER INSTAN -->
                 </div>
 
                 <div id="emptyState" class="hidden text-center py-16 bg-cyberCard rounded-xl border border-cyberBorder mt-2">
@@ -477,21 +477,18 @@
             </div>
 
             <div id="modalDetailScrollable" class="overflow-y-auto p-4 sm:p-5 space-y-5 flex-1 scroll-smooth">
-                <!-- Ringkasan Produk dengan Carousel Slide Gambar ala Shopee -->
+                <!-- Ringkasan Produk -->
                 <div class="flex flex-col sm:flex-row gap-4 items-start bg-cyberDark/60 p-3 rounded-xl border border-cyberBorder">
                     
-                    <!-- CAROUSEL GAMBAR PRODUK MODAL (BISA DIKLIK UNTUK ZOOME) -->
                     <div class="relative w-full sm:w-36 h-36 rounded-lg overflow-hidden bg-slate-900 border border-cyberBorder flex-shrink-0 group cursor-pointer" id="modalProductCarousel" onclick="zoomCurrentProductImage()">
                         <div class="flex w-full h-full transition-transform duration-300 ease-out" id="modalCarouselTrack">
                             <img id="detailImg" src="" class="w-full h-full object-cover flex-shrink-0">
                         </div>
                         
-                        <!-- Icon Zoom Hint -->
                         <span class="absolute top-1.5 right-1.5 bg-black/60 text-cyberCyan text-[10px] p-1 rounded backdrop-blur-sm opacity-80 group-hover:opacity-100 transition">
                             <i class="fa-solid fa-magnifying-glass-plus"></i>
                         </span>
 
-                        <!-- Navigasi Panah Slide Modal -->
                         <button onclick="event.stopPropagation(); slideModalCarousel(-1)" class="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition hover:bg-cyberCyan hover:text-black">
                             <i class="fa-solid fa-chevron-left"></i>
                         </button>
@@ -499,7 +496,6 @@
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
 
-                        <!-- Indikator Dots -->
                         <div class="absolute bottom-1.5 inset-x-0 flex justify-center gap-1 z-10" id="modalCarouselDots"></div>
                     </div>
 
@@ -516,9 +512,7 @@
                     <h4 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-comments text-cyberCyan"></i> Penilaian Pembeli
                     </h4>
-                    <div id="reviewsListContainer" class="space-y-3">
-                        <!-- Render Ulasan via JS -->
-                    </div>
+                    <div id="reviewsListContainer" class="space-y-3"></div>
                 </div>
             </div>
 
@@ -574,8 +568,6 @@
 
     <!-- MODAL LIGHTBOX FULLSCREEN UNTUK ZOOM GAMBAR PRODUK & SLIDER -->
     <div id="productZoomLightbox" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 hidden flex flex-col justify-between p-3 sm:p-6 select-none" onclick="closeProductZoomLightbox()">
-        
-        <!-- Header Lightbox Zoom -->
         <div class="flex items-center justify-between text-white z-20" onclick="event.stopPropagation()">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-box text-cyberCyan"></i>
@@ -586,9 +578,7 @@
             </button>
         </div>
 
-        <!-- Area Gambar & Swipe/Drag Gesture -->
         <div class="relative flex-1 flex items-center justify-center overflow-hidden my-2" id="zoomSwipeArea" onclick="event.stopPropagation()">
-            <!-- Tombol Navigasi Slide Gambar Produk -->
             <button onclick="navigateProductZoom(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 border border-cyberBorder text-white hover:text-cyberCyan flex items-center justify-center transition hover:scale-110 shadow-glowCyanSm">
                 <i class="fa-solid fa-chevron-left text-base"></i>
             </button>
@@ -596,13 +586,11 @@
                 <i class="fa-solid fa-chevron-right text-base"></i>
             </button>
 
-            <!-- Element Gambar Produk Fullscreen Zoom -->
             <div class="max-w-4xl max-h-[78vh] w-full flex items-center justify-center p-2">
                 <img id="zoomImageElement" src="" class="max-w-full max-h-[78vh] rounded-xl object-contain border border-cyberCyan/40 shadow-glowCyan transition-transform duration-200">
             </div>
         </div>
 
-        <!-- Footer Lightbox Zoom Indikator -->
         <div class="bg-cyberDark/90 border border-cyberBorder/60 p-3 rounded-xl max-w-xl mx-auto w-full z-20 flex flex-col items-center justify-center space-y-2" onclick="event.stopPropagation()">
             <div id="zoomCounterText" class="text-xs font-mono text-cyberCyan font-bold">Gambar 1 dari 1</div>
             <div id="zoomDotsContainer" class="flex items-center gap-1.5"></div>
@@ -612,10 +600,8 @@
         </div>
     </div>
 
-    <!-- MODAL LIGHTBOX SLIDER MEDIA RATING (2-WAY SLIDE) -->
+    <!-- MODAL LIGHTBOX SLIDER MEDIA RATING -->
     <div id="mediaLightboxModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 hidden flex flex-col justify-between p-3 sm:p-6 select-none" onclick="closeMediaLightbox()">
-        
-        <!-- Header Lightbox Info User -->
         <div class="flex items-center justify-between text-white z-20" onclick="event.stopPropagation()">
             <div class="flex items-center gap-3">
                 <img id="lightboxUserAvatar" src="" class="w-9 h-9 rounded-full object-cover border border-cyberCyan">
@@ -629,10 +615,7 @@
             </button>
         </div>
 
-        <!-- Container Tengah Viewer Media Fullscreen -->
         <div class="relative flex-1 flex items-center justify-center overflow-hidden my-2" id="lightboxSwipeArea" onclick="event.stopPropagation()">
-            
-            <!-- Tombol Navigasi Slide Media (Kiri/Kanan) -->
             <button onclick="navigateMediaHorizontal(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 border border-cyberBorder text-white hover:text-cyberCyan flex items-center justify-center transition hover:scale-110">
                 <i class="fa-solid fa-chevron-left text-base"></i>
             </button>
@@ -640,23 +623,19 @@
                 <i class="fa-solid fa-chevron-right text-base"></i>
             </button>
 
-            <!-- Media Element (Image / Video) -->
             <div class="max-w-4xl max-h-[75vh] w-full flex items-center justify-center p-2">
                 <img id="lightboxImage" src="" class="hidden max-w-full max-h-[75vh] rounded-xl object-contain border border-cyberCyan/40 shadow-glowCyan transition-all duration-200">
                 <video id="lightboxVideo" controls autoplay loop class="hidden max-w-full max-h-[75vh] rounded-xl object-contain border border-cyberCyan/40 shadow-glowCyan transition-all duration-200"></video>
             </div>
 
-            <!-- Tombol Navigasi Slide User (Atas/Bawah) -->
             <button onclick="navigateUserVertical(-1)" class="absolute top-2 left-1/2 -translate-x-1/2 z-30 px-3 py-1 rounded-full bg-black/60 border border-cyberBorder text-xs text-slate-300 hover:text-cyberCyan flex items-center gap-1 transition">
                 <i class="fa-solid fa-chevron-up"></i> Ulasan SBLM
             </button>
             <button onclick="navigateUserVertical(1)" class="absolute bottom-2 left-1/2 -translate-x-1/2 z-30 px-3 py-1 rounded-full bg-black/60 border border-cyberBorder text-xs text-slate-300 hover:text-cyberCyan flex items-center gap-1 transition">
                 Ulasan SELANJUTNYA <i class="fa-solid fa-chevron-down"></i>
             </button>
-
         </div>
 
-        <!-- Footer Lightbox Komentar & Indikator Slide -->
         <div class="bg-cyberDark/90 border border-cyberBorder/60 p-3 rounded-xl max-w-2xl mx-auto w-full z-20 space-y-1.5" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between text-[11px] font-mono text-cyberCyan">
                 <span id="lightboxMediaCounter">Media 1 dari 1</span>
@@ -667,10 +646,9 @@
                 <i class="fa-solid fa-arrows-up-down-left-right text-cyberCyan"></i> Geser Kiri/Kanan: ganti media | Geser Atas/Bawah: ganti ulasan
             </p>
         </div>
-
     </div>
 
-    <!-- MODAL POPUP CHECKOUT -->
+    <!-- MODAL POPUP CHECKOUT METODE PEMBAYARAN -->
     <div id="checkoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4 transition-opacity duration-300 overflow-y-auto">
         <div class="bg-cyberCard w-full max-w-lg rounded-2xl shadow-glowCyan border border-cyberCyan/40 transform transition-all scale-95 duration-200 overflow-hidden my-auto max-h-[95vh] flex flex-col" id="modalContent">
 
@@ -684,7 +662,7 @@
             </div>
 
             <div class="overflow-y-auto p-4 sm:p-5 flex-1">
-                <!-- STEP 1: FORM UTAMA -->
+                <!-- STEP 1: FORM UTAMA PEMILIHAN 3 METODE PEMBAYARAN -->
                 <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
                     <div class="flex items-center justify-between bg-cyberDark border border-cyberBorder px-3 py-2 rounded-lg">
                         <span class="text-[11px] font-semibold text-slate-400">ID TRX:</span>
@@ -760,7 +738,9 @@
 
                         <input type="hidden" id="paymentMethodSelect" value="auto">
 
+                        <!-- 3 PILIHAN METODE PEMBAYARAN -->
                         <div class="space-y-2.5" id="customPaymentOptions">
+                            <!-- 1. AUTOMATIC QRIS -->
                             <div onclick="selectCyberPayment('auto')" id="opt-auto" class="cyber-option-card active p-3 rounded-xl cursor-pointer flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-lg bg-cyberCyan/10 border border-cyberCyan/30 flex items-center justify-center text-cyberCyan">
@@ -776,6 +756,23 @@
                                 </div>
                             </div>
 
+                            <!-- 2. SALDO DEPOSIT USER -->
+                            <div onclick="selectCyberPayment('saldo')" id="opt-saldo" class="cyber-option-card p-3 rounded-xl cursor-pointer flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                                        <i class="fa-solid fa-wallet text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-100 font-cyber">Saldo Akun Anda</p>
+                                        <p class="text-[10px] text-amber-400 font-bold" id="userBalanceOptionLabel">Saldo Tersedia: Rp 0</p>
+                                    </div>
+                                </div>
+                                <div class="cyber-radio-dot">
+                                    <div class="cyber-radio-inner"></div>
+                                </div>
+                            </div>
+
+                            <!-- 3. MANUAL WHATSAPP -->
                             <div onclick="selectCyberPayment('manual')" id="opt-manual" class="cyber-option-card p-3 rounded-xl cursor-pointer flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
@@ -817,8 +814,13 @@
                     </div>
 
                     <div class="pt-3 border-t border-cyberBorder">
+                        <!-- TAMPIL SESUAI METODE PILIHAN -->
                         <button type="button" id="btnPayAuto" onclick="processAutoPayment()" class="w-full bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-extrabold py-3 rounded-xl text-xs shadow-glowCyan transition-all flex items-center justify-center gap-2 tracking-wider uppercase">
                             <i class="fa-solid fa-bolt"></i> Bayar Otomatis Sekarang
+                        </button>
+
+                        <button type="button" id="btnPaySaldo" onclick="processSaldoPayment()" class="w-full hidden bg-amber-500 hover:bg-amber-400 text-cyberDark font-cyber font-extrabold py-3 rounded-xl text-xs shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all flex items-center justify-center gap-2 tracking-wider uppercase">
+                            <i class="fa-solid fa-wallet"></i> Bayar Menggunakan Saldo
                         </button>
 
                         <button type="submit" id="btnPayManual" class="w-full hidden bg-emerald-500 hover:bg-emerald-400 text-cyberDark font-cyber font-extrabold py-3 rounded-xl text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all flex items-center justify-center gap-2 tracking-wider uppercase">
@@ -869,7 +871,7 @@
                     </div>
                     <div>
                         <h4 class="text-base font-bold text-white font-cyber">Pembayaran Berhasil!</h4>
-                        <p class="text-xs text-slate-400 mt-1">Terima kasih, pembayaran Anda telah terverifikasi secara otomatis oleh sistem.</p>
+                        <p class="text-xs text-slate-400 mt-1">Terima kasih, transaksi Anda telah dikonfirmasi dan diproses secara otomatis.</p>
                     </div>
 
                     <div class="w-full bg-cyberDark border border-cyberCyan/50 p-4 rounded-xl shadow-glowCyanSm space-y-2">
@@ -936,10 +938,8 @@
         let REMOVED_MEDIA_URLS = []; 
         let KEEP_EXISTING_MEDIA = true;
 
-        // Cache ulasan internal untuk loading cepat tanpa delay
         const REVIEWS_CACHE = {};
 
-        // CAROUSEL & LIGHTBOX ZOOM STATE
         let cardCarouselIndices = {};
         let currentModalImages = [];
         let currentModalImageIndex = 0;
@@ -963,6 +963,11 @@
                         CURRENT_LOGGED_USER = data.user;
                         if (authBtn) authBtn.href = '/profile';
                         if (authLabel) authLabel.innerText = 'Profil';
+
+                        const balLabel = document.getElementById('userBalanceOptionLabel');
+                        if (balLabel) {
+                            balLabel.innerText = `Saldo Tersedia: ${formatRupiah(data.user.saldo || 0)}`;
+                        }
                     } else {
                         if (authBtn) authBtn.href = '/login';
                         if (authLabel) authLabel.innerText = 'Login';
@@ -1097,7 +1102,6 @@
             setRating(0);
         }
 
-        // ==================== BUKA MODAL DETAIL & CAROUSEL PRODUK ====================
         function openProductDetailModal(productId) {
             const product = DATA_PRODUK.find(p => (p.Id || p._id) === productId);
             if (!product) return;
@@ -1175,7 +1179,6 @@
             document.getElementById('productDetailModal').classList.add('hidden');
         }
 
-        // ==================== LIGHTBOX ZOOM GAMBAR PRODUK ====================
         function openProductZoomLightbox(prodIndex, initialImgIndex = 0) {
             const produk = DATA_PRODUK[prodIndex];
             if (!produk) return;
@@ -1241,7 +1244,6 @@
             }, { passive: true });
         }
 
-        // ==================== LIGHTBOX SLIDER RATING MEDIA ====================
         function openMediaLightboxSlider(reviewIndex, mediaIndex) {
             activeUserReviewIndex = reviewIndex;
             activeMediaItemIndex = mediaIndex;
@@ -1579,6 +1581,7 @@
             }
         }
 
+        // SELEKSI 3 METODE PEMBAYARAN: AUTO, SALDO, DAN MANUAL
         function selectCyberPayment(method) {
             document.getElementById('paymentMethodSelect').value = method;
 
@@ -1588,17 +1591,26 @@
 
             const manualFields = document.getElementById('manualFieldsGroup');
             const btnAuto = document.getElementById('btnPayAuto');
+            const btnSaldo = document.getElementById('btnPaySaldo');
             const btnManual = document.getElementById('btnPayManual');
             const usernameInput = document.getElementById('usernameInput');
 
             if (method === 'manual') {
                 manualFields.classList.remove('hidden');
                 btnAuto.classList.add('hidden');
+                btnSaldo.classList.add('hidden');
                 btnManual.classList.remove('hidden');
                 usernameInput.setAttribute('required', 'true');
+            } else if (method === 'saldo') {
+                manualFields.classList.add('hidden');
+                btnAuto.classList.add('hidden');
+                btnSaldo.classList.remove('hidden');
+                btnManual.classList.add('hidden');
+                usernameInput.removeAttribute('required');
             } else {
                 manualFields.classList.add('hidden');
                 btnAuto.classList.remove('hidden');
+                btnSaldo.classList.add('hidden');
                 btnManual.classList.add('hidden');
                 usernameInput.removeAttribute('required');
                 usernameInput.value = '';
@@ -1758,7 +1770,6 @@
             renderProduk();
         }
 
-        // FUNGSI RENDER PRODUK DIREVISI: SANGAT CEPAT TANPA AFK DELAY / LOADING TINGGI
         function renderProduk() {
             const grid = document.getElementById('productGrid');
             const emptyState = document.getElementById('emptyState');
@@ -2153,6 +2164,103 @@
             document.getElementById('checkoutModal').classList.add('hidden');
         }
 
+        // FUNGSI PEMBAYARAN MENGGUNAKAN SALDO DEPOSIT (DENGAN SWEETALERT SALDO TIDAK TERSEDIA)
+        async function processSaldoPayment() {
+            if (!CURRENT_LOGGED_USER) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'BELUM LOGIN',
+                    text: 'Silakan login terlebih dahulu untuk membayar menggunakan saldo.',
+                    customClass: { popup: 'cyber-swal' }
+                });
+                return;
+            }
+
+            const calc = calculateFinalTotal();
+            const userSaldo = CURRENT_LOGGED_USER.saldo || 0;
+
+            if (userSaldo < calc.total || userSaldo === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'SALDO TIDAK TERSEDIA',
+                    text: 'Saldo tidak tersedia silahkan deposit',
+                    confirmButtonText: 'Deposit Sekarang',
+                    showCancelButton: true,
+                    cancelButtonText: 'Batal',
+                    customClass: { popup: 'cyber-swal' }
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        window.location.href = '/profile';
+                    }
+                });
+                return;
+            }
+
+            const confirmRes = await Swal.fire({
+                title: 'KONFIRMASI PEMBAYARAN',
+                text: `Bayar ${formatRupiah(calc.total)} dengan saldo akun Anda?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Bayar',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'cyber-swal' }
+            });
+
+            if (!confirmRes.isConfirmed) return;
+
+            Swal.fire({
+                title: 'MEMPROSES...',
+                text: 'Memotong saldo dan mengonfirmasi pesanan...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); },
+                customClass: { popup: 'cyber-swal' }
+            });
+
+            try {
+                const res = await fetch('/api/store/pay-with-balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productId: SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id,
+                        qty: CURRENT_QTY
+                    })
+                });
+
+                const result = await res.json();
+                Swal.close();
+
+                if (result.status && result.data) {
+                    recordPurchasedProduct(SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id);
+                    await fetchCurrentUserStatus();
+                    fetchProduk();
+                    onPaymentSuccess(result.data.productLink || SELECTED_PRODUCT.link || "#");
+                } else {
+                    if (result.insufficientBalance) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'SALDO TIDAK TERSEDIA',
+                            text: 'Saldo tidak tersedia silahkan deposit',
+                            confirmButtonText: 'Deposit Sekarang',
+                            showCancelButton: true,
+                            cancelButtonText: 'Batal',
+                            customClass: { popup: 'cyber-swal' }
+                        }).then((r) => {
+                            if (r.isConfirmed) window.location.href = '/profile';
+                        });
+                    } else {
+                        throw new Error(result.message || "Gagal memproses pembayaran saldo.");
+                    }
+                }
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'PEMBAYARAN GAGAL',
+                    text: err.message,
+                    customClass: { popup: 'cyber-swal' }
+                });
+            }
+        }
+
         async function processAutoPayment() {
             const btnAuto = document.getElementById('btnPayAuto');
             btnAuto.disabled = true;
@@ -2379,7 +2487,7 @@
             Swal.fire({
                 icon: 'success',
                 title: 'PEMBAYARAN DITERIMA!',
-                text: 'Dana telah terverifikasi oleh gateway. Silakan akses tautan produk Anda.',
+                text: 'Transaksi telah terverifikasi. Silakan akses tautan produk Anda.',
                 timer: 3500,
                 showConfirmButton: false,
                 customClass: {

@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         tailwind.config = {
@@ -46,6 +47,12 @@
             color: #e2e8f0 !important;
             box-shadow: 0 0 20px rgba(0, 243, 255, 0.25) !important;
             font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
+        #depQrcodeContainer canvas, #depQrcodeContainer img {
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto !important;
+            display: block;
         }
 
         /* BOTTOM NAVIGATION STYLE */
@@ -136,10 +143,71 @@
             </div>
         </div>
 
+        <!-- WIDGET SALDO & DEPOSIT -->
+        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl space-y-4 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-widest block">Saldo Akun Anda</span>
+                    <h3 id="profileSaldo" class="text-2xl sm:text-3xl font-black font-cyber text-cyberCyan drop-shadow-[0_0_10px_rgba(0,243,255,0.6)] mt-0.5">Rp 0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-cyberCyan/10 border border-cyberCyan/30 flex items-center justify-center text-cyberCyan text-xl shadow-glowCyanSm">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+            </div>
+
+            <hr class="border-cyberBorder/60">
+
+            <div class="space-y-3">
+                <label class="block text-xs font-bold font-cyber text-slate-300 uppercase tracking-wider">
+                    <i class="fa-solid fa-circle-plus text-cyberCyan"></i> Deposit Saldo via Paywuz
+                </label>
+                
+                <div class="flex items-center gap-2">
+                    <div class="relative flex-1">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-xs font-bold text-slate-400">Rp</span>
+                        <input type="number" id="depositAmountInput" min="1000" placeholder="Minimal 1000" 
+                               class="w-full pl-9 pr-3 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-bold font-cyber transition">
+                    </div>
+                    <button onclick="processDepositPaywuz()" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-extrabold px-5 py-2.5 rounded-xl text-xs transition shadow-glowCyan flex items-center gap-1.5 uppercase tracking-wider">
+                        <i class="fa-solid fa-bolt"></i> Top Up
+                    </button>
+                </div>
+                <p class="text-[10px] text-slate-500 font-mono">* Deposit minimal Rp 1.000. Saldo tersimpan permanen & dapat digunakan untuk membeli produk.</p>
+            </div>
+        </div>
+
         <a href="/auth/logout" class="block w-full bg-red-950/40 hover:bg-red-900/60 border border-red-500/50 text-red-400 font-cyber font-bold py-3 rounded-xl text-xs text-center transition tracking-wider uppercase">
             <i class="fa-solid fa-right-from-bracket"></i> Keluar dari Akun
         </a>
 
+    </div>
+
+    <!-- MODAL POPUP QRIS DEPOSIT PAYWUZ -->
+    <div id="depositModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cyberCard w-full max-w-md rounded-2xl border border-cyberCyan/40 p-5 space-y-4 text-center relative shadow-glowCyan">
+            <button onclick="closeDepositModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-sm font-bold font-cyber text-cyberCyan uppercase">Scan QRIS Top Up Saldo</h3>
+            
+            <div class="bg-cyberDark p-3 rounded-xl border border-cyberBorder">
+                <p class="text-[10px] text-slate-400 uppercase">Total Deposit</p>
+                <h4 id="depTotalAmountText" class="text-xl font-black font-cyber text-cyberCyan">Rp 0</h4>
+                <p class="text-[10px] text-slate-500 font-mono mt-0.5">Order ID: <span id="depOrderIdText">-</span></p>
+            </div>
+
+            <div class="bg-white p-3 rounded-xl border-2 border-cyberCyan shadow-glowCyan inline-block">
+                <div id="depQrcodeContainer"></div>
+            </div>
+
+            <p class="text-xs text-slate-300 animate-pulse font-mono">
+                <i class="fa-solid fa-spinner fa-spin text-cyberCyan"></i> Menunggu Pembayaran...
+            </p>
+
+            <button onclick="closeDepositModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2 rounded-xl border border-cyberBorder">
+                Tutup / Selesai
+            </button>
+        </div>
     </div>
 
     <!-- BOTTOM NAVIGATION BAR (DASHBOARD, TOKO, RIWAYAT, LOGIN/PROFILE) -->
@@ -163,6 +231,17 @@
     </nav>
 
     <script>
+        let depPollInterval = null;
+        let currentDepOrderId = '';
+
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(angka);
+        }
+
         async function loadUserProfile() {
             try {
                 const res = await fetch('/api/user-status');
@@ -173,6 +252,8 @@
                 if (data.loggedIn && data.user) {
                     document.getElementById('profileUsername').innerText = data.user.username;
                     document.getElementById('profileEmail').innerText = data.user.email || 'Email terdaftar';
+                    document.getElementById('profileSaldo').innerText = formatRupiah(data.user.saldo || 0);
+
                     if (data.user.avatar) document.getElementById('profileAvatar').src = data.user.avatar;
                     if (authBtn) authBtn.href = '/profile';
                     if (authLabel) authLabel.innerText = 'Profil';
@@ -180,6 +261,93 @@
                     window.location.href = '/login';
                 }
             } catch(e) {}
+        }
+
+        async function processDepositPaywuz() {
+            const amountInput = document.getElementById('depositAmountInput');
+            const amount = parseInt(amountInput.value);
+
+            if (isNaN(amount) || amount < 1000) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'DEPOSIT MINIMAL',
+                    text: 'Nominal deposit minimal adalah Rp 1.000',
+                    customClass: { popup: 'cyber-swal' }
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'MEMPROSES DEPOSIT...',
+                text: 'Membuat QRIS Paywuz',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); },
+                customClass: { popup: 'cyber-swal' }
+            });
+
+            try {
+                const res = await fetch('/api/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: amount })
+                });
+
+                const result = await res.json();
+                Swal.close();
+
+                if (result.status && result.data) {
+                    currentDepOrderId = result.data.orderId;
+                    document.getElementById('depTotalAmountText').innerText = formatRupiah(result.data.amount);
+                    document.getElementById('depOrderIdText').innerText = currentDepOrderId;
+
+                    const qContainer = document.getElementById('depQrcodeContainer');
+                    qContainer.innerHTML = '';
+                    new QRCode(qContainer, {
+                        text: result.data.paymentNumber,
+                        width: 260,
+                        height: 260
+                    });
+
+                    document.getElementById('depositModal').classList.remove('hidden');
+                    startDepositPolling();
+                } else {
+                    throw new Error(result.message || 'Gagal memproses deposit');
+                }
+            } catch(err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'GAGAL',
+                    text: err.message,
+                    customClass: { popup: 'cyber-swal' }
+                });
+            }
+        }
+
+        function startDepositPolling() {
+            if (depPollInterval) clearInterval(depPollInterval);
+            depPollInterval = setInterval(async () => {
+                if (!currentDepOrderId) return;
+                try {
+                    const res = await fetch(`/transactions/${currentDepOrderId}`);
+                    const result = await res.json();
+                    if (result.data && ["settlement", "success", "paid", "settled"].includes((result.data.status || "").toLowerCase())) {
+                        clearInterval(depPollInterval);
+                        closeDepositModal();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'DEPOSIT BERHASIL!',
+                            text: 'Saldo Anda telah berhasil ditambahkan.',
+                            customClass: { popup: 'cyber-swal' }
+                        });
+                        loadUserProfile();
+                    }
+                } catch(e) {}
+            }, 3000);
+        }
+
+        function closeDepositModal() {
+            if (depPollInterval) clearInterval(depPollInterval);
+            document.getElementById('depositModal').classList.add('hidden');
         }
 
         async function uploadAvatar(input) {
