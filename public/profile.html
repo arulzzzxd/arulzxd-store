@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Profil Saya - ArulzXD Store</title>
+    <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        cyber: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        cyberCyan: '#00f3ff',
+                        cyberDark: '#050b14',
+                        cyberCard: '#0a1628',
+                        cyberBorder: '#162a45'
+                    },
+                    boxShadow: {
+                        glowCyan: '0 0 15px rgba(0, 243, 255, 0.35)',
+                        glowCyanSm: '0 0 8px rgba(0, 243, 255, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050b14; color: #e2e8f0; overflow-x: hidden; }
+        .bg-cyber-grid {
+            background-image: linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .swal2-popup.cyber-swal {
+            background: #0a1628 !important;
+            border: 1px solid #162a45 !important;
+            border-radius: 16px !important;
+            color: #e2e8f0 !important;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.25) !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
+
+        /* BOTTOM NAVIGATION STYLE */
+        .bottom-nav-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 460px;
+            background: rgba(10, 22, 40, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 28px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 10px;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding: 2px 12px;
+        }
+        .nav-item i {
+            font-size: 20px;
+            transition: transform 0.2s ease;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: #00f3ff;
+        }
+        .nav-item.active i {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.8));
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 6px;
+            height: 6px;
+            background-color: #00f3ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00f3ff;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen pb-32">
+
+    <!-- TOP NAVBAR -->
+    <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
+        <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)]">
+                Arulz<span class="text-white">Store</span>
+            </a>
+            <a href="/auth/logout" class="text-xs bg-red-950/60 border border-red-800/50 text-red-400 hover:bg-red-900/80 font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-right-from-bracket"></i> Keluar
+            </a>
+        </div>
+    </nav>
+
+    <div class="max-w-3xl mx-auto px-4 py-6 space-y-6">
+
+        <!-- PROFILE CARD -->
+        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl text-center space-y-4">
+            <div class="relative w-24 h-24 mx-auto">
+                <img id="profileAvatar" src="https://arulz-xd.my.id/files/X1F0Cn.png" class="w-24 h-24 rounded-full object-cover border-2 border-cyberCyan shadow-glowCyan">
+                <label for="avatarInput" title="Ganti Avatar" class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-cyberCyan text-cyberDark flex items-center justify-center cursor-pointer shadow hover:scale-110 transition">
+                    <i class="fa-solid fa-camera text-xs"></i>
+                </label>
+                <input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="uploadAvatar(this)">
+            </div>
+
+            <div>
+                <h2 id="profileUsername" class="text-xl font-bold font-cyber text-white">Loading...</h2>
+                <p id="profileEmail" class="text-xs text-slate-400 font-mono mt-0.5">-</p>
+            </div>
+        </div>
+
+        <a href="/auth/logout" class="block w-full bg-red-950/40 hover:bg-red-900/60 border border-red-500/50 text-red-400 font-cyber font-bold py-3 rounded-xl text-xs text-center transition tracking-wider uppercase">
+            <i class="fa-solid fa-right-from-bracket"></i> Keluar dari Akun
+        </a>
+
+    </div>
+
+    <!-- BOTTOM NAVIGATION BAR (DASHBOARD, TOKO, RIWAYAT, LOGIN/PROFILE) -->
+    <nav class="bottom-nav-container">
+        <a href="/dashboard" class="nav-item" id="nav-dashboard">
+            <i class="fa-solid fa-border-all"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/store" class="nav-item" id="nav-toko">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span>Toko</span>
+        </a>
+        <a href="/riwayat" class="nav-item" id="nav-riwayat">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>Riwayat</span>
+        </a>
+        <a href="/profile" class="nav-item active" id="nav-auth">
+            <i class="fa-regular fa-user"></i>
+            <span id="nav-auth-label">Profil</span>
+        </a>
+    </nav>
+
+    <script>
+        async function loadUserProfile() {
+            try {
+                const res = await fetch('/api/user-status');
+                const data = await res.json();
+                const authBtn = document.getElementById('nav-auth');
+                const authLabel = document.getElementById('nav-auth-label');
+
+                if (data.loggedIn && data.user) {
+                    document.getElementById('profileUsername').innerText = data.user.username;
+                    document.getElementById('profileEmail').innerText = data.user.email || 'Email terdaftar';
+                    if (data.user.avatar) document.getElementById('profileAvatar').src = data.user.avatar;
+                    if (authBtn) authBtn.href = '/profile';
+                    if (authLabel) authLabel.innerText = 'Profil';
+                } else {
+                    window.location.href = '/login';
+                }
+            } catch(e) {}
+        }
+
+        async function uploadAvatar(input) {
+            if (!input.files || !input.files[0]) return;
+            const formData = new FormData();
+            formData.append('avatar', input.files[0]);
+
+            Swal.fire({
+                title: 'MENGUNGGAH...',
+                text: 'Memperbarui gambar profil Anda',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); },
+                customClass: { popup: 'cyber-swal' }
+            });
+
+            try {
+                const res = await fetch('/api/user/update-avatar', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (result.status) {
+                    document.getElementById('profileAvatar').src = result.avatar;
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'BERHASIL',
+                        text: 'Avatar profil berhasil diperbarui!',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        customClass: { popup: 'cyber-swal' }
+                    });
+                } else {
+                    throw new Error(result.message || 'Gagal unggah gambar');
+                }
+            } catch(err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'GAGAL',
+                    text: err.message,
+                    customClass: { popup: 'cyber-swal' }
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUserProfile);
+    </script>
+</body>
+</html>

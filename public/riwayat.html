@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Riwayat Transaksi - ArulzXD Store</title>
+    <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        cyber: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        cyberCyan: '#00f3ff',
+                        cyberDark: '#050b14',
+                        cyberCard: '#0a1628',
+                        cyberBorder: '#162a45'
+                    },
+                    boxShadow: {
+                        glowCyan: '0 0 15px rgba(0, 243, 255, 0.35)',
+                        glowCyanSm: '0 0 8px rgba(0, 243, 255, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050b14; color: #e2e8f0; overflow-x: hidden; }
+        .bg-cyber-grid {
+            background-image: linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* BOTTOM NAVIGATION STYLE */
+        .bottom-nav-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 460px;
+            background: rgba(10, 22, 40, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 28px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 10px;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding: 2px 12px;
+        }
+        .nav-item i {
+            font-size: 20px;
+            transition: transform 0.2s ease;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: #00f3ff;
+        }
+        .nav-item.active i {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.8));
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 6px;
+            height: 6px;
+            background-color: #00f3ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00f3ff;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen pb-32">
+
+    <!-- TOP NAVBAR -->
+    <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)]">
+                Arulz<span class="text-white">Store</span>
+            </a>
+            <button onclick="loadTransactions()" class="text-xs bg-cyberCard border border-cyberBorder hover:border-cyberCyan text-cyberCyan font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate-right"></i> Refresh
+            </button>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-6 space-y-5">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-black text-white font-cyber flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-cyberCyan"></i> Riwayat Transaksi
+                </h1>
+                <p class="text-xs text-slate-400 mt-0.5">Seluruh daftar pesanan produk digital tersimpan otomatis di MongoDB.</p>
+            </div>
+        </div>
+
+        <!-- LIST TRANSAKSI -->
+        <div id="historyList" class="space-y-3">
+            <div class="bg-cyberCard rounded-xl border border-cyberBorder p-4 text-center text-xs text-slate-400 animate-pulse">
+                Memuat riwayat transaksi dari MongoDB...
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION BAR (DASHBOARD, TOKO, RIWAYAT, LOGIN/PROFILE) -->
+    <nav class="bottom-nav-container">
+        <a href="/dashboard" class="nav-item" id="nav-dashboard">
+            <i class="fa-solid fa-border-all"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/store" class="nav-item" id="nav-toko">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span>Toko</span>
+        </a>
+        <a href="/riwayat" class="nav-item active" id="nav-riwayat">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>Riwayat</span>
+        </a>
+        <a href="/login" class="nav-item" id="nav-auth">
+            <i class="fa-regular fa-user"></i>
+            <span id="nav-auth-label">Login</span>
+        </a>
+    </nav>
+
+    <script>
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(angka);
+        }
+
+        async function loadTransactions() {
+            const listEl = document.getElementById('historyList');
+            
+            let localOrders = JSON.parse(localStorage.getItem('my_orders_history') || '[]');
+            const activeOrder = localStorage.getItem('active_order_id');
+            if (activeOrder && !localOrders.includes(activeOrder)) localOrders.push(activeOrder);
+
+            try {
+                const res = await fetch(`/api/user/transactions?orderIds=${localOrders.join(',')}`);
+                const data = await res.json();
+
+                if (!res.ok || !data.status || !data.transactions || data.transactions.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-8 text-center space-y-3">
+                            <i class="fa-solid fa-receipt text-5xl text-slate-600"></i>
+                            <h3 class="text-sm font-bold text-slate-300">Belum Ada Riwayat Transaksi</h3>
+                            <p class="text-xs text-slate-500 max-w-sm mx-auto">Anda belum melakukan transaksi produk. Pesanan yang Anda lakukan akan tersimpan di sini secara otomatis.</p>
+                            <a href="/store" class="inline-block bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-bold px-4 py-2 rounded-xl text-xs transition shadow-glowCyanSm uppercase">
+                                Belanja Sekarang
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                listEl.innerHTML = data.transactions.map(trx => {
+                    const status = (trx.status || 'pending').toLowerCase();
+                    let badgeClass = 'bg-amber-950/60 text-amber-400 border-amber-800/50';
+                    let statusLabel = 'PENDING / MENUNGGU';
+
+                    if (['settlement','success','paid','settled'].includes(status)) {
+                        badgeClass = 'bg-emerald-950/60 text-emerald-400 border-emerald-800/50';
+                        statusLabel = 'BERHASIL / LUNAS';
+                    } else if (['cancelled','failed','expired'].includes(status)) {
+                        badgeClass = 'bg-red-950/60 text-red-400 border-red-800/50';
+                        statusLabel = 'DIBATALKAN / EXPIRED';
+                    }
+
+                    const namaProduk = trx.itemDetails?.nama || 'Produk Store';
+                    const harga = trx.amount || trx.itemDetails?.harga || 0;
+                    const dateStr = trx.createdAt ? new Date(trx.createdAt).toLocaleString('id-ID') : '-';
+
+                    let linkBtn = '';
+                    if (['settlement','success','paid','settled'].includes(status) && (trx.productLink || trx.itemDetails?.link)) {
+                        const link = trx.productLink || trx.itemDetails?.link;
+                        linkBtn = `
+                            <a href="${link}" target="_blank" class="text-xs bg-cyberCyan/10 border border-cyberCyan/40 text-cyberCyan hover:bg-cyberCyan hover:text-cyberDark font-bold px-3 py-1.5 rounded-lg transition inline-flex items-center gap-1 mt-2 shadow-glowCyanSm">
+                                <i class="fa-solid fa-cloud-arrow-down"></i> Akses Produk
+                            </a>
+                        `;
+                    }
+
+                    return `
+                        <div class="bg-cyberCard rounded-xl border border-cyberBorder p-4 shadow-md space-y-2">
+                            <div class="flex items-center justify-between border-b border-cyberBorder/50 pb-2">
+                                <span class="text-[11px] font-mono text-slate-400">Order ID: <strong class="text-slate-200">${trx.orderId}</strong></span>
+                                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${badgeClass} uppercase">${statusLabel}</span>
+                            </div>
+                            <div class="flex items-start justify-between gap-3 pt-1">
+                                <div>
+                                    <h4 class="text-sm font-bold text-white font-cyber">${namaProduk}</h4>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">Waktu: ${dateStr}</p>
+                                    ${linkBtn}
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs text-slate-400 block">Total Tagihan:</span>
+                                    <span class="text-sm font-bold font-cyber text-cyberCyan">${formatRupiah(harga)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch(err) {
+                listEl.innerHTML = `<div class="text-center text-xs text-red-400 py-4">Gagal memuat data transaksi dari MongoDB.</div>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTransactions();
+            fetch('/api/user-status')
+                .then(res => res.json())
+                .then(data => {
+                    const authBtn = document.getElementById('nav-auth');
+                    const authLabel = document.getElementById('nav-auth-label');
+                    if (data.loggedIn && data.user) {
+                        if (authBtn) authBtn.href = '/profile';
+                        if (authLabel) authLabel.innerText = 'Profil';
+                    } else {
+                        if (authBtn) authBtn.href = '/login';
+                        if (authLabel) authLabel.innerText = 'Login';
+                    }
+                })
+                .catch(err => console.error(err));
+        });
+    </script>
+</body>
+</html>

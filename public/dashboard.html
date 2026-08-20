@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard - ArulzXD Store</title>
+    <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        cyber: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        cyberCyan: '#00f3ff',
+                        cyberDark: '#050b14',
+                        cyberCard: '#0a1628',
+                        cyberBorder: '#162a45'
+                    },
+                    boxShadow: {
+                        glowCyan: '0 0 15px rgba(0, 243, 255, 0.35)',
+                        glowCyanSm: '0 0 8px rgba(0, 243, 255, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050b14; color: #e2e8f0; overflow-x: hidden; }
+        .bg-cyber-grid {
+            background-image: linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* BOTTOM NAVIGATION STYLE */
+        .bottom-nav-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 460px;
+            background: rgba(10, 22, 40, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 28px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 10px;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding: 2px 12px;
+        }
+        .nav-item i {
+            font-size: 20px;
+            transition: transform 0.2s ease;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: #00f3ff;
+        }
+        .nav-item.active i {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.8));
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 6px;
+            height: 6px;
+            background-color: #00f3ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00f3ff;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen pb-32">
+
+    <!-- TOP NAVBAR -->
+    <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)]">
+                Arulz<span class="text-white">Store</span>
+            </a>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-mono font-bold text-cyberCyan bg-cyberCyan/10 px-3 py-1 rounded-full border border-cyberCyan/30">
+                    <i class="fa-solid fa-server text-[10px] animate-pulse"></i> SERVER ONLINE
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+
+        <!-- HEADER BANNER -->
+        <div class="p-6 sm:p-8 bg-cyberCard rounded-2xl border border-cyberBorder shadow-xl relative overflow-hidden">
+            <div class="absolute -top-24 -left-24 w-48 h-48 bg-cyberCyan/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 bg-cyberCyan/10 border border-cyberCyan/30 text-cyberCyan text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-3 font-cyber">
+                        <i class="fa-solid fa-gauge-high"></i> Control Panel
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl font-black text-white font-cyber tracking-tight">
+                        Selamat Datang, <span id="dashUsername" class="text-cyberCyan">Pengguna</span>
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl">
+                        Pantau aktivitas belanja, riwayat transaksi dari MongoDB, dan layanan marketplace digital secara terpusat.
+                    </p>
+                </div>
+                <a href="/store" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-black px-5 py-2.5 rounded-xl text-xs shadow-glowCyan transition-all uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-store"></i> Belanja di Toko
+                </a>
+            </div>
+        </div>
+
+        <!-- STATS GRID -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-semibold">Total Pesanan</span>
+                    <i class="fa-solid fa-cart-shopping text-cyberCyan"></i>
+                </div>
+                <h3 id="statTotalTrx" class="text-xl font-bold font-cyber text-white">0</h3>
+            </div>
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-semibold">Transaksi Lunas</span>
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                </div>
+                <h3 id="statSuccessTrx" class="text-xl font-bold font-cyber text-emerald-400">0</h3>
+            </div>
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-semibold">Status Gateway</span>
+                    <i class="fa-solid fa-bolt text-cyberCyan"></i>
+                </div>
+                <h3 class="text-xs font-bold font-cyber text-cyberCyan">QRIS ACTIVE</h3>
+            </div>
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-xs font-semibold">Database</span>
+                    <i class="fa-solid fa-database text-amber-400"></i>
+                </div>
+                <h3 class="text-xs font-bold font-cyber text-amber-400 uppercase">MONGODB OK</h3>
+            </div>
+        </div>
+
+        <!-- QUICK ACCESS MENU -->
+        <div class="bg-cyberCard p-5 rounded-2xl border border-cyberBorder shadow-md space-y-4">
+            <h3 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-bolt text-cyberCyan"></i> Akses Cepat Menu
+            </h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <a href="/store" class="p-3.5 rounded-xl bg-cyberDark border border-cyberBorder hover:border-cyberCyan transition group flex flex-col items-center text-center">
+                    <i class="fa-solid fa-shop text-2xl text-cyberCyan mb-2 group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-bold text-slate-200">Store Marketplace</span>
+                </a>
+                <a href="/riwayat" class="p-3.5 rounded-xl bg-cyberDark border border-cyberBorder hover:border-cyberCyan transition group flex flex-col items-center text-center">
+                    <i class="fa-solid fa-clock-rotate-left text-2xl text-orange-400 mb-2 group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-bold text-slate-200">Riwayat Transaksi</span>
+                </a>
+                <a href="/profile" class="p-3.5 rounded-xl bg-cyberDark border border-cyberBorder hover:border-cyberCyan transition group flex flex-col items-center text-center">
+                    <i class="fa-solid fa-user-gear text-2xl text-emerald-400 mb-2 group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-bold text-slate-200">Pengaturan Profil</span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM NAVIGATION BAR (DASHBOARD, TOKO, RIWAYAT, LOGIN/PROFILE) -->
+    <nav class="bottom-nav-container">
+        <a href="/dashboard" class="nav-item active" id="nav-dashboard">
+            <i class="fa-solid fa-border-all"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/store" class="nav-item" id="nav-toko">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span>Toko</span>
+        </a>
+        <a href="/riwayat" class="nav-item" id="nav-riwayat">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>Riwayat</span>
+        </a>
+        <a href="/login" class="nav-item" id="nav-auth">
+            <i class="fa-regular fa-user"></i>
+            <span id="nav-auth-label">Login</span>
+        </a>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch('/api/user-status');
+                const data = await res.json();
+                const authBtn = document.getElementById('nav-auth');
+                const authLabel = document.getElementById('nav-auth-label');
+
+                if (data.loggedIn && data.user) {
+                    document.getElementById('dashUsername').innerText = data.user.username;
+                    if (authBtn) authBtn.href = '/profile';
+                    if (authLabel) authLabel.innerText = 'Profil';
+                } else {
+                    if (authBtn) authBtn.href = '/login';
+                    if (authLabel) authLabel.innerText = 'Login';
+                }
+            } catch (e) {}
+
+            try {
+                const savedOrder = localStorage.getItem('active_order_id');
+                const orderIds = savedOrder ? [savedOrder] : [];
+                const res = await fetch(`/api/user/transactions?orderIds=${orderIds.join(',')}`);
+                const data = await res.json();
+                if (data.status && data.transactions) {
+                    document.getElementById('statTotalTrx').innerText = data.transactions.length;
+                    const successCount = data.transactions.filter(t => ['settlement','success','paid','settled'].includes(t.status?.toLowerCase())).length;
+                    document.getElementById('statSuccessTrx').innerText = successCount;
+                }
+            } catch(e) {}
+        });
+    </script>
+</body>
+</html>

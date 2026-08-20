@@ -289,9 +289,64 @@
             box-shadow: 0 0 12px var(--neon-cyan);
             transition: width 0.15s ease-out;
         }
+
+        /* BOTTOM NAVIGATION STYLE */
+        .bottom-nav-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 460px;
+            background: rgba(10, 22, 40, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 28px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 10px;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding: 2px 12px;
+        }
+        .nav-item i {
+            font-size: 20px;
+            transition: transform 0.2s ease;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: #00f3ff;
+        }
+        .nav-item.active i {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.8));
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 6px;
+            height: 6px;
+            background-color: #00f3ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00f3ff;
+        }
     </style>
 </head>
-<body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen">
+<body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen pb-32">
 
     <div id="cyber-loader-overlay">
         <div class="scanner-beam"></div>
@@ -343,7 +398,6 @@
             </div>
 
             <div class="flex items-center gap-4 text-slate-300">
-                <a href="/docs" class="text-sm font-semibold hover:text-cyberCyan transition hidden sm:block">Docs API</a>
                 <button onclick="window.history.back()" title="Kembali" class="text-lg hover:text-cyberCyan transition relative flex items-center justify-center w-8 h-8 rounded-lg bg-cyberCard border border-cyberBorder">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
@@ -838,12 +892,32 @@
         </div>
     </div>
 
+    <!-- BOTTOM NAVIGATION BAR (DASHBOARD, TOKO, RIWAYAT, LOGIN/PROFILE) -->
+    <nav class="bottom-nav-container">
+        <a href="/dashboard" class="nav-item" id="nav-dashboard">
+            <i class="fa-solid fa-border-all"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/store" class="nav-item active" id="nav-toko">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span>Toko</span>
+        </a>
+        <a href="/riwayat" class="nav-item" id="nav-riwayat">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>Riwayat</span>
+        </a>
+        <a href="/login" class="nav-item" id="nav-auth">
+            <i class="fa-regular fa-user"></i>
+            <span id="nav-auth-label">Login</span>
+        </a>
+    </nav>
+
     <!-- FOOTER -->
     <footer class="bg-cyberCard border-t border-cyberBorder mt-16 py-6 text-center text-xs text-slate-500 font-medium">
         <p>© 2026 Arulz-XD Store. All rights reserved.</p>
     </footer>
 
-        <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
         document.addEventListener('dblclick', function (e) { e.preventDefault(); }, { passive: false });
@@ -886,8 +960,16 @@
                 const res = await fetch('/api/user-status');
                 if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
                     const data = await res.json();
+                    const authBtn = document.getElementById('nav-auth');
+                    const authLabel = document.getElementById('nav-auth-label');
+
                     if (data.loggedIn && data.user) {
                         CURRENT_LOGGED_USER = data.user;
+                        if (authBtn) authBtn.href = '/profile';
+                        if (authLabel) authLabel.innerText = 'Profil';
+                    } else {
+                        if (authBtn) authBtn.href = '/login';
+                        if (authLabel) authLabel.innerText = 'Login';
                     }
                 }
             } catch (e) {
@@ -1292,7 +1374,6 @@
             }
         }
 
-        // FIX HAPUS RATING: PENANGANAN ERROR UNEXPECTED TOKEN '<' BILA BACKEND RESPONSE BUKAN JSON
         async function deleteMyReview(reviewId) {
             const confirm = await Swal.fire({
                 title: 'HAPUS ULASAN?',
@@ -1337,7 +1418,6 @@
             }
         }
 
-        // LOADING ULASAN TANPA DELAY DENGAN OPTIMASI CACHING
         async function loadProductReviews(productId, forceRefresh = false) {
             const container = document.getElementById('reviewsListContainer');
 
@@ -1682,7 +1762,6 @@
             renderProduk();
         }
 
-        // LOADING PRODUK TANPA DELAY (PARALLEL PROMISE FETCHING)
         async function renderProduk() {
             const grid = document.getElementById('productGrid');
             const emptyState = document.getElementById('emptyState');
