@@ -54,7 +54,6 @@
             height: auto !important;
             display: block;
         }
-
         .bottom-nav-container {
             position: fixed;
             bottom: 20px;
@@ -148,7 +147,7 @@
             </div>
         </div>
 
-        <!-- WIDGET SALDO (TERPISAH) -->
+        <!-- WIDGET SALDO TERPISAH -->
         <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl relative overflow-hidden">
             <div class="flex items-center justify-between">
                 <div>
@@ -161,7 +160,7 @@
             </div>
         </div>
 
-        <!-- WIDGET DEPOSIT (TERPISAH) -->
+        <!-- WIDGET DEPOSIT TERPISAH -->
         <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl space-y-4">
             <div class="flex items-center justify-between">
                 <label class="block text-xs font-bold font-cyber text-slate-300 uppercase tracking-wider">
@@ -170,7 +169,7 @@
                 <span class="text-[10px] text-slate-400 font-mono">Minimal Rp 1.000</span>
             </div>
 
-            <!-- PILIHAN NOMINAL PRESET DEPOSIT -->
+            <!-- PRESET NOMINAL DEPOSIT -->
             <div class="grid grid-cols-4 gap-2">
                 <button onclick="setDepositAmount(1000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">1.000</button>
                 <button onclick="setDepositAmount(2000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">2.000</button>
@@ -194,7 +193,7 @@
                 </button>
             </div>
 
-            <!-- PANDUAN DEPOSIT DILENGKAPI DI BAWAH DEPOSIT -->
+            <!-- PANDUAN ISI SALDO -->
             <div class="mt-4 pt-4 border-t border-cyberBorder/60 space-y-2">
                 <h4 class="text-xs font-bold font-cyber text-cyberCyan flex items-center gap-1.5">
                     <i class="fa-solid fa-circle-question"></i> Panduan Deposit Saldo
@@ -202,11 +201,11 @@
                 <div class="text-[11px] text-slate-300 space-y-2 leading-relaxed">
                     <div>
                         <p class="font-bold text-slate-200">Bagaimana cara isi saldo?</p>
-                        <p class="text-slate-400">Pilih atau masukkan nominal minimal Rp1.000, klik tombol QRIS, dan lakukan scan menggunakan aplikasi e-wallet / mobile banking Anda.</p>
+                        <p class="text-slate-400">Pilih atau masukkan nominal minimal Rp1.000, klik tombol Top Up, lalu scan kode QRIS menggunakan e-wallet / mobile banking Anda.</p>
                     </div>
                     <div>
-                        <p class="font-bold text-slate-200">Apakah saldo langsung masuk?</p>
-                        <p class="text-slate-400">Ya, sistem payment gateway mendeteksi pembayaran secara otomatis 100% instan dalam hitungan detik.</p>
+                        <p class="font-bold text-slate-200">Apakah saldo masuk otomatis?</p>
+                        <p class="text-slate-400">Ya, sistem mendeteksi pembayaran secara otomatis 100% instan dalam hitungan detik setelah Anda sukses membayar.</p>
                     </div>
                 </div>
             </div>
@@ -295,14 +294,14 @@
                 const authLabel = document.getElementById('nav-auth-label');
 
                 if (data.loggedIn && data.user) {
-                    document.getElementById('profileUsername').innerText = data.user.username;
+                    document.getElementById('profileUsername').innerText = data.user.username || data.user.name;
                     document.getElementById('profileEmail').innerText = data.user.email || 'Email terdaftar';
                     document.getElementById('profileSaldo').innerText = formatRupiah(data.user.saldo || 0);
                     
                     if (data.user.createdAt) {
                         const joinedDate = new Date(data.user.createdAt).toLocaleDateString('id-ID', {
                             day: 'numeric',
-                            month: 'Long',
+                            month: 'long',
                             year: 'numeric'
                         });
                         document.getElementById('profileJoined').innerText = `Terdaftar sejak: ${joinedDate}`;

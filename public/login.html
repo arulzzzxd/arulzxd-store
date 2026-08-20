@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autentikasi - ArulzXD REST API</title>
+    <title>Autentikasi - ArulzXD STORE</title>
     <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tambahan: SweetAlert2 untuk Alert Estetik -->
@@ -84,7 +84,7 @@
 
         .hidden-form { display: none; }
 
-        /* Styling khusus kustomisasi SweetAlert2 agar tema serasi dengan ArulzXD API */
+        /* Styling khusus kustomisasi SweetAlert2 agar tema serasi dengan ArulzXD STORE */
         .swal2-popup-custom {
             background: rgba(17, 24, 39, 0.95) !important;
             backdrop-filter: blur(16px);
@@ -275,7 +275,7 @@
         </div>
 
         <div class="absolute bottom-6 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
-            BACKEND DEV - ARULZ-XD API v2.0
+            BACKEND DEV - ARULZ-XD STORE v1.0
         </div>
     </div>
 
@@ -288,9 +288,9 @@
         <!-- Logo/Header -->
         <div class="text-center mb-6 relative z-10">
             <h1 class="text-2xl font-extrabold tracking-tight text-white mb-1">
-                Arulz<span class="text-cyan-400 glow-text-cyan">XD</span> API
+                Arulz<span class="text-cyan-400 glow-text-cyan">XD</span> STORE
             </h1>
-            <p id="form-description" class="text-xs text-gray-400">Masuk untuk mengelola token dan akses API Anda.</p>
+            <p id="form-description" class="text-xs text-gray-400">Masuk untuk mengelola akun Anda.</p>
         </div>
 
         <!-- ================= FORM SIGN IN ================= -->
@@ -425,10 +425,10 @@
 
             if (formType === 'signin') {
                 signinForm.classList.remove('hidden-form');
-                description.innerText = "Masuk untuk mengelola token dan akses API Anda.";
+                description.innerText = "Masuk untuk mengelola akses STORE Anda.";
             } else if (formType === 'signup') {
                 signupForm.classList.remove('hidden-form');
-                description.innerText = "Daftarkan akun baru Anda untuk mendapatkan API Key gratis.";
+                description.innerText = "Daftarkan akun baru Anda secara gratis.";
             } else if (formType === 'forgot') {
                 forgotForm.classList.remove('hidden-form');
                 description.innerText = "Masukkan email Anda untuk memproses penyetelan ulang sandi.";
@@ -498,7 +498,7 @@
                 'docs': 'Dokumentasi',
                 'doc': 'Dokumentasi',
                 'status': 'Status Server',
-                'store': 'Store API',
+                'store': 'Store',
                 'changelog': 'Changelog',
                 'uploader': 'Uploader File',
                 'pastecode': 'Pastecode',

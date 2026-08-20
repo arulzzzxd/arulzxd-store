@@ -115,19 +115,19 @@
                 <h1 class="text-2xl font-black text-white font-cyber flex items-center gap-2">
                     <i class="fa-solid fa-clock-rotate-left text-cyberCyan"></i> Riwayat Transaksi
                 </h1>
-                <p class="text-xs text-slate-400 mt-0.5">Seluruh daftar pesanan produk digital tersimpan secara otomatis.</p>
+                <p class="text-xs text-slate-400 mt-0.5">Seluruh daftar transaksi akun Anda tersimpan permanen di database.</p>
             </div>
         </div>
 
         <!-- LIST TRANSAKSI -->
         <div id="historyList" class="space-y-3">
             <div class="bg-cyberCard rounded-xl border border-cyberBorder p-4 text-center text-xs text-slate-400 animate-pulse">
-                Memuat riwayat transaksi...
+                Memuat riwayat transaksi dari server...
             </div>
         </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION BAR (DASHBOARD, TOKO, RIWAYAT, LOGIN/PROFILE) -->
+    <!-- BOTTOM NAVIGATION BAR -->
     <nav class="bottom-nav-container">
         <a href="/dashboard" class="nav-item" id="nav-dashboard">
             <i class="fa-solid fa-border-all"></i>
@@ -172,7 +172,7 @@
                         <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-8 text-center space-y-3">
                             <i class="fa-solid fa-receipt text-5xl text-slate-600"></i>
                             <h3 class="text-sm font-bold text-slate-300">Belum Ada Riwayat Transaksi</h3>
-                            <p class="text-xs text-slate-500 max-w-sm mx-auto">Anda belum melakukan transaksi produk. Pesanan yang Anda lakukan akan tersimpan di sini secara otomatis.</p>
+                            <p class="text-xs text-slate-500 max-w-sm mx-auto">Anda belum melakukan transaksi. Pesanan atau deposit Anda akan tersimpan secara permanen di database akun Anda.</p>
                             <a href="/store" class="inline-block bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-bold px-4 py-2 rounded-xl text-xs transition shadow-glowCyanSm uppercase">
                                 Belanja Sekarang
                             </a>
@@ -194,12 +194,16 @@
                         statusLabel = 'DIBATALKAN / EXPIRED';
                     }
 
-                    const namaProduk = trx.itemDetails?.nama || 'Produk Store';
+                    const typeTag = trx.type === 'DEPOSIT' 
+                        ? `<span class="text-[10px] bg-cyan-950/80 text-cyberCyan border border-cyberCyan/40 font-bold px-2 py-0.5 rounded mr-2">DEPOSIT</span>` 
+                        : `<span class="text-[10px] bg-purple-950/80 text-purple-400 border border-purple-800/50 font-bold px-2 py-0.5 rounded mr-2">PEMBELIAN</span>`;
+
+                    const namaProduk = trx.itemDetails?.nama || (trx.type === 'DEPOSIT' ? 'Deposit Saldo' : 'Produk Store');
                     const harga = trx.amount || trx.itemDetails?.harga || 0;
                     const dateStr = trx.createdAt ? new Date(trx.createdAt).toLocaleString('id-ID') : '-';
 
                     let linkBtn = '';
-                    if (['settlement','success','paid','settled'].includes(status) && (trx.productLink || trx.itemDetails?.link)) {
+                    if (trx.type !== 'DEPOSIT' && ['settlement','success','paid','settled'].includes(status) && (trx.productLink || trx.itemDetails?.link)) {
                         const link = trx.productLink || trx.itemDetails?.link;
                         linkBtn = `
                             <a href="${link}" target="_blank" class="text-xs bg-cyberCyan/10 border border-cyberCyan/40 text-cyberCyan hover:bg-cyberCyan hover:text-cyberDark font-bold px-3 py-1.5 rounded-lg transition inline-flex items-center gap-1 mt-2 shadow-glowCyanSm">
@@ -216,8 +220,8 @@
                             </div>
                             <div class="flex items-start justify-between gap-3 pt-1">
                                 <div>
-                                    <h4 class="text-sm font-bold text-white font-cyber">${namaProduk}</h4>
-                                    <p class="text-[11px] text-slate-400 mt-0.5">Waktu: ${dateStr}</p>
+                                    <h4 class="text-sm font-bold text-white font-cyber flex items-center">${typeTag}${namaProduk}</h4>
+                                    <p class="text-[11px] text-slate-400 mt-1">Waktu: ${dateStr}</p>
                                     ${linkBtn}
                                 </div>
                                 <div class="text-right">
