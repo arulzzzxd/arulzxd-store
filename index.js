@@ -47,7 +47,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'arulzxd-super-secret-jwt-key-999';
 // SCHEMAS & MODELS (V2)
 // ====================================================
 
-// USER SCHEMA V2 (Tanpa Role & Apikey, dengan Fitur Saldo Permanen)
+// USER SCHEMA V2 (Tanpa Role & Apikey, dengan Fitur Saldo & Tanggal Registrasi Permanen)
 const userSchemaV2 = new mongoose.Schema({
     username: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
@@ -127,14 +127,14 @@ const voucherSchemaV2 = new mongoose.Schema({
 
 const VoucherV2 = mongoose.models.VoucherV2 || mongoose.model('VoucherV2', voucherSchemaV2);
 
-// TRANSACTION SCHEMA V2
+// TRANSACTION SCHEMA V2 / SCHEMA RIWAYAT V2 (Tersimpan Permanen Sesuai Email User)
 const transactionSchemaV2 = new mongoose.Schema({
     orderId: { type: String, required: true, unique: true },
     amount: { type: Number, required: true },
     paymentNumber: { type: String, default: null }, 
     paymentMethod: { type: String, default: "QRIS" },
     type: { type: String, enum: ['PURCHASE', 'DEPOSIT'], default: 'PURCHASE' },
-    userEmail: { type: String, default: null },
+    userEmail: { type: String, default: null, index: true },
     status: { type: String, default: "pending" }, 
     itemDetails: {
         nama: String,
@@ -143,7 +143,8 @@ const transactionSchemaV2 = new mongoose.Schema({
         kategori: String,
         gambar: String,
         link: String,
-        buyer: String
+        buyer: String,
+        qty: Number
     },
     productLink: { type: String, default: null },
     createdAt: { type: Date, default: Date.now },
@@ -199,6 +200,58 @@ function getUserIdentifier(req) {
     return req.ip; 
 }
 
+// PERBARUI USERNAME LANGSUNG TERSIMPAN DI MONGODB
+app.post('/api/user/update-username', checkAuthSession, async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ status: false, message: 'Silakan login terlebih dahulu!' });
+        }
+
+        const newUsername = req.body.username;
+        if (!newUsername || !newUsername.trim()) {
+            return res.status(400).json({ status: false, message: 'Username baru tidak boleh kosong!' });
+        }
+
+        const cleanUsername = newUsername.trim();
+        const userId = req.user.id || req.user._id;
+
+        const updatedUser = await UserV2.findByIdAndUpdate(
+            userId,
+            { $set: { username: cleanUsername } },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ status: false, message: 'User tidak ditemukan.' });
+        }
+
+        const userPayload = {
+            id: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            name: updatedUser.username,
+            avatar: updatedUser.avatar,
+            createdAt: updatedUser.createdAt
+        };
+
+        const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '7d' });
+        res.cookie('auth_session', token, {
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            secure: true,
+            sameSite: 'lax'
+        });
+
+        return res.json({
+            status: true,
+            message: 'Username berhasil diperbarui!',
+            username: updatedUser.username
+        });
+    } catch(err) {
+        return res.status(500).json({ status: false, message: 'Gagal memperbarui username.' });
+    }
+});
+
 const uploadavatar = multer({ 
     limits: { fileSize: 4 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
@@ -249,7 +302,8 @@ app.post('/api/user/update-avatar', checkAuthSession, (req, res) => {
                 username: updatedUser.username,
                 email: updatedUser.email,
                 name: updatedUser.username,
-                avatar: updatedUser.avatar
+                avatar: updatedUser.avatar,
+                createdAt: updatedUser.createdAt
             };
 
             const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '7d' });
@@ -466,7 +520,7 @@ async function axiosPaywuzWithRetry(config, maxRetries = 3, delayMs = 1500) {
             const isLastAttempt = i === maxRetries - 1;
 
             if (isRateLimited && !isLastAttempt) {
-                console.warn(`⚠️ Menerima 429 dari PayWuz. Retry ke-${i + 1} dalam ${delayMs}ms...`);
+                console.warn(`⚠️ Menerima 429 dari Gateway. Retry ke-${i + 1} dalam ${delayMs}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delayMs));
                 delayMs *= 1.5; 
             } else {
@@ -619,11 +673,9 @@ async function updateProductStockAndSold(productName, qtyChange = 1, isRollback 
             if (isRollback) {
                 product.stok = (product.stok || 0) + qtyChange;
                 product.terjual = Math.max(0, (product.terjual || 0) - qtyChange);
-                console.log(`🔄 [STOK RESTORED] Produk "${product.nama}": Stok (${product.stok}), Terjual (${product.terjual})`);
             } else {
                 product.stok = Math.max(0, (product.stok || 0) - qtyChange);
                 product.terjual = (product.terjual || 0) + qtyChange;
-                console.log(`📦 [STOK UPDATED] Produk "${product.nama}": Stok (${product.stok}), Terjual (${product.terjual})`);
             }
 
             await product.save();
@@ -681,10 +733,9 @@ function verifyPaywuzSignature(rawBody, receivedSignature, apikey) {
 }
 
 // ====================================================
-// FITUR DEPOSIT PAYWUZ & PEMBAYARAN SALDO
+// FITUR DEPOSIT & PEMBAYARAN SALDO
 // ====================================================
 
-// ENDPOINT KREAT DEPOSIT DEPOSIT SALDO VIA PAYWUZ (MINIMAL 1000)
 app.post('/api/deposit', checkAuthSession, async (req, res) => {
     try {
         if (!req.user) {
@@ -765,7 +816,6 @@ app.post('/api/deposit', checkAuthSession, async (req, res) => {
     }
 });
 
-// ENDPOINT PEMBAYARAN MEMBELI PRODUK DENGAN SALDO DEPOSIT
 app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
     try {
         if (!req.user) {
@@ -810,11 +860,9 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
             });
         }
 
-        // POTONG SALDO USER & SIMPAN PERMANEN DI MONGODB
         user.saldo = currentBalance - totalPrice;
         await user.save();
 
-        // UPDATE STOK DAN PEMBELI PRODUK
         await updateProductStockAndSold(dbProduct.nama, buyQty, false);
         await recordProductBuyer(dbProduct.nama, user.email);
 
@@ -825,7 +873,7 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
             paymentMethod: "SALDO",
             status: "success",
             type: "PURCHASE",
-            userEmail: user.email,
+            userEmail: user.email.toLowerCase().trim(),
             itemDetails: {
                 nama: dbProduct.nama,
                 harga: unitPrice,
@@ -857,7 +905,7 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
     }
 });
 
-app.post('/transactions', async (req, res) => {
+app.post('/transactions', checkAuthSession, async (req, res) => {
     try {
         const { orderId, amount, itemDetails, qty } = req.body;
         const buyQty = Number(qty) || 1;
@@ -919,7 +967,7 @@ app.post('/transactions', async (req, res) => {
         }
 
         const expiredAt = new Date(Date.now() + 15 * 60 * 1000);
-        const buyerIdentifier = getUserIdentifier(req);
+        const uEmail = req.user ? req.user.email.toLowerCase().trim() : null;
 
         const newTransaction = new TransactionV2({
             orderId,
@@ -927,11 +975,12 @@ app.post('/transactions', async (req, res) => {
             paymentNumber: qrisNumber,
             paymentMethod: "QRIS",
             type: "PURCHASE",
+            userEmail: uEmail,
             status: (transactionData.status || "pending").toLowerCase(),
             itemDetails: {
                 ...itemDetails,
                 qty: buyQty,
-                buyer: buyerIdentifier
+                buyer: uEmail || getUserIdentifier(req)
             },
             productLink: pLink,
             expiredAt: expiredAt
@@ -1052,7 +1101,7 @@ app.post('/transactions/:orderId/cancel', async (req, res) => {
                 headers: PAYWUZ_HEADERS
             });
         } catch (err) {
-            console.warn(`Paywuz cancel notice for ${orderId}:`, err.message);
+            console.warn(`Gateway cancel notice for ${orderId}:`, err.message);
         }
 
         if (["paid", "settlement", "success"].includes(prevStatus)) {
@@ -1082,7 +1131,7 @@ app.post('/transactions/:orderId/cancel', async (req, res) => {
     }
 });
 
-// WEBHOOK UPDATE STATUS TRANSAKSI & PENAMBAHAN SALDO OTOMATIS
+// WEBHOOK DISAMARKAN & AUTO TOP-UP SALDO
 app.post('/webhook', async (req, res) => {
     try {
         const signature = req.headers['x-paywuz-signature'];
@@ -1119,19 +1168,13 @@ app.post('/webhook', async (req, res) => {
                 const isCancelEvent = ["cancelled", "failed", "expire"].includes(status);
 
                 if (isPaidEvent && !["paid", "settlement", "success"].includes(prevStatus)) {
-                    console.log(`⚡ [TRANSACTION.PAID] Order ID ${orderId} Lunas!`);
-
-                    // JIKA TRANSAKSI ADALAH DEPOSIT SALDO
                     if (localTrx.type === 'DEPOSIT' && localTrx.userEmail) {
                         const depositAmount = localTrx.itemDetails?.harga || localTrx.amount;
                         await UserV2.findOneAndUpdate(
                             { email: localTrx.userEmail.toLowerCase().trim() },
                             { $inc: { saldo: depositAmount } }
                         );
-                        console.log(`💰 [SALDO ADDED] Saldo user ${localTrx.userEmail} bertambah sebesar Rp ${depositAmount.toLocaleString('id-ID')}`);
-                    } 
-                    // JIKA TRANSAKSI PEMBELIAN PRODUK biasa
-                    else if (localTrx.itemDetails && localTrx.itemDetails.nama) {
+                    } else if (localTrx.itemDetails && localTrx.itemDetails.nama) {
                         const qtyPurchased = localTrx.itemDetails.qty || 1;
                         await updateProductStockAndSold(localTrx.itemDetails.nama, qtyPurchased, false);
 
@@ -1193,20 +1236,18 @@ app.post('/api/store/manual-order', async (req, res) => {
     }
 });
 
-// ====================================================
-// ENDPOINT RIWAYAT TRANSAKSI DARI DATABASE
-// ====================================================
-app.get('/api/user/transactions', async (req, res) => {
+// RIWAYAT TRANSAKSI DARI DATABASE USER
+app.get('/api/user/transactions', checkAuthSession, async (req, res) => {
     try {
         let transactions = [];
         const orderIds = req.query.orderIds ? req.query.orderIds.split(',').filter(Boolean) : [];
 
-        if (req.user) {
-            const uIdent = (req.user.email || req.user.username || "").toLowerCase().trim();
+        if (req.user && req.user.email) {
+            const uIdent = req.user.email.toLowerCase().trim();
             transactions = await TransactionV2.find({
                 $or: [
-                    { "itemDetails.buyer": uIdent },
                     { userEmail: uIdent },
+                    { "itemDetails.buyer": uIdent },
                     { orderId: { $in: orderIds } }
                 ]
             }).sort({ createdAt: -1 }).lean();
@@ -1215,7 +1256,7 @@ app.get('/api/user/transactions', async (req, res) => {
                 orderId: { $in: orderIds }
             }).sort({ createdAt: -1 }).lean();
         } else {
-            transactions = await TransactionV2.find().sort({ createdAt: -1 }).limit(15).lean();
+            transactions = [];
         }
 
         return res.json({ status: true, transactions: transactions });
@@ -1225,6 +1266,7 @@ app.get('/api/user/transactions', async (req, res) => {
     }
 });
 
+// AUTHENTICATION & LOGIN/REGISTER HANDLERS
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -1321,7 +1363,7 @@ function sendSweetAlert(res, icon, title, text, redirectUrl) {
     `);
 }
 
-// --- LOGIN ROUTE (LOCAL AUTH VIA USER V2) ---
+// LOGIN ROUTE
 app.post('/auth/login', (req, res, next) => {
     passport.authenticate('local', async (err, user, info) => { 
         if (err) return next(err);
@@ -1340,7 +1382,8 @@ app.post('/auth/login', (req, res, next) => {
                     username: user.username,
                     email: user.email,
                     name: user.username,
-                    avatar: user.avatar || 'https://arulz-xd.my.id/files/X1F0Cn.png'
+                    avatar: user.avatar || 'https://arulz-xd.my.id/files/X1F0Cn.png',
+                    createdAt: user.createdAt
                 };
 
                 const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '7d' });
@@ -1362,7 +1405,7 @@ app.post('/auth/login', (req, res, next) => {
     })(req, res, next);
 });
 
-// --- REGISTER ROUTE (LOCAL AUTH VIA USER V2) ---
+// REGISTER ROUTE
 app.post('/auth/register', async (req, res) => {
     try {
         const username = req.body.username;
@@ -1392,7 +1435,8 @@ app.post('/auth/register', async (req, res) => {
             email: cleanEmail,
             password: hashedPassword,
             provider: 'local',
-            avatar: defaultAvatar
+            avatar: defaultAvatar,
+            createdAt: new Date()
         });
         await newUser.save();
 
@@ -1401,7 +1445,8 @@ app.post('/auth/register', async (req, res) => {
             username: newUser.username,
             name: newUser.username,
             email: newUser.email,
-            avatar: defaultAvatar
+            avatar: defaultAvatar,
+            createdAt: newUser.createdAt
         };
 
         const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '7d' });
@@ -1590,7 +1635,7 @@ const GOOGLE_CLIENT_ID = `${d}${e}${f}${cl}${id}`;
 const GOOGLE_CLIENT_SECRET = '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';
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "https://arulzxd.biz.id/auth/google/callback";
 
-/* ==================== ENDPOINT AUTH GITHUB ==================== */
+/* OAuth GitHub */
 app.get('/auth/github', (req, res) => {
     const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_CALLBACK_URL}&scope=user:email`;
     res.redirect(url);
@@ -1642,7 +1687,8 @@ app.get('/auth/github/callback', async (req, res) => {
                 email: finalEmail,
                 provider: 'github',
                 providerId: String(userData.id),
-                avatar: userData.avatar_url || 'https://arulz-xd.my.id/files/X1F0Cn.png'
+                avatar: userData.avatar_url || 'https://arulz-xd.my.id/files/X1F0Cn.png',
+                createdAt: new Date()
             });
 
             await dbUser.save();
@@ -1658,7 +1704,8 @@ app.get('/auth/github/callback', async (req, res) => {
             username: dbUser.username,
             email: dbUser.email,
             name: userData.name || dbUser.username,
-            avatar: dbUser.avatar
+            avatar: dbUser.avatar,
+            createdAt: dbUser.createdAt
         };
 
         const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '7d' });
@@ -1677,7 +1724,7 @@ app.get('/auth/github/callback', async (req, res) => {
     }
 });
 
-/* ==================== ENDPOINT AUTH GOOGLE ==================== */
+/* OAuth Google */
 app.get('/auth/google', (req, res) => {
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_CALLBACK_URL}&response_type=code&scope=profile email`;
     res.redirect(url);
@@ -1723,7 +1770,8 @@ app.get('/auth/google/callback', async (req, res) => {
                 email: email,
                 provider: 'google',
                 providerId: String(userData.id),
-                avatar: userData.picture || 'https://arulz-xd.my.id/files/X1F0Cn.png'
+                avatar: userData.picture || 'https://arulz-xd.my.id/files/X1F0Cn.png',
+                createdAt: new Date()
             });
 
             await dbUser.save();
@@ -1739,7 +1787,8 @@ app.get('/auth/google/callback', async (req, res) => {
             username: dbUser.username,
             email: dbUser.email,
             name: userData.name || dbUser.username,
-            avatar: dbUser.avatar
+            avatar: dbUser.avatar,
+            createdAt: dbUser.createdAt
         };
 
         const token = jwt.sign(userPayload, JWT_SECRET, { expiresIn: '7d' });
@@ -1765,18 +1814,11 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// ROUTING NAVIGASI UTAMA STORE
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
-
-app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
-
-app.get('/riwayat', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'riwayat.html'));
-});
+// NAVIGASI UTAMA
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
+app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
+app.get('/riwayat', (req, res) => res.sendFile(path.join(__dirname, 'public', 'riwayat.html')));
+app.get('/store', (req, res) => res.sendFile(path.join(__dirname, 'public', 'store.html')));
 
 app.get('/profile', checkAuthSession, (req, res) => {
     if (!req.user) {
@@ -1793,10 +1835,6 @@ app.get('/database/produk', async (req, res) => {
         console.error("Gagal mengambil data produk dari Database:", err);
         res.status(500).json({ error: "Gagal memuat data produk" });
     }
-});
-
-app.get('/store', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'store.html'));
 });
 
 app.get('/auth/logout', (req, res, next) => {
@@ -1820,7 +1858,8 @@ app.get('/api/user-status', async (req, res) => {
                     username: activeUser.username,
                     email: activeUser.email,
                     avatar: activeUser.avatar,
-                    saldo: activeUser.saldo || 0
+                    saldo: activeUser.saldo || 0,
+                    createdAt: activeUser.createdAt
                 }
             });
         } catch (err) {
