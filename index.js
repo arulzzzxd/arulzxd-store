@@ -43,11 +43,7 @@ mongoose.connect(MONGODB_URI)
 
 const JWT_SECRET = process.env.JWT_SECRET || 'arulzxd-super-secret-jwt-key-999';
 
-// ====================================================
-// SCHEMAS & MODELS (V2)
-// ====================================================
-
-// USER SCHEMA V2 (Mendukung Kode Referal, Saldo, & Tanggal Registrasi Permanen)
+// USER SCHEMA V2
 const userSchemaV2 = new mongoose.Schema({
     username: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
@@ -1424,7 +1420,7 @@ app.post('/auth/login', (req, res, next) => {
     })(req, res, next);
 });
 
-// REGISTER ROUTE (DENGAN BONUS KODE UNDANGAN & SALDO AWAL)
+// REGISTER ROUTE (DENGAN BONUS KODE UNDANGAN: UNDANG = 1000, DIUNDANG = 500)
 app.post('/auth/register', async (req, res) => {
     try {
         const { username, email, password, referralCode } = req.body;
@@ -1451,14 +1447,18 @@ app.post('/auth/register', async (req, res) => {
         let initialSaldo = 0;
         let inviterUser = null;
 
-        if (referralCode && referralCode.trim()) {
-            inviterUser = await UserV2.findOne({ referralCode: referralCode.trim().toUpperCase() });
+        const codeToUse = referralCode || req.cookies?.pending_ref;
+
+        if (codeToUse && codeToUse.trim()) {
+            inviterUser = await UserV2.findOne({ referralCode: codeToUse.trim().toUpperCase() });
             if (inviterUser) {
-                initialSaldo = 1000; // Bonus user baru
-                inviterUser.saldo = (inviterUser.saldo || 0) + 1000; // Bonus pengundang
+                initialSaldo = 500; // Bonus user baru yang diundang
+                inviterUser.saldo = (inviterUser.saldo || 0) + 1000; // Bonus user pengundang
                 await inviterUser.save();
             }
         }
+
+        res.clearCookie('pending_ref');
 
         const newUser = new UserV2({
             username: cleanUsername,
@@ -1494,7 +1494,7 @@ app.post('/auth/register', async (req, res) => {
         req.logIn(newUser, (err) => {
             if (err) return res.redirect('/login');
             const alertMsg = inviterUser 
-                ? 'Pendaftaran berhasil! Anda mendapatkan bonus saldo awal Rp 1.000 dari kode undangan.' 
+                ? 'Pendaftaran berhasil! Anda mendapatkan bonus saldo Rp 500 dari kode undangan.' 
                 : 'Pendaftaran berhasil! Selamat datang.';
             return sendSweetAlert(res, 'success', 'Berhasil!', alertMsg, '/dashboard');
         });
@@ -1671,7 +1671,7 @@ const GOOGLE_CLIENT_ID = `${d}${e}${f}${cl}${id}`;
 const GOOGLE_CLIENT_SECRET = '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';
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "https://arulzxd.biz.id/auth/google/callback";
 
-/* OAuth GitHub (Dukungan Bonus Referal Undangan) */
+/* OAuth GitHub */
 app.get('/auth/github', (req, res) => {
     const ref = req.query.ref ? encodeURIComponent(req.query.ref) : '';
     const state = ref ? JSON.stringify({ ref }) : '';
@@ -1683,11 +1683,11 @@ app.get('/auth/github/callback', async (req, res) => {
     const { code, state } = req.query;
     if (!code) return res.send('Authentication failed: No code provided');
 
-    let refCodeFromState = null;
+    let refCodeFromState = req.cookies?.pending_ref || null;
     if (state) {
         try {
             const parsedState = JSON.parse(decodeURIComponent(state));
-            refCodeFromState = parsedState.ref;
+            if (parsedState.ref) refCodeFromState = parsedState.ref;
         } catch (e) {}
     }
 
@@ -1734,8 +1734,8 @@ app.get('/auth/github/callback', async (req, res) => {
             if (refCodeFromState) {
                 inviterUser = await UserV2.findOne({ referralCode: refCodeFromState.trim().toUpperCase() });
                 if (inviterUser) {
-                    initialSaldo = 1000;
-                    inviterUser.saldo = (inviterUser.saldo || 0) + 1000;
+                    initialSaldo = 500; // Bonus diundang
+                    inviterUser.saldo = (inviterUser.saldo || 0) + 1000; // Bonus pengundang
                     await inviterUser.save();
                 }
             }
@@ -1759,6 +1759,8 @@ app.get('/auth/github/callback', async (req, res) => {
                 await dbUser.save();
             }
         }
+
+        res.clearCookie('pending_ref');
 
         const userPayload = {
             id: dbUser._id,
@@ -1785,7 +1787,7 @@ app.get('/auth/github/callback', async (req, res) => {
     }
 });
 
-/* OAuth Google (Dukungan Bonus Referal Undangan) */
+/* OAuth Google */
 app.get('/auth/google', (req, res) => {
     const ref = req.query.ref ? encodeURIComponent(req.query.ref) : '';
     const state = ref ? JSON.stringify({ ref }) : '';
@@ -1797,11 +1799,11 @@ app.get('/auth/google/callback', async (req, res) => {
     const { code, state } = req.query;
     if (!code) return res.send('Authentication failed: No code provided');
 
-    let refCodeFromState = null;
+    let refCodeFromState = req.cookies?.pending_ref || null;
     if (state) {
         try {
             const parsedState = JSON.parse(decodeURIComponent(state));
-            refCodeFromState = parsedState.ref;
+            if (parsedState.ref) refCodeFromState = parsedState.ref;
         } catch (e) {}
     }
 
@@ -1842,8 +1844,8 @@ app.get('/auth/google/callback', async (req, res) => {
             if (refCodeFromState) {
                 inviterUser = await UserV2.findOne({ referralCode: refCodeFromState.trim().toUpperCase() });
                 if (inviterUser) {
-                    initialSaldo = 1000;
-                    inviterUser.saldo = (inviterUser.saldo || 0) + 1000;
+                    initialSaldo = 500; // Bonus diundang
+                    inviterUser.saldo = (inviterUser.saldo || 0) + 1000; // Bonus pengundang
                     await inviterUser.save();
                 }
             }
@@ -1867,6 +1869,8 @@ app.get('/auth/google/callback', async (req, res) => {
                 await dbUser.save();
             }
         }
+
+        res.clearCookie('pending_ref');
 
         const userPayload = {
             id: dbUser._id,
@@ -1931,7 +1935,7 @@ app.get('/auth/logout', (req, res, next) => {
     });
 });
 
-// GET USER STATUS LENGKAP TERMASUK AKUMULASI DEPOSIT & BELANJA TERSIMPAN PERMANEN
+// GET USER STATUS LENGKAP TERMASUK AKUMULASI DEPOSIT, BELANJA, DAN LIST USER DIUNDANG
 app.get('/api/user-status', async (req, res) => {
     if (req.user) {
         try {
@@ -1939,7 +1943,6 @@ app.get('/api/user-status', async (req, res) => {
 
             if (!activeUser) return res.json({ loggedIn: false });
 
-            // Pastikan user memiliki kode referal
             if (!activeUser.referralCode) {
                 activeUser.referralCode = generateReferralCode();
                 await activeUser.save();
@@ -1947,13 +1950,11 @@ app.get('/api/user-status', async (req, res) => {
 
             const uEmail = activeUser.email.toLowerCase().trim();
 
-            // Hitung akumulasi Total Deposit permanen dari Database TransactionV2
             const deposits = await TransactionV2.aggregate([
                 { $match: { userEmail: uEmail, type: 'DEPOSIT', status: { $in: ['settlement', 'success', 'paid', 'settled'] } } },
                 { $group: { _id: null, total: { $sum: '$amount' } } }
             ]);
 
-            // Hitung akumulasi Total Belanja permanen dari Database TransactionV2
             const purchases = await TransactionV2.aggregate([
                 { $match: { userEmail: uEmail, type: 'PURCHASE', status: { $in: ['settlement', 'success', 'paid', 'settled'] } } },
                 { $group: { _id: null, total: { $sum: '$amount' } } }
@@ -1961,6 +1962,11 @@ app.get('/api/user-status', async (req, res) => {
 
             const totalDeposit = deposits.length > 0 ? deposits[0].total : 0;
             const totalBelanja = purchases.length > 0 ? purchases[0].total : 0;
+
+            const invitedUsers = await UserV2.find({ referredBy: activeUser.referralCode })
+                .select('username email createdAt')
+                .sort({ createdAt: -1 })
+                .lean();
 
             res.json({
                 loggedIn: true,
@@ -1974,6 +1980,7 @@ app.get('/api/user-status', async (req, res) => {
                     referralCode: activeUser.referralCode,
                     totalDeposit: totalDeposit,
                     totalBelanja: totalBelanja,
+                    invitedUsers: invitedUsers,
                     createdAt: activeUser.createdAt
                 }
             });
