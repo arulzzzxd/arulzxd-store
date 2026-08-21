@@ -117,8 +117,9 @@
             <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)]">
                 Arulz<span class="text-white">Store</span>
             </a>
-            <a href="/auth/logout" class="text-xs bg-red-950/60 border border-red-800/50 text-red-400 hover:bg-red-900/80 font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-                <i class="fa-solid fa-right-from-bracket"></i> Keluar
+            <!-- TOMBOL KELUAR DI KANAN ATAS DIBUAT SANGAT JELAS -->
+            <a href="/auth/logout" class="text-xs bg-red-600/20 border-2 border-red-500/60 text-red-400 hover:bg-red-600 hover:text-white font-cyber font-extrabold px-4 py-2 rounded-xl transition shadow-[0_0_12px_rgba(239,68,68,0.4)] flex items-center gap-2 uppercase tracking-wider">
+                <i class="fa-solid fa-right-from-bracket text-sm"></i> Keluar
             </a>
         </div>
     </nav>
@@ -160,6 +161,50 @@
             </div>
         </div>
 
+        <!-- WIDGET STATISTIK TOTAL DEPOSIT & TOTAL BELANJA (PERMANEN MONGODB) -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-cyberCard p-4 rounded-2xl border border-cyberBorder shadow-lg relative overflow-hidden">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-wider">Total Deposit</span>
+                    <i class="fa-solid fa-circle-arrow-down text-emerald-400 text-sm"></i>
+                </div>
+                <h4 id="profileTotalDeposit" class="text-lg font-black font-cyber text-emerald-400">Rp 0</h4>
+                <p class="text-[9px] text-slate-500 font-mono mt-1">Akumulasi Depo Berhasil</p>
+            </div>
+            
+            <div class="bg-cyberCard p-4 rounded-2xl border border-cyberBorder shadow-lg relative overflow-hidden">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-wider">Total Belanja</span>
+                    <i class="fa-solid fa-bag-shopping text-purple-400 text-sm"></i>
+                </div>
+                <h4 id="profileTotalBelanja" class="text-lg font-black font-cyber text-purple-400">Rp 0</h4>
+                <p class="text-[9px] text-slate-500 font-mono mt-1">Akumulasi Belanja Produk</p>
+            </div>
+        </div>
+
+        <!-- WIDGET REFERAL UNDANGAN -->
+        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl space-y-4">
+            <div class="flex items-center justify-between">
+                <label class="block text-xs font-bold font-cyber text-slate-300 uppercase tracking-wider">
+                    <i class="fa-solid fa-gift text-cyberCyan"></i> Undag Teman (Bonus Saldo Rp 1.000)
+                </label>
+                <span class="text-[10px] text-emerald-400 font-mono font-bold">+Rp 1.000 / User</span>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+                Bagikan link undangan Anda! Setiap user baru yang mendaftar via link Anda akan otomatis memasukkan kode undangan, mendapatkan bonus saldo awal Rp 1.000, dan Anda juga mendapatkan bonus Rp 1.000.
+            </p>
+
+            <div class="flex items-center gap-2 pt-1">
+                <div class="relative flex-1">
+                    <input type="text" id="referralLinkInput" readonly value="Memuat link..." 
+                           class="w-full pl-3 pr-3 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-200 font-mono focus:outline-none select-all">
+                </div>
+                <button onclick="copyReferralLink()" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-extrabold px-4 py-2.5 rounded-xl text-xs transition shadow-glowCyan flex items-center gap-1.5 uppercase tracking-wider">
+                    <i class="fa-solid fa-copy"></i> Salin Link
+                </button>
+            </div>
+        </div>
+
         <!-- WIDGET DEPOSIT TERPISAH -->
         <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl space-y-4">
             <div class="flex items-center justify-between">
@@ -193,27 +238,39 @@
                 </button>
             </div>
 
-            <!-- PANDUAN ISI SALDO -->
-            <div class="mt-4 pt-4 border-t border-cyberBorder/60 space-y-2">
-                <h4 class="text-xs font-bold font-cyber text-cyberCyan flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-question"></i> Panduan Deposit Saldo
+            <!-- PANDUAN ISI SALDO KELENGKAPAN -->
+            <div class="mt-4 pt-4 border-t border-cyberBorder/60 space-y-3">
+                <h4 class="text-xs font-bold font-cyber text-cyberCyan flex items-center gap-1.5 uppercase tracking-wider">
+                    <i class="fa-solid fa-circle-info"></i> Panduan & Kebijakan Deposit Saldo
                 </h4>
-                <div class="text-[11px] text-slate-300 space-y-2 leading-relaxed">
+                <div class="text-[11px] text-slate-300 space-y-2.5 leading-relaxed bg-cyberDark/60 p-3.5 rounded-xl border border-cyberBorder">
                     <div>
-                        <p class="font-bold text-slate-200">Bagaimana cara isi saldo?</p>
-                        <p class="text-slate-400">Pilih atau masukkan nominal minimal Rp1.000, klik tombol Top Up, lalu scan kode QRIS menggunakan e-wallet / mobile banking Anda.</p>
+                        <p class="font-bold text-white flex items-center gap-1">
+                            <i class="fa-solid fa-money-bill-wave text-emerald-400 text-[10px]"></i> Minimal Pengisian Saldo
+                        </p>
+                        <p class="text-slate-400 mt-0.5">Minimal pengisian saldo adalah <strong class="text-cyberCyan">Rp 1.000</strong>.</p>
                     </div>
                     <div>
-                        <p class="font-bold text-slate-200">Apakah saldo masuk otomatis?</p>
-                        <p class="text-slate-400">Ya, sistem mendeteksi pembayaran secara otomatis 100% instan dalam hitungan detik setelah Anda sukses membayar.</p>
+                        <p class="font-bold text-white flex items-center gap-1">
+                            <i class="fa-solid fa-qrcode text-cyberCyan text-[10px]"></i> Metode Transfer QRIS Instan
+                        </p>
+                        <p class="text-slate-400 mt-0.5">Proses transfer menggunakan kode QRIS instan dari e-wallet (DANA, OVO, GoPay, ShopeePay) atau bank transfer (BCA, Mandiri, BNI, BRI, dll).</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-white flex items-center gap-1">
+                            <i class="fa-solid fa-clock text-amber-400 text-[10px]"></i> Verifikasi Otomatis 24 Jam
+                        </p>
+                        <p class="text-slate-400 mt-0.5">Verifikasi pembayaran diproses secara otomatis oleh sistem 24 jam non-stop dalam hitungan detik setelah transaksi sukses.</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-white flex items-center gap-1">
+                            <i class="fa-solid fa-shield-halved text-red-400 text-[10px]"></i> Kebijakan Deposit
+                        </p>
+                        <p class="text-slate-400 mt-0.5">Kebijakan pengisian saldo bersifat final dan tidak dapat di-refund / ditarik kembali.</p>
                     </div>
                 </div>
             </div>
         </div>
-
-        <a href="/auth/logout" class="block w-full bg-red-950/40 hover:bg-red-900/60 border border-red-500/50 text-red-400 font-cyber font-bold py-3 rounded-xl text-xs text-center transition tracking-wider uppercase">
-            <i class="fa-solid fa-right-from-bracket"></i> Keluar dari Akun
-        </a>
 
     </div>
 
@@ -279,7 +336,7 @@
                 style: 'currency',
                 currency: 'IDR',
                 minimumFractionDigits: 0
-            }).format(angka);
+            }).format(angka || 0);
         }
 
         function setDepositAmount(val) {
@@ -298,6 +355,13 @@
                     document.getElementById('profileEmail').innerText = data.user.email || 'Email terdaftar';
                     document.getElementById('profileSaldo').innerText = formatRupiah(data.user.saldo || 0);
                     
+                    document.getElementById('profileTotalDeposit').innerText = formatRupiah(data.user.totalDeposit || 0);
+                    document.getElementById('profileTotalBelanja').innerText = formatRupiah(data.user.totalBelanja || 0);
+
+                    const refCode = data.user.referralCode || '';
+                    const inviteUrl = `${window.location.origin}/login?ref=${refCode}`;
+                    document.getElementById('referralLinkInput').value = inviteUrl;
+
                     if (data.user.createdAt) {
                         const joinedDate = new Date(data.user.createdAt).toLocaleDateString('id-ID', {
                             day: 'numeric',
@@ -318,6 +382,22 @@
                     window.location.href = '/login';
                 }
             } catch(e) {}
+        }
+
+        function copyReferralLink() {
+            const input = document.getElementById('referralLinkInput');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'LINK DISALIN!',
+                text: 'Link undangan referral berhasil disalin!',
+                timer: 1500,
+                showConfirmButton: false,
+                customClass: { popup: 'cyber-swal' }
+            });
         }
 
         async function editUsernameModal() {

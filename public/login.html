@@ -6,7 +6,6 @@
     <title>Autentikasi - ArulzXD STORE</title>
     <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tambahan: SweetAlert2 untuk Alert Estetik -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
@@ -28,7 +27,6 @@
             background-attachment: fixed;
         }
         
-        /* Glass Card dengan Animasi Glow Border */
         .glass-card {
             background: rgba(17, 24, 39, 0.75);
             backdrop-filter: blur(16px);
@@ -52,18 +50,15 @@
             }
         }
 
-        /* Glowing Text FX */
         .glow-text-cyan {
             text-shadow: 0 0 10px rgba(0, 243, 255, 0.6), 0 0 20px rgba(0, 243, 255, 0.3);
         }
 
-        /* Glowing Input Focus FX */
         .glow-input:focus {
             box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
             border-color: #00f3ff !important;
         }
 
-        /* Glowing Buttons */
         .glow-btn-cyan {
             box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
             transition: all 0.3s ease;
@@ -84,7 +79,6 @@
 
         .hidden-form { display: none; }
 
-        /* Styling khusus kustomisasi SweetAlert2 agar tema serasi dengan ArulzXD STORE */
         .swal2-popup-custom {
             background: rgba(17, 24, 39, 0.95) !important;
             backdrop-filter: blur(16px);
@@ -123,15 +117,6 @@
             --border-color: rgba(0, 243, 255, 0.2);
         }
 
-        /* Support Light Theme Mode */
-        html.light {
-            --neon-cyan: #008b9b;
-            --neon-glow: rgba(0, 139, 155, 0.25);
-            --bg-dark: #f0fdfa;
-            --bg-card: rgba(255, 255, 255, 0.85);
-            --border-color: rgba(0, 139, 155, 0.3);
-        }
-
         #cyber-loader-overlay {
             position: fixed;
             inset: 0;
@@ -151,7 +136,6 @@
             pointer-events: none;
         }
 
-        /* Laser Scanner Beam */
         .scanner-beam {
             position: absolute;
             top: 0;
@@ -166,7 +150,6 @@
             100% { transform: translateY(100%); }
         }
 
-        /* Concentric Hologram HUD Rotating Rings */
         .hud-ring {
             position: relative;
             width: 130px;
@@ -219,7 +202,6 @@
         @keyframes spinClockwise { 100% { transform: rotate(360deg); } }
         @keyframes spinCounterClockwise { 100% { transform: rotate(-360deg); } }
 
-        /* Animated Dot Pulse */
         .animated-dots::after {
             content: '';
             display: inline-block;
@@ -245,7 +227,6 @@
     <div id="cyber-loader-overlay">
         <div class="scanner-beam"></div>
 
-        <!-- Central Holographic HUD Ring Spinner -->
         <div class="hud-ring mb-6">
             <div class="ring-outer"></div>
             <div class="ring-middle"></div>
@@ -253,7 +234,6 @@
             <img src="https://arulz-xd.my.id/files/Q2C70y.png" alt="Logo" class="hud-avatar">
         </div>
 
-        <!-- Dynamic Page Name & Animated Dot Text -->
         <div class="text-center px-4">
             <div id="loader-title-text" class="text-sm font-extrabold tracking-widest uppercase text-cyan-400 code-font mb-1">
                 Memuat Halaman<span class="animated-dots"></span>
@@ -263,7 +243,6 @@
             </div>
         </div>
 
-        <!-- Progress Bar (0% - 100%) -->
         <div class="w-64 sm:w-80 mt-6">
             <div class="flex items-center justify-between text-xs font-bold code-font mb-2">
                 <span class="text-slate-400 text-[10px]">SYSTEM STATUS</span>
@@ -281,11 +260,9 @@
 
     <div class="glass-card p-8 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
         
-        <!-- Ornamen Dekoratif Glowing Bubbles -->
         <div class="absolute -top-10 -right-10 w-36 h-36 bg-cyan-500/20 rounded-full blur-2xl animate-pulse"></div>
         <div class="absolute -bottom-10 -left-10 w-36 h-36 bg-purple-500/20 rounded-full blur-2xl animate-pulse"></div>
 
-        <!-- Logo/Header -->
         <div class="text-center mb-6 relative z-10">
             <h1 class="text-2xl font-extrabold tracking-tight text-white mb-1">
                 Arulz<span class="text-cyan-400 glow-text-cyan">XD</span> STORE
@@ -318,19 +295,17 @@
                 <button type="submit" class="glow-btn-cyan w-full bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-slate-950 font-bold py-3 rounded-xl text-sm tracking-wide uppercase">Masuk</button>
             </form>
 
-            <!-- Oauth Divider -->
             <div class="relative flex py-2 items-center">
                 <div class="flex-grow border-t border-white/5"></div>
                 <span class="flex-shrink mx-4 text-gray-500 text-[10px] font-bold tracking-widest uppercase">Atau masuk dengan</span>
                 <div class="flex-grow border-t border-white/5"></div>
             </div>
 
-            <!-- OAuth Buttons -->
             <div class="grid grid-cols-2 gap-3">
-                <a href="/auth/google" class="flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800 border border-white/10 hover:border-cyan-500/50 py-2.5 rounded-xl text-xs font-semibold transition text-white hover:shadow-[0_0_12px_rgba(0,243,255,0.2)]">
+                <a id="btnGoogleAuth" href="/auth/google" class="flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800 border border-white/10 hover:border-cyan-500/50 py-2.5 rounded-xl text-xs font-semibold transition text-white hover:shadow-[0_0_12px_rgba(0,243,255,0.2)]">
                     <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-4 h-4" alt="Google"> Google
                 </a>
-                <a href="/auth/github" class="flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800 border border-white/10 hover:border-purple-500/50 py-2.5 rounded-xl text-xs font-semibold transition text-white hover:shadow-[0_0_12px_rgba(168,85,247,0.2)]">
+                <a id="btnGithubAuth" href="/auth/github" class="flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800 border border-white/10 hover:border-purple-500/50 py-2.5 rounded-xl text-xs font-semibold transition text-white hover:shadow-[0_0_12px_rgba(168,85,247,0.2)]">
                     <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" class="w-4 h-4 invert" alt="GitHub"> GitHub
                 </a>
             </div>
@@ -361,6 +336,16 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- INPUT KODE REFERAL UNDANGAN -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5 flex items-center justify-between">
+                        <span>Kode Referal / Undangan</span>
+                        <span class="text-[10px] text-cyan-400 font-bold lowercase">(bonus saldo Rp 1.000)</span>
+                    </label>
+                    <input type="text" id="referralCodeInput" name="referralCode" placeholder="Masukkan kode undangan (opsional)" class="glow-input w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-cyan-400 font-mono font-bold uppercase placeholder-gray-500 focus:outline-none transition">
+                </div>
+
                 <button type="submit" class="glow-btn-purple w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold py-3 rounded-xl text-sm tracking-wide uppercase">Buat Akun Baru</button>
             </form>
             <p class="text-center text-xs text-gray-400 mt-4">Sudah punya akun? <button onclick="switchForm('signin')" class="text-cyan-400 font-bold hover:underline hover:drop-shadow-[0_0_8px_rgba(0,243,255,0.6)]">Masuk</button></p>
@@ -380,9 +365,7 @@
 
     </div>
 
-    <!-- JavaScript Logika Form dan Show/Hide Password -->
     <script>
-        // Konfigurasi Dasar Custom Classes SweetAlert2
         const swalConfig = {
             customClass: {
                 popup: 'swal2-popup-custom',
@@ -393,7 +376,6 @@
             buttonsStyling: false
         };
 
-        // Fungsi Utama Show/Hide Password
         function togglePassword(inputId, iconId) {
             const passwordInput = document.getElementById(inputId);
             const eyeIcon = document.getElementById(iconId);
@@ -412,7 +394,6 @@
             }
         }
 
-        // Fungsi Switch Form
         function switchForm(formType) {
             const signinForm = document.getElementById('signin-form');
             const signupForm = document.getElementById('signup-form');
@@ -435,9 +416,36 @@
             }
         }
 
-        // --- INTERSEPT SUBMIT & SWEETALERT LOGIC ---
+        // ====================================================
+        // DOKUMENTASI REFERAL UNDANGAN (Otomatis & Terkunci di Mana Pun)
+        // ====================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
 
-        // 1. Alert Form Login
+            if (refCode) {
+                const cleanRef = refCode.trim().toUpperCase();
+
+                // 1. Pindahkan tampilan ke form pendaftaran
+                switchForm('signup');
+
+                // 2. Isi & kunci input referal agar tidak dapat dihapus/diubah
+                const refInput = document.getElementById('referralCodeInput');
+                if (refInput) {
+                    refInput.value = cleanRef;
+                    refInput.readOnly = true;
+                    refInput.classList.add('bg-slate-800/80', 'cursor-not-allowed', 'border-cyan-500/50');
+                }
+
+                // 3. Sertakan parameter referal ke tombol OAuth (Google & GitHub)
+                const btnGoogle = document.getElementById('btnGoogleAuth');
+                const btnGithub = document.getElementById('btnGithubAuth');
+
+                if (btnGoogle) btnGoogle.href = `/auth/google?ref=${cleanRef}`;
+                if (btnGithub) btnGithub.href = `/auth/github?ref=${cleanRef}`;
+            }
+        });
+
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             Swal.fire({
@@ -453,13 +461,12 @@
             });
         });
 
-        // 2. Alert Form Register
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             Swal.fire({
                 ...swalConfig,
                 icon: 'success',
-                iconColor: '#a855f7', // Warna ungu mengikuti tema registrasi Anda
+                iconColor: '#a855f7',
                 title: 'Pendaftaran Berhasil',
                 text: 'Akun Anda berhasil dibuat! Mengalihkan ke dashboard...',
                 confirmButtonText: 'Lanjutkan'
@@ -470,7 +477,6 @@
             });
         });
 
-        // 3. Alert Form Lupa Password
         document.getElementById('forgotForm').addEventListener('submit', function(e) {
             e.preventDefault();
             Swal.fire({
@@ -518,7 +524,6 @@
             loaderTitleEl.innerHTML = `Memuat ${pageName}<span class="animated-dots"></span>`;
         }
 
-        // Progress Loader 0% - 100%
         let currentProgress = 0;
         const progressFill = document.getElementById('loader-progress-fill');
         const percentageText = document.getElementById('loader-percentage');
@@ -546,7 +551,6 @@
             }, 400);
         });
 
-        // Fallback Safety (Maksimal 4 detik)
         setTimeout(() => {
             clearInterval(progressInterval);
             updateProgress(100);
