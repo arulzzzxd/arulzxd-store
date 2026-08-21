@@ -47,7 +47,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'arulzxd-super-secret-jwt-key-999';
 // SCHEMAS & MODELS (V2)
 // ====================================================
 
-// USER SCHEMA V2 (Tanpa Role & Apikey, dengan Fitur Saldo & Tanggal Registrasi Permanen)
+// USER SCHEMA V2 (Mendukung Kode Referal, Saldo, & Tanggal Registrasi Permanen)
 const userSchemaV2 = new mongoose.Schema({
     username: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
@@ -58,10 +58,16 @@ const userSchemaV2 = new mongoose.Schema({
     resetPasswordExpires: Date,
     avatar: { type: String, default: 'https://arulz-xd.my.id/files/X1F0Cn.png' }, 
     saldo: { type: Number, default: 0 },
+    referralCode: { type: String, unique: true },
+    referredBy: { type: String, default: null },
     createdAt: { type: Date, default: Date.now }
 });
 
 const UserV2 = mongoose.models.UserV2 || mongoose.model('UserV2', userSchemaV2);
+
+function generateReferralCode() {
+    return 'REF' + Math.floor(100000 + Math.random() * 900000);
+}
 
 // PRODUCT SCHEMA V2
 const productSchemaV2 = new mongoose.Schema({
@@ -127,7 +133,7 @@ const voucherSchemaV2 = new mongoose.Schema({
 
 const VoucherV2 = mongoose.models.VoucherV2 || mongoose.model('VoucherV2', voucherSchemaV2);
 
-// TRANSACTION SCHEMA V2 / SCHEMA RIWAYAT V2 (Tersimpan Permanen Sesuai Email User)
+// TRANSACTION SCHEMA V2
 const transactionSchemaV2 = new mongoose.Schema({
     orderId: { type: String, required: true, unique: true },
     amount: { type: Number, required: true },
@@ -200,7 +206,6 @@ function getUserIdentifier(req) {
     return req.ip; 
 }
 
-// PERBARUI USERNAME LANGSUNG TERSIMPAN DI MONGODB
 app.post('/api/user/update-username', checkAuthSession, async (req, res) => {
     try {
         if (!req.user) {
@@ -279,10 +284,6 @@ app.post('/api/user/update-avatar', checkAuthSession, (req, res) => {
             }
 
             const mimeType = req.file.mimetype || mime.lookup(req.file.originalname) || 'image/png';
-            if (!mimeType.startsWith('image/')) {
-                return res.status(400).json({ status: false, message: 'File harus berupa gambar (JPG, PNG, GIF, WebP)!' });
-            }
-
             const base64 = req.file.buffer.toString("base64");
             const avatarDataUrl = `data:${mimeType};base64,${base64}`;
 
@@ -345,7 +346,6 @@ app.post('/api/reviews', checkAuthSession, (req, res) => {
         }
 
         try {
-            // 1. WAJIB LOGIN
             if (!req.user) {
                 return res.status(401).json({ 
                     status: false, 
@@ -371,9 +371,7 @@ app.post('/api/reviews', checkAuthSession, (req, res) => {
             const userAvatar = req.user.avatar || 'https://arulz-xd.my.id/files/X1F0Cn.png';
             const userId = (req.user.id || req.user._id).toString();
             const userEmail = (req.user.email || "").toLowerCase().trim();
-            const userUsername = (req.user.username || "").toLowerCase().trim();
 
-            // 2. CEK PRODUK
             const product = await ProductV2.findOne({
                 $or: [{ Id: productId }, { _id: mongoose.Types.ObjectId.isValid(productId) ? productId : null }]
             });
@@ -382,11 +380,10 @@ app.post('/api/reviews', checkAuthSession, (req, res) => {
                 return res.status(404).json({ status: false, message: 'Produk tidak ditemukan.' });
             }
 
-            // 3. VALIDASI PEMBELI DARI SEMUA METODE PEMBAYARAN
             const purchasedList = (product.purchasedBy || []).map(p => p.toLowerCase().trim());
             const isBuyer = purchasedList.some(p => 
                 p === userEmail || 
-                p === userUsername || 
+                p === username.toLowerCase() || 
                 p === userId.toLowerCase()
             );
 
@@ -1244,7 +1241,6 @@ app.post('/api/store/manual-order', checkAuthSession, async (req, res) => {
             return res.status(404).json({ status: false, message: "Produk tidak ditemukan di database." });
         }
 
-        // Catat pembeli (baik user login maupun identifier alternatif)
         const buyer = req.user ? req.user.email : (req.body.username || getUserIdentifier(req));
         await recordProductBuyer(updatedProduct.Id || updatedProduct._id, buyer);
 
@@ -1428,12 +1424,10 @@ app.post('/auth/login', (req, res, next) => {
     })(req, res, next);
 });
 
-// REGISTER ROUTE
+// REGISTER ROUTE (DENGAN BONUS KODE UNDANGAN & SALDO AWAL)
 app.post('/auth/register', async (req, res) => {
     try {
-        const username = req.body.username;
-        const email = req.body.email;
-        const password = req.body.password;
+        const { username, email, password, referralCode } = req.body;
 
         if (!username || !email || !password) {
             return sendSweetAlert(res, 'error', 'Pendaftaran Gagal', 'Semua data wajib diisi!', '/login');
@@ -1452,6 +1446,19 @@ app.post('/auth/register', async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const defaultAvatar = 'https://arulz-xd.my.id/files/X1F0Cn.png';
+        const myReferralCode = generateReferralCode();
+
+        let initialSaldo = 0;
+        let inviterUser = null;
+
+        if (referralCode && referralCode.trim()) {
+            inviterUser = await UserV2.findOne({ referralCode: referralCode.trim().toUpperCase() });
+            if (inviterUser) {
+                initialSaldo = 1000; // Bonus user baru
+                inviterUser.saldo = (inviterUser.saldo || 0) + 1000; // Bonus pengundang
+                await inviterUser.save();
+            }
+        }
 
         const newUser = new UserV2({
             username: cleanUsername,
@@ -1459,6 +1466,9 @@ app.post('/auth/register', async (req, res) => {
             password: hashedPassword,
             provider: 'local',
             avatar: defaultAvatar,
+            saldo: initialSaldo,
+            referralCode: myReferralCode,
+            referredBy: inviterUser ? inviterUser.referralCode : null,
             createdAt: new Date()
         });
         await newUser.save();
@@ -1483,7 +1493,10 @@ app.post('/auth/register', async (req, res) => {
 
         req.logIn(newUser, (err) => {
             if (err) return res.redirect('/login');
-            return sendSweetAlert(res, 'success', 'Berhasil!', 'Pendaftaran berhasil! Selamat datang.', '/dashboard');
+            const alertMsg = inviterUser 
+                ? 'Pendaftaran berhasil! Anda mendapatkan bonus saldo awal Rp 1.000 dari kode undangan.' 
+                : 'Pendaftaran berhasil! Selamat datang.';
+            return sendSweetAlert(res, 'success', 'Berhasil!', alertMsg, '/dashboard');
         });
 
     } catch (error) {
@@ -1658,15 +1671,25 @@ const GOOGLE_CLIENT_ID = `${d}${e}${f}${cl}${id}`;
 const GOOGLE_CLIENT_SECRET = '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';
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "https://arulzxd.biz.id/auth/google/callback";
 
-/* OAuth GitHub */
+/* OAuth GitHub (Dukungan Bonus Referal Undangan) */
 app.get('/auth/github', (req, res) => {
-    const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_CALLBACK_URL}&scope=user:email`;
+    const ref = req.query.ref ? encodeURIComponent(req.query.ref) : '';
+    const state = ref ? JSON.stringify({ ref }) : '';
+    const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_CALLBACK_URL}&scope=user:email${state ? '&state=' + encodeURIComponent(state) : ''}`;
     res.redirect(url);
 });
 
 app.get('/auth/github/callback', async (req, res) => {
-    const { code } = req.query;
+    const { code, state } = req.query;
     if (!code) return res.send('Authentication failed: No code provided');
+
+    let refCodeFromState = null;
+    if (state) {
+        try {
+            const parsedState = JSON.parse(decodeURIComponent(state));
+            refCodeFromState = parsedState.ref;
+        } catch (e) {}
+    }
 
     try {
         const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {
@@ -1705,12 +1728,27 @@ app.get('/auth/github/callback', async (req, res) => {
         let dbUser = await UserV2.findOne({ email: finalEmail });
 
         if (!dbUser) {
+            let initialSaldo = 0;
+            let inviterUser = null;
+
+            if (refCodeFromState) {
+                inviterUser = await UserV2.findOne({ referralCode: refCodeFromState.trim().toUpperCase() });
+                if (inviterUser) {
+                    initialSaldo = 1000;
+                    inviterUser.saldo = (inviterUser.saldo || 0) + 1000;
+                    await inviterUser.save();
+                }
+            }
+
             dbUser = new UserV2({
                 username: currentUsername,
                 email: finalEmail,
                 provider: 'github',
                 providerId: String(userData.id),
                 avatar: userData.avatar_url || 'https://arulz-xd.my.id/files/X1F0Cn.png',
+                saldo: initialSaldo,
+                referralCode: generateReferralCode(),
+                referredBy: inviterUser ? inviterUser.referralCode : null,
                 createdAt: new Date()
             });
 
@@ -1747,15 +1785,25 @@ app.get('/auth/github/callback', async (req, res) => {
     }
 });
 
-/* OAuth Google */
+/* OAuth Google (Dukungan Bonus Referal Undangan) */
 app.get('/auth/google', (req, res) => {
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_CALLBACK_URL}&response_type=code&scope=profile email`;
+    const ref = req.query.ref ? encodeURIComponent(req.query.ref) : '';
+    const state = ref ? JSON.stringify({ ref }) : '';
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_CALLBACK_URL}&response_type=code&scope=profile email${state ? '&state=' + encodeURIComponent(state) : ''}`;
     res.redirect(url);
 });
 
 app.get('/auth/google/callback', async (req, res) => {
-    const { code } = req.query;
+    const { code, state } = req.query;
     if (!code) return res.send('Authentication failed: No code provided');
+
+    let refCodeFromState = null;
+    if (state) {
+        try {
+            const parsedState = JSON.parse(decodeURIComponent(state));
+            refCodeFromState = parsedState.ref;
+        } catch (e) {}
+    }
 
     try {
         const params = new URLSearchParams({
@@ -1788,12 +1836,27 @@ app.get('/auth/google/callback', async (req, res) => {
         let dbUser = await UserV2.findOne({ email: email });
 
         if (!dbUser) {
+            let initialSaldo = 0;
+            let inviterUser = null;
+
+            if (refCodeFromState) {
+                inviterUser = await UserV2.findOne({ referralCode: refCodeFromState.trim().toUpperCase() });
+                if (inviterUser) {
+                    initialSaldo = 1000;
+                    inviterUser.saldo = (inviterUser.saldo || 0) + 1000;
+                    await inviterUser.save();
+                }
+            }
+
             dbUser = new UserV2({
                 username: currentUsername,
                 email: email,
                 provider: 'google',
                 providerId: String(userData.id),
                 avatar: userData.picture || 'https://arulz-xd.my.id/files/X1F0Cn.png',
+                saldo: initialSaldo,
+                referralCode: generateReferralCode(),
+                referredBy: inviterUser ? inviterUser.referralCode : null,
                 createdAt: new Date()
             });
 
@@ -1868,20 +1931,49 @@ app.get('/auth/logout', (req, res, next) => {
     });
 });
 
+// GET USER STATUS LENGKAP TERMASUK AKUMULASI DEPOSIT & BELANJA TERSIMPAN PERMANEN
 app.get('/api/user-status', async (req, res) => {
     if (req.user) {
         try {
-            const freshUser = await UserV2.findById(req.user.id || req.user._id);
-            const activeUser = freshUser || req.user;
+            const activeUser = await UserV2.findById(req.user.id || req.user._id);
+
+            if (!activeUser) return res.json({ loggedIn: false });
+
+            // Pastikan user memiliki kode referal
+            if (!activeUser.referralCode) {
+                activeUser.referralCode = generateReferralCode();
+                await activeUser.save();
+            }
+
+            const uEmail = activeUser.email.toLowerCase().trim();
+
+            // Hitung akumulasi Total Deposit permanen dari Database TransactionV2
+            const deposits = await TransactionV2.aggregate([
+                { $match: { userEmail: uEmail, type: 'DEPOSIT', status: { $in: ['settlement', 'success', 'paid', 'settled'] } } },
+                { $group: { _id: null, total: { $sum: '$amount' } } }
+            ]);
+
+            // Hitung akumulasi Total Belanja permanen dari Database TransactionV2
+            const purchases = await TransactionV2.aggregate([
+                { $match: { userEmail: uEmail, type: 'PURCHASE', status: { $in: ['settlement', 'success', 'paid', 'settled'] } } },
+                { $group: { _id: null, total: { $sum: '$amount' } } }
+            ]);
+
+            const totalDeposit = deposits.length > 0 ? deposits[0].total : 0;
+            const totalBelanja = purchases.length > 0 ? purchases[0].total : 0;
 
             res.json({
                 loggedIn: true,
                 user: {
+                    id: activeUser._id,
                     name: activeUser.username,
                     username: activeUser.username,
                     email: activeUser.email,
                     avatar: activeUser.avatar,
                     saldo: activeUser.saldo || 0,
+                    referralCode: activeUser.referralCode,
+                    totalDeposit: totalDeposit,
+                    totalBelanja: totalBelanja,
                     createdAt: activeUser.createdAt
                 }
             });
