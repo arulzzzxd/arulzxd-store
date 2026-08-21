@@ -341,7 +341,7 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5 flex items-center justify-between">
                         <span>Kode Referal / Undangan</span>
-                        <span class="text-[10px] text-cyan-400 font-bold lowercase">(bonus saldo Rp 1.000)</span>
+                        <span class="text-[10px] text-cyan-400 font-bold lowercase">(bonus saldo Rp 500)</span>
                     </label>
                     <input type="text" id="referralCodeInput" name="referralCode" placeholder="Masukkan kode undangan (opsional)" class="glow-input w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-cyan-400 font-mono font-bold uppercase placeholder-gray-500 focus:outline-none transition">
                 </div>
@@ -416,20 +416,16 @@
             }
         }
 
-        // ====================================================
-        // DOKUMENTASI REFERAL UNDANGAN (Otomatis & Terkunci di Mana Pun)
-        // ====================================================
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
 
             if (refCode) {
                 const cleanRef = refCode.trim().toUpperCase();
+                document.cookie = `pending_ref=${cleanRef}; path=/; max-age=86400`;
 
-                // 1. Pindahkan tampilan ke form pendaftaran
                 switchForm('signup');
 
-                // 2. Isi & kunci input referal agar tidak dapat dihapus/diubah
                 const refInput = document.getElementById('referralCodeInput');
                 if (refInput) {
                     refInput.value = cleanRef;
@@ -437,7 +433,6 @@
                     refInput.classList.add('bg-slate-800/80', 'cursor-not-allowed', 'border-cyan-500/50');
                 }
 
-                // 3. Sertakan parameter referal ke tombol OAuth (Google & GitHub)
                 const btnGoogle = document.getElementById('btnGoogleAuth');
                 const btnGithub = document.getElementById('btnGithubAuth');
 

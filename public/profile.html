@@ -117,7 +117,6 @@
             <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)]">
                 Arulz<span class="text-white">Store</span>
             </a>
-            <!-- TOMBOL KELUAR DI KANAN ATAS DIBUAT SANGAT JELAS -->
             <a href="/auth/logout" class="text-xs bg-red-600/20 border-2 border-red-500/60 text-red-400 hover:bg-red-600 hover:text-white font-cyber font-extrabold px-4 py-2 rounded-xl transition shadow-[0_0_12px_rgba(239,68,68,0.4)] flex items-center gap-2 uppercase tracking-wider">
                 <i class="fa-solid fa-right-from-bracket text-sm"></i> Keluar
             </a>
@@ -161,7 +160,7 @@
             </div>
         </div>
 
-        <!-- WIDGET STATISTIK TOTAL DEPOSIT & TOTAL BELANJA (PERMANEN MONGODB) -->
+        <!-- WIDGET STATISTIK TOTAL DEPOSIT & TOTAL BELANJA -->
         <div class="grid grid-cols-2 gap-4">
             <div class="bg-cyberCard p-4 rounded-2xl border border-cyberBorder shadow-lg relative overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
@@ -186,12 +185,12 @@
         <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl space-y-4">
             <div class="flex items-center justify-between">
                 <label class="block text-xs font-bold font-cyber text-slate-300 uppercase tracking-wider">
-                    <i class="fa-solid fa-gift text-cyberCyan"></i> Undag Teman (Bonus Saldo Rp 1.000)
+                    <i class="fa-solid fa-gift text-cyberCyan"></i> Undang Teman
                 </label>
-                <span class="text-[10px] text-emerald-400 font-mono font-bold">+Rp 1.000 / User</span>
+                <span class="text-[10px] text-emerald-400 font-mono font-bold">+Rp 1.000 / Undangan</span>
             </div>
             <p class="text-xs text-slate-400 leading-relaxed">
-                Bagikan link undangan Anda! Setiap user baru yang mendaftar via link Anda akan otomatis memasukkan kode undangan, mendapatkan bonus saldo awal Rp 1.000, dan Anda juga mendapatkan bonus Rp 1.000.
+                Bagikan link undangan Anda! User yang mendaftar via link Anda otomatis mendapatkan saldo <strong class="text-cyberCyan">Rp 500</strong>, dan Anda mendapatkan bonus <strong class="text-emerald-400">Rp 1.000</strong>.
             </p>
 
             <div class="flex items-center gap-2 pt-1">
@@ -202,6 +201,32 @@
                 <button onclick="copyReferralLink()" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-extrabold px-4 py-2.5 rounded-xl text-xs transition shadow-glowCyan flex items-center gap-1.5 uppercase tracking-wider">
                     <i class="fa-solid fa-copy"></i> Salin Link
                 </button>
+            </div>
+
+            <!-- TABEL USER YANG DIUNDANG -->
+            <div class="pt-4 border-t border-cyberBorder/60 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-users text-cyberCyan"></i> Daftar Teman Diundang (<span id="invitedCount">0</span>)
+                    </h4>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-cyberBorder bg-cyberDark/60">
+                    <table class="w-full text-left border-collapse text-[11px]">
+                        <thead>
+                            <tr class="bg-cyberCard border-b border-cyberBorder text-slate-400 font-cyber">
+                                <th class="p-2.5">Username</th>
+                                <th class="p-2.5">Email</th>
+                                <th class="p-2.5 text-right">Tgl Bergabung</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invitedUsersTableBody" class="divide-y divide-cyberBorder/40 font-mono text-slate-300">
+                            <tr>
+                                <td colspan="3" class="p-4 text-center text-slate-500 italic">Belum ada teman yang diundang.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -238,7 +263,7 @@
                 </button>
             </div>
 
-            <!-- PANDUAN ISI SALDO KELENGKAPAN -->
+            <!-- PANDUAN ISI SALDO -->
             <div class="mt-4 pt-4 border-t border-cyberBorder/60 space-y-3">
                 <h4 class="text-xs font-bold font-cyber text-cyberCyan flex items-center gap-1.5 uppercase tracking-wider">
                     <i class="fa-solid fa-circle-info"></i> Panduan & Kebijakan Deposit Saldo
@@ -343,6 +368,12 @@
             document.getElementById('depositAmountInput').value = val;
         }
 
+        function maskEmail(email) {
+            if (!email || !email.includes('@')) return '-';
+            const [name, domain] = email.split('@');
+            return name.substring(0, 2) + '***@' + domain;
+        }
+
         async function loadUserProfile() {
             try {
                 const res = await fetch('/api/user-status');
@@ -369,19 +400,39 @@
                             year: 'numeric'
                         });
                         document.getElementById('profileJoined').innerText = `Terdaftar sejak: ${joinedDate}`;
-                    } else {
-                        document.getElementById('profileJoined').innerText = `Terdaftar sejak: 12 Agustus 2026`;
                     }
 
                     if (data.user.avatar) document.getElementById('profileAvatar').src = data.user.avatar;
                     if (authBtn) authBtn.href = '/profile';
                     if (authLabel) authLabel.innerText = 'Profil';
 
+                    renderInvitedUsers(data.user.invitedUsers || []);
                     checkActiveDepositTransaction();
                 } else {
                     window.location.href = '/login';
                 }
             } catch(e) {}
+        }
+
+        function renderInvitedUsers(users) {
+            const tbody = document.getElementById('invitedUsersTableBody');
+            document.getElementById('invitedCount').innerText = users.length;
+
+            if (!users || users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-500 italic">Belum ada teman yang diundang.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = users.map(u => {
+                const joined = u.createdAt ? new Date(u.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+                return `
+                    <tr class="hover:bg-cyberCard/80 transition">
+                        <td class="p-2.5 font-bold text-slate-200">${u.username}</td>
+                        <td class="p-2.5 text-slate-400">${maskEmail(u.email)}</td>
+                        <td class="p-2.5 text-right text-cyberCyan">${joined}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function copyReferralLink() {
