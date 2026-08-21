@@ -345,6 +345,14 @@ app.post('/api/reviews', checkAuthSession, (req, res) => {
         }
 
         try {
+            // 1. WAJIB LOGIN
+            if (!req.user) {
+                return res.status(401).json({ 
+                    status: false, 
+                    message: 'Anda wajib login terlebih dahulu untuk memberikan ulasan!' 
+                });
+            }
+
             const { productId, rating, comment } = req.body;
 
             if (!productId) {
@@ -359,30 +367,34 @@ app.post('/api/reviews', checkAuthSession, (req, res) => {
                 return res.status(400).json({ status: false, message: 'Anda diwajibkan menuliskan ulasan/penilaian!' });
             }
 
-            let username = 'Anonim';
-            let userAvatar = 'https://arulz-xd.my.id/files/X1F0Cn.png';
-            let userId = getUserIdentifier(req);
+            const username = req.user.username || req.user.name;
+            const userAvatar = req.user.avatar || 'https://arulz-xd.my.id/files/X1F0Cn.png';
+            const userId = (req.user.id || req.user._id).toString();
+            const userEmail = (req.user.email || "").toLowerCase().trim();
+            const userUsername = (req.user.username || "").toLowerCase().trim();
 
-            if (req.user) {
-                username = req.user.username || req.user.name;
-                userAvatar = req.user.avatar || userAvatar;
-                userId = (req.user.id || req.user._id || req.user.email || req.user.username).toString();
-            }
-
+            // 2. CEK PRODUK
             const product = await ProductV2.findOne({
                 $or: [{ Id: productId }, { _id: mongoose.Types.ObjectId.isValid(productId) ? productId : null }]
             });
 
-            if (product && product.purchasedBy) {
-                const userClean = userId.toLowerCase().trim();
-                const isBuyer = product.purchasedBy.some(p => p.toLowerCase().trim() === userClean);
+            if (!product) {
+                return res.status(404).json({ status: false, message: 'Produk tidak ditemukan.' });
+            }
 
-                if (!isBuyer && process.env.NODE_ENV === 'production') {
-                    return res.status(403).json({
-                        status: false,
-                        message: 'Anda belum pernah membeli produk ini, tidak dapat memberikan penilaian!'
-                    });
-                }
+            // 3. VALIDASI PEMBELI DARI SEMUA METODE PEMBAYARAN
+            const purchasedList = (product.purchasedBy || []).map(p => p.toLowerCase().trim());
+            const isBuyer = purchasedList.some(p => 
+                p === userEmail || 
+                p === userUsername || 
+                p === userId.toLowerCase()
+            );
+
+            if (!isBuyer) {
+                return res.status(403).json({
+                    status: false,
+                    message: 'Anda belum pernah membeli produk ini, tidak dapat memberikan penilaian!'
+                });
             }
 
             const mediaList = [];
@@ -649,12 +661,19 @@ app.get('/api/vouchers/:code', async (req, res) => {
     }
 });
 
-async function recordProductBuyer(productName, userIdentifier) {
-    if (!productName || !userIdentifier) return;
+async function recordProductBuyer(productQuery, userIdentifier) {
+    if (!productQuery || !userIdentifier) return;
     try {
+        const cleanIdentifier = userIdentifier.toString().toLowerCase().trim();
         await ProductV2.findOneAndUpdate(
-            { nama: { $regex: new RegExp(`^${productName.trim()}$`, 'i') } },
-            { $addToSet: { purchasedBy: userIdentifier.toString().toLowerCase().trim() } }
+            { 
+                $or: [
+                    { Id: productQuery },
+                    { _id: mongoose.Types.ObjectId.isValid(productQuery) ? productQuery : null },
+                    { nama: { $regex: new RegExp(`^${productQuery.toString().trim()}$`, 'i') } }
+                ]
+            },
+            { $addToSet: { purchasedBy: cleanIdentifier } }
         );
     } catch (err) {
         console.error("❌ Gagal mencatat pembeli produk:", err.message);
@@ -1209,7 +1228,7 @@ app.post('/webhook', async (req, res) => {
     }
 });
 
-app.post('/api/store/manual-order', async (req, res) => {
+app.post('/api/store/manual-order', checkAuthSession, async (req, res) => {
     try {
         const productName = req.body.productName;
         const qty = req.body.qty;
@@ -1224,6 +1243,10 @@ app.post('/api/store/manual-order', async (req, res) => {
         if (!updatedProduct) {
             return res.status(404).json({ status: false, message: "Produk tidak ditemukan di database." });
         }
+
+        // Catat pembeli (baik user login maupun identifier alternatif)
+        const buyer = req.user ? req.user.email : (req.body.username || getUserIdentifier(req));
+        await recordProductBuyer(updatedProduct.Id || updatedProduct._id, buyer);
 
         return res.json({
             status: true,
