@@ -1992,22 +1992,50 @@ app.get('/api/user-status', async (req, res) => {
     }
 });
 
-// ENDPOINT STATISTIK GLOBAL UNTUK DASHBOARD (GLOBAL USER, TOTAL PESANAN, & TRANSAKSI LUNAS)
+// ENDPOINT STATISTIK DASHBOARD LENGKAP
 app.get('/api/dashboard-stats', async (req, res) => {
     try {
-        const [totalUsers, totalTrx, lunasTrx] = await Promise.all([
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+
+        const startOfYesterday = new Date(startOfToday);
+        startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+
+        const [
+            totalUsers, 
+            totalProducts, 
+            totalTrx, 
+            lunasTrx, 
+            trxToday, 
+            trxYesterday, 
+            recentTrx
+        ] = await Promise.all([
             UserV2.countDocuments(),
+            ProductV2.countDocuments(),
             TransactionV2.countDocuments(),
             TransactionV2.countDocuments({
                 status: { $in: ['settlement', 'success', 'paid', 'settled'] }
-            })
+            }),
+            TransactionV2.countDocuments({ createdAt: { $gte: startOfToday } }),
+            TransactionV2.countDocuments({
+                createdAt: { $gte: startOfYesterday, $lt: startOfToday }
+            }),
+            TransactionV2.find({})
+                .sort({ createdAt: -1 })
+                .limit(8)
+                .select('orderId userEmail amount status itemDetails createdAt')
+                .lean()
         ]);
 
         res.json({
             status: true,
-            totalUsers: totalUsers,
-            totalTrx: totalTrx,
-            lunasTrx: lunasTrx
+            totalUsers,
+            totalProducts,
+            totalTrx,
+            lunasTrx,
+            trxToday,
+            trxYesterday,
+            recentTrx
         });
     } catch (err) {
         console.error("Gagal mengambil statistik dashboard:", err);
