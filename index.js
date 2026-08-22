@@ -1992,7 +1992,7 @@ app.get('/api/user-status', async (req, res) => {
     }
 });
 
-// ENDPOINT STATISTIK DASHBOARD LENGKAP + DATA GRAFIK
+// ENDPOINT STATISTIK DASHBOARD LENGKAP + DATA REAL-TIME TABLE
 app.get('/api/dashboard-stats', async (req, res) => {
     try {
         const startOfToday = new Date();
@@ -2001,7 +2001,6 @@ app.get('/api/dashboard-stats', async (req, res) => {
         const startOfYesterday = new Date(startOfToday);
         startOfYesterday.setDate(startOfYesterday.getDate() - 1);
 
-        // Agregasi Data Grafik 14 Hari Terakhir
         const fourteenDaysAgo = new Date(startOfToday);
         fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 13);
 
@@ -2012,7 +2011,7 @@ app.get('/api/dashboard-stats', async (req, res) => {
             lunasTrx, 
             trxToday, 
             trxYesterday, 
-            recentTrx,
+            recentTrxRaw,
             dailyChartRaw
         ] = await Promise.all([
             UserV2.countDocuments(),
@@ -2046,7 +2045,34 @@ app.get('/api/dashboard-stats', async (req, res) => {
             ])
         ]);
 
-        // Mapping Data Tanggal untuk Grafik
+        // Ambil data User untuk pencocokan Nama Pelanggan Real-time
+        const emails = recentTrxRaw.map(t => t.userEmail).filter(Boolean);
+        const users = await UserV2.find({ email: { $in: emails } }).select('email username').lean();
+        const userMap = {};
+        users.forEach(u => {
+            if (u.email) userMap[u.email.toLowerCase().trim()] = u.username;
+        });
+
+        const recentTrx = recentTrxRaw.map(trx => {
+            const emailKey = (trx.userEmail || '').toLowerCase().trim();
+            const fetchedUsername = userMap[emailKey];
+            
+            // Prioritas nama: Username DB -> Buyer Item -> Potongan Email -> Guest
+            let cleanName = fetchedUsername || trx.itemDetails?.buyer || 'Guest';
+            if (cleanName.includes('@')) {
+                cleanName = cleanName.split('@')[0];
+            }
+
+            return {
+                orderId: trx.orderId,
+                pelanggan: cleanName,
+                produk: trx.itemDetails?.nama || (trx.type === 'DEPOSIT' ? 'Deposit Saldo' : 'Pembelian Marketplace'),
+                amount: trx.amount,
+                status: trx.status,
+                createdAt: trx.createdAt
+            };
+        });
+
         const chartLabels = [];
         const chartTotalTrx = [];
         const chartLunasTrx = [];
