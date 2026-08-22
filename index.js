@@ -451,19 +451,40 @@ app.post('/api/reviews', checkAuthSession, (req, res) => {
 app.get('/api/reviews/:productId', async (req, res) => {
     try {
         const { productId } = req.params;
-        const reviews = await ReviewV2.find({ productId }).sort({ createdAt: -1 });
+        const reviews = await ReviewV2.find({ productId }).sort({ createdAt: -1 }).lean();
+
+        // Mengambil avatar & username terbaru dari koleksi UserV2 secara real-time
+        const userIds = reviews.map(r => r.userId).filter(Boolean);
+        const users = await UserV2.find({ _id: { $in: userIds } }).select('_id avatar username').lean();
+        
+        const userMap = {};
+        users.forEach(u => {
+            userMap[u._id.toString()] = u;
+        });
+
+        // Sinkronisasi avatar & username ke daftar ulasan
+        const updatedReviews = reviews.map(rev => {
+            if (rev.userId && userMap[rev.userId]) {
+                return {
+                    ...rev,
+                    userAvatar: userMap[rev.userId].avatar || rev.userAvatar,
+                    username: userMap[rev.userId].username || rev.username
+                };
+            }
+            return rev;
+        });
 
         let averageRating = 0;
-        if (reviews.length > 0) {
-            const totalRating = reviews.reduce((sum, item) => sum + item.rating, 0);
-            averageRating = Number((totalRating / reviews.length).toFixed(1));
+        if (updatedReviews.length > 0) {
+            const totalRating = updatedReviews.reduce((sum, item) => sum + item.rating, 0);
+            averageRating = Number((totalRating / updatedReviews.length).toFixed(1));
         }
 
         return res.json({
             status: true,
-            totalReviews: reviews.length,
+            totalReviews: updatedReviews.length,
             averageRating: averageRating,
-            reviews: reviews
+            reviews: updatedReviews
         });
     } catch (error) {
         console.error("Error fetch reviews:", error);
