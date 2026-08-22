@@ -856,20 +856,19 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
         const unitPrice = dbProduct.harga_diskon || dbProduct.harga;
         let totalPrice = unitPrice * buyQty;
 
-        // CEK & HITUNG POTONGAN VOUCHER JIKA ADA
+        // PERBAIKAN: Mendukung voucher tipe 'percentage' maupun 'fixed'
         let discountAmount = 0;
         if (voucherCode && voucherCode.trim()) {
             const v = await VoucherV2.findOne({ code: voucherCode.trim().toUpperCase() });
             if (v && v.usageLimit > 0 && new Date() <= new Date(v.expiredAt)) {
                 if (v.type === 'percentage') {
                     discountAmount = Math.floor((totalPrice * v.discount) / 100);
-                } else {
+                } else if (v.type === 'fixed') {
                     discountAmount = v.discount;
                 }
             }
         }
 
-        // Harga Akhir Setelah Potongan Voucher
         const finalPrice = Math.max(0, totalPrice - discountAmount);
 
         const user = await UserV2.findById(req.user.id || req.user._id);
@@ -896,7 +895,7 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
         const orderId = `SALDO-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
         const newTransaction = new TransactionV2({
             orderId,
-            amount: finalPrice, // Menyimpan Harga Bersih Setelah Voucher
+            amount: finalPrice,
             paymentMethod: "SALDO",
             status: "success",
             type: "PURCHASE",
@@ -954,7 +953,7 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
 
         let inputAmount = Number(amount);
 
-        // FITUR VOUCHER DISKON
+        // HITUNG POTONGAN VOUCHER DISKON
         if (voucherCode && voucherCode.trim()) {
             const v = await VoucherV2.findOne({ code: voucherCode.trim().toUpperCase() });
             if (v && v.usageLimit > 0 && new Date() <= new Date(v.expiredAt)) {
@@ -965,7 +964,7 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
             }
         }
 
-        // REQUEST KE GATEWAY PAYWUZ
+        // REQUEST KE GATEWAY PAYWUZ DENGAN HARGA SETELAH DISKON
         const paywuzRes = await axiosPaywuzWithRetry({
             method: 'post',
             url: `${PAYWUZ_BASE_URL}/transactions`,
@@ -976,12 +975,12 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
         const transactionData = paywuzRes.data?.data || paywuzRes.data;
         const qrisNumber = transactionData.paymentNumber || transactionData.qrString || transactionData.qrUrl;
 
-        // KALKULASI TOTAL HARGA + FEE DARI GATEWAY (SAMA SEPERTI ALUR DEPOSIT)
         const safeNum = (val) => {
             const num = Number(val);
             return (!isNaN(num) && num > 0) ? num : null;
         };
 
+        // PERBAIKAN: Gunakan inputAmount (harga bersih) untuk menghitung Admin Fee Gateway
         const feeFlatIdr = Number(transactionData.feeFlatIdr) || 290;
         const feePercentBps = Number(transactionData.feePercentBps) || 70;
         const calculatedFee = feeFlatIdr + Math.ceil((inputAmount * feePercentBps) / 10000);
@@ -995,7 +994,6 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
             finalAmount = inputAmount + feeVal;
         }
 
-        // AMBIL LINK PRODUK JIKA ADA
         let pLink = itemDetails?.link || null;
         if (!pLink && itemDetails?.nama) {
             const dbProduct = await ProductV2.findOne({ 
@@ -1007,10 +1005,9 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
         const expiredAt = new Date(Date.now() + 15 * 60 * 1000);
         const uEmail = req.user ? req.user.email.toLowerCase().trim() : null;
 
-        // PENYIMPANAN TRANSAKSI LANGSUNG
         const newTransaction = new TransactionV2({
             orderId,
-            amount: finalAmount, // Total otomatis + admin fee
+            amount: finalAmount, // Total harga bersih + fee
             paymentNumber: qrisNumber,
             paymentMethod: "QRIS",
             type: "PURCHASE",
