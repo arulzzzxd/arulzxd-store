@@ -1992,7 +1992,7 @@ app.get('/api/user-status', async (req, res) => {
     }
 });
 
-// ENDPOINT STATISTIK DASHBOARD LENGKAP
+// ENDPOINT STATISTIK DASHBOARD LENGKAP + DATA GRAFIK
 app.get('/api/dashboard-stats', async (req, res) => {
     try {
         const startOfToday = new Date();
@@ -2001,6 +2001,10 @@ app.get('/api/dashboard-stats', async (req, res) => {
         const startOfYesterday = new Date(startOfToday);
         startOfYesterday.setDate(startOfYesterday.getDate() - 1);
 
+        // Agregasi Data Grafik 14 Hari Terakhir
+        const fourteenDaysAgo = new Date(startOfToday);
+        fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 13);
+
         const [
             totalUsers, 
             totalProducts, 
@@ -2008,7 +2012,8 @@ app.get('/api/dashboard-stats', async (req, res) => {
             lunasTrx, 
             trxToday, 
             trxYesterday, 
-            recentTrx
+            recentTrx,
+            dailyChartRaw
         ] = await Promise.all([
             UserV2.countDocuments(),
             ProductV2.countDocuments(),
@@ -2024,8 +2029,38 @@ app.get('/api/dashboard-stats', async (req, res) => {
                 .sort({ createdAt: -1 })
                 .limit(8)
                 .select('orderId userEmail amount status itemDetails createdAt')
-                .lean()
+                .lean(),
+            TransactionV2.aggregate([
+                { $match: { createdAt: { $gte: fourteenDaysAgo } } },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%d %b", date: "$createdAt" } },
+                        total: { $sum: 1 },
+                        lunas: {
+                            $sum: {
+                                $cond: [{ $in: ["$status", ["settlement", "success", "paid", "settled"]] }, 1, 0]
+                            }
+                        }
+                    }
+                }
+            ])
         ]);
+
+        // Mapping Data Tanggal untuk Grafik
+        const chartLabels = [];
+        const chartTotalTrx = [];
+        const chartLunasTrx = [];
+
+        for (let i = 13; i >= 0; i--) {
+            const d = new Date(startOfToday);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+            
+            const found = dailyChartRaw.find(item => item._id === dateStr);
+            chartLabels.push(dateStr);
+            chartTotalTrx.push(found ? found.total : 0);
+            chartLunasTrx.push(found ? found.lunas : 0);
+        }
 
         res.json({
             status: true,
@@ -2035,7 +2070,12 @@ app.get('/api/dashboard-stats', async (req, res) => {
             lunasTrx,
             trxToday,
             trxYesterday,
-            recentTrx
+            recentTrx,
+            chartData: {
+                labels: chartLabels,
+                totalTrx: chartTotalTrx,
+                lunasTrx: chartLunasTrx
+            }
         });
     } catch (err) {
         console.error("Gagal mengambil statistik dashboard:", err);
