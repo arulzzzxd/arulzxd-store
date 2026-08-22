@@ -6,6 +6,7 @@
     <title>Dashboard - ArulzXD Store</title>
     <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -39,28 +40,11 @@
             background-size: 30px 30px;
         }
 
-        /* DIGITAL ANIMATED BORDER & PULSE */
         @keyframes borderGlow {
             0%, 100% { border-color: rgba(0, 243, 255, 0.3); box-shadow: 0 0 10px rgba(0, 243, 255, 0.1); }
             50% { border-color: rgba(0, 243, 255, 0.8); box-shadow: 0 0 18px rgba(0, 243, 255, 0.35); }
         }
-        .animated-cyber-card {
-            animation: borderGlow 4s infinite ease-in-out;
-        }
-
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(1000%); }
-        }
-        .scanline-effect::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: rgba(0, 243, 255, 0.4);
-            opacity: 0.6;
-            animation: scanline 6s linear infinite;
-        }
+        .animated-cyber-card { animation: borderGlow 4s infinite ease-in-out; }
 
         /* BOTTOM NAVIGATION STYLE */
         .bottom-nav-container {
@@ -124,7 +108,7 @@
             <div class="flex items-center gap-2">
                 <span class="text-xs font-mono font-bold text-cyberCyan bg-cyberCyan/10 px-3 py-1 rounded-full border border-cyberCyan/30 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-cyberCyan animate-ping"></span>
-                    <span>SYSTEM ONLINE</span>
+                    <span>SERVER ONLINE</span>
                 </span>
             </div>
         </div>
@@ -133,18 +117,18 @@
     <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
 
         <!-- HEADER BANNER -->
-        <div class="p-6 sm:p-8 bg-cyberCard rounded-2xl border border-cyberBorder shadow-xl relative overflow-hidden scanline-effect">
+        <div class="p-6 sm:p-8 bg-cyberCard rounded-2xl border border-cyberBorder shadow-xl relative overflow-hidden">
             <div class="absolute -top-24 -left-24 w-48 h-48 bg-cyberCyan/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <span class="inline-flex items-center gap-1.5 bg-cyberCyan/10 border border-cyberCyan/30 text-cyberCyan text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-3 font-cyber">
-                        <i class="fa-solid fa-gauge-high animate-pulse"></i> Control Panel Digital
+                        <i class="fa-solid fa-gauge-high"></i> Control Panel Digital
                     </span>
                     <h1 class="text-2xl sm:text-3xl font-black text-white font-cyber tracking-tight">
                         Selamat Datang, <span id="dashUsername" class="text-cyberCyan">Pengguna</span>
                     </h1>
                     <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl">
-                        Pantau statistik penjualan, total pengguna, produk aktif, serta aktivitas transaksi secara real-time.
+                        Pantau grafik analitik, total pesanan perhari, pengguna aktif, dan status transaksi marketplace.
                     </p>
                 </div>
                 <a href="/store" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-black px-5 py-2.5 rounded-xl text-xs shadow-glowCyan transition-all uppercase tracking-wider flex items-center gap-2">
@@ -155,7 +139,6 @@
 
         <!-- STATS GRID -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
-            <!-- Total User -->
             <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
                     <span class="text-[11px] font-semibold uppercase font-cyber">Total User</span>
@@ -163,8 +146,6 @@
                 </div>
                 <h3 id="statTotalUsers" class="text-xl font-black font-cyber text-white">0</h3>
             </div>
-
-            <!-- Total Produk -->
             <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
                     <span class="text-[11px] font-semibold uppercase font-cyber">Total Produk</span>
@@ -172,8 +153,6 @@
                 </div>
                 <h3 id="statTotalProducts" class="text-xl font-black font-cyber text-purple-400">0</h3>
             </div>
-
-            <!-- Total Pesanan -->
             <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
                     <span class="text-[11px] font-semibold uppercase font-cyber">Total Pesanan</span>
@@ -181,8 +160,6 @@
                 </div>
                 <h3 id="statTotalTrx" class="text-xl font-black font-cyber text-white">0</h3>
             </div>
-
-            <!-- Transaksi Lunas -->
             <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
                     <span class="text-[11px] font-semibold uppercase font-cyber">Pesanan Lunas</span>
@@ -190,17 +167,13 @@
                 </div>
                 <h3 id="statSuccessTrx" class="text-xl font-black font-cyber text-emerald-400">0</h3>
             </div>
-
-            <!-- Pesanan Hari Ini -->
             <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
                     <span class="text-[11px] font-semibold uppercase font-cyber">Hari Ini</span>
-                    <i class="fa-solid fa-calendar-day text-amber-400 animate-bounce"></i>
+                    <i class="fa-solid fa-calendar-day text-amber-400"></i>
                 </div>
                 <h3 id="statTrxToday" class="text-xl font-black font-cyber text-amber-400">0</h3>
             </div>
-
-            <!-- Pesanan Hari Sebelumnya -->
             <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
                     <span class="text-[11px] font-semibold uppercase font-cyber">Kemarin</span>
@@ -210,11 +183,50 @@
             </div>
         </div>
 
-        <!-- TABEL STATUS TRANSAKSI DIGITAL MODERN -->
-        <div class="bg-cyberCard p-5 rounded-2xl border border-cyberBorder shadow-xl animated-cyber-card space-y-4">
+        <!-- DIAGRAM GABUNGAN (LINE & BAR CHART CYBERSTYLE) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Grafik Trend Transaksi (Line Chart - Gambar Referensi) -->
+            <div class="lg:col-span-2 bg-cyberCard p-5 rounded-2xl border border-cyberBorder shadow-xl animated-cyber-card space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-cyberBorder/60 pb-3">
+                    <div>
+                        <h3 class="text-xs font-bold font-cyber text-white uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-cyberCyan"></i> Requests & Latency Analytics
+                        </h3>
+                        <p class="text-[10px] text-slate-400 mt-0.5 font-mono">
+                            <span class="text-emerald-400 font-bold">● LIVE</span> • 95 TICKS
+                        </p>
+                    </div>
+                    <!-- Filter Pill Style Seperti di Gambar Referensi -->
+                    <div class="flex items-center gap-1 bg-cyberDark p-1 rounded-full border border-cyberBorder self-start sm:self-auto">
+                        <button class="px-3 py-1 rounded-full text-[10px] font-bold font-cyber bg-white text-cyberDark transition">DAILY</button>
+                        <button class="px-3 py-1 rounded-full text-[10px] font-bold font-cyber text-slate-400 hover:text-white transition">WEEKLY</button>
+                        <button class="px-3 py-1 rounded-full text-[10px] font-bold font-cyber text-slate-400 hover:text-white transition">MONTHLY</button>
+                    </div>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Diagram Batang (Bar Chart - Pesanan Perhari) -->
+            <div class="bg-cyberCard p-5 rounded-2xl border border-cyberBorder shadow-xl space-y-4">
+                <div class="border-b border-cyberBorder/60 pb-3">
+                    <h3 class="text-xs font-bold font-cyber text-white uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-chart-column text-purple-400"></i> Diagram Batang Pesanan
+                    </h3>
+                    <p class="text-[10px] text-slate-400 mt-0.5 font-mono">Perbandingan Pesanan vs Lunas</p>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABEL STATUS TRANSAKSI -->
+        <div class="bg-cyberCard p-5 rounded-2xl border border-cyberBorder shadow-xl space-y-4">
             <div class="flex items-center justify-between border-b border-cyberBorder/60 pb-3">
                 <h3 class="text-xs font-bold font-cyber text-white uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-cyberCyan animate-pulse"></i> Status Transaksi Terbaru
+                    <i class="fa-solid fa-list-check text-cyberCyan"></i> Status Transaksi Terbaru
                 </h3>
                 <span class="text-[10px] font-mono text-cyberCyan bg-cyberCyan/10 px-2.5 py-1 rounded-full border border-cyberCyan/30">
                     <i class="fa-solid fa-circle text-[6px] text-emerald-400 animate-ping"></i> LIVE MONITOR
@@ -244,27 +256,6 @@
             </div>
         </div>
 
-        <!-- AKSES CEPAT MENU -->
-        <div class="bg-cyberCard p-5 rounded-2xl border border-cyberBorder shadow-md space-y-4">
-            <h3 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                <i class="fa-solid fa-bolt text-cyberCyan"></i> Akses Cepat Menu
-            </h3>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <a href="/store" class="p-3.5 rounded-xl bg-cyberDark border border-cyberBorder hover:border-cyberCyan transition group flex flex-col items-center text-center">
-                    <i class="fa-solid fa-shop text-2xl text-cyberCyan mb-2 group-hover:scale-110 transition"></i>
-                    <span class="text-xs font-bold text-slate-200">Store Marketplace</span>
-                </a>
-                <a href="/riwayat" class="p-3.5 rounded-xl bg-cyberDark border border-cyberBorder hover:border-cyberCyan transition group flex flex-col items-center text-center">
-                    <i class="fa-solid fa-clock-rotate-left text-2xl text-orange-400 mb-2 group-hover:scale-110 transition"></i>
-                    <span class="text-xs font-bold text-slate-200">Riwayat Transaksi</span>
-                </a>
-                <a href="/profile" class="p-3.5 rounded-xl bg-cyberDark border border-cyberBorder hover:border-cyberCyan transition group flex flex-col items-center text-center">
-                    <i class="fa-solid fa-user-gear text-2xl text-emerald-400 mb-2 group-hover:scale-110 transition"></i>
-                    <span class="text-xs font-bold text-slate-200">Pengaturan Profil</span>
-                </a>
-            </div>
-        </div>
-
     </div>
 
     <!-- BOTTOM NAVIGATION BAR -->
@@ -288,7 +279,6 @@
     </nav>
 
     <script>
-        // FUNGI ANIMASI HITUNG DIGITAL
         function animateCounter(elementId, targetValue) {
             const el = document.getElementById(elementId);
             if (!el) return;
@@ -327,7 +317,7 @@
                 }
             } catch (e) {}
 
-            // Fetch Global Dashboard Stats
+            // Fetch Stats & Chart Data
             try {
                 const res = await fetch('/api/dashboard-stats');
                 const data = await res.json();
@@ -338,6 +328,101 @@
                     animateCounter('statSuccessTrx', data.lunasTrx || 0);
                     animateCounter('statTrxToday', data.trxToday || 0);
                     animateCounter('statTrxYesterday', data.trxYesterday || 0);
+
+                    // INITIALIZE LINE CHART (Sesuai Desain Gambar 2)
+                    const ctxLine = document.getElementById('lineChart').getContext('2d');
+                    
+                    const cyanGrad = ctxLine.createLinearGradient(0, 0, 0, 200);
+                    cyanGrad.addColorStop(0, 'rgba(0, 243, 255, 0.35)');
+                    cyanGrad.addColorStop(1, 'rgba(0, 243, 255, 0.0)');
+
+                    const purpleGrad = ctxLine.createLinearGradient(0, 0, 0, 200);
+                    purpleGrad.addColorStop(0, 'rgba(168, 85, 247, 0.35)');
+                    purpleGrad.addColorStop(1, 'rgba(168, 85, 247, 0.0)');
+
+                    new Chart(ctxLine, {
+                        type: 'line',
+                        data: {
+                            labels: data.chartData.labels,
+                            datasets: [
+                                {
+                                    label: 'Total Pesanan',
+                                    data: data.chartData.totalTrx,
+                                    borderColor: '#00f3ff',
+                                    backgroundColor: cyanGrad,
+                                    borderWidth: 3,
+                                    tension: 0.4,
+                                    fill: true,
+                                    pointRadius: 4,
+                                    pointBackgroundColor: '#00f3ff'
+                                },
+                                {
+                                    label: 'Pesanan Lunas',
+                                    data: data.chartData.lunasTrx,
+                                    borderColor: '#a855f7',
+                                    backgroundColor: purpleGrad,
+                                    borderWidth: 3,
+                                    tension: 0.4,
+                                    fill: true,
+                                    pointRadius: 4,
+                                    pointBackgroundColor: '#a855f7'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: {
+                                    grid: { color: 'rgba(22, 42, 69, 0.5)' },
+                                    ticks: { color: '#64748b', font: { family: 'Orbitron', size: 9 } }
+                                },
+                                y: {
+                                    grid: { color: 'rgba(22, 42, 69, 0.5)' },
+                                    ticks: { color: '#64748b', font: { family: 'Orbitron', size: 9 } }
+                                }
+                            }
+                        }
+                    });
+
+                    // INITIALIZE BAR CHART (Diagram Batang)
+                    const ctxBar = document.getElementById('barChart').getContext('2d');
+                    new Chart(ctxBar, {
+                        type: 'bar',
+                        data: {
+                            labels: data.chartData.labels.slice(-7), // 7 Hari Terakhir
+                            datasets: [
+                                {
+                                    label: 'Total',
+                                    data: data.chartData.totalTrx.slice(-7),
+                                    backgroundColor: '#00f3ff',
+                                    borderRadius: 6
+                                },
+                                {
+                                    label: 'Lunas',
+                                    data: data.chartData.lunasTrx.slice(-7),
+                                    backgroundColor: '#a855f7',
+                                    borderRadius: 6
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { color: '#64748b', font: { family: 'Orbitron', size: 9 } }
+                                },
+                                y: {
+                                    grid: { color: 'rgba(22, 42, 69, 0.5)' },
+                                    ticks: { color: '#64748b', font: { family: 'Orbitron', size: 9 } }
+                                }
+                            }
+                        }
+                    });
 
                     // Render Tabel Status Transaksi
                     const tbody = document.getElementById('transactionTableBody');
@@ -358,14 +443,11 @@
                                 icon = 'fa-circle-xmark';
                             }
 
-                            const namaProduk = trx.itemDetails?.nama || 'Pembelian';
-                            const emailUser = trx.userEmail || trx.itemDetails?.buyer || 'Guest';
-
                             return `
                                 <tr class="hover:bg-cyberBorder/30 transition">
                                     <td class="py-3 px-2 font-mono text-[11px] text-cyberCyan font-semibold">${trx.orderId}</td>
-                                    <td class="py-3 px-2 font-medium truncate max-w-[120px]">${emailUser}</td>
-                                    <td class="py-3 px-2 text-slate-300 font-medium truncate max-w-[140px]">${namaProduk}</td>
+                                    <td class="py-3 px-2 font-medium truncate max-w-[120px]">${trx.userEmail || 'Guest'}</td>
+                                    <td class="py-3 px-2 text-slate-300 font-medium truncate max-w-[140px]">${trx.itemDetails?.nama || 'Pembelian'}</td>
                                     <td class="py-3 px-2 font-mono font-bold text-white">Rp ${Number(trx.amount || 0).toLocaleString('id-ID')}</td>
                                     <td class="py-3 px-2 text-center">
                                         <span class="inline-flex items-center gap-1 text-[10px] font-bold font-cyber px-2.5 py-0.5 rounded-full border ${badgeClass}">
@@ -376,19 +458,11 @@
                             `;
                         }).join('');
                     } else {
-                        tbody.innerHTML = `
-                            <tr>
-                                <td colspan="5" class="py-6 text-center text-slate-500 font-mono">Belum ada transaksi.</td>
-                            </tr>
-                        `;
+                        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 font-mono">Belum ada transaksi.</td></tr>`;
                     }
                 }
             } catch(e) {
-                document.getElementById('transactionTableBody').innerHTML = `
-                    <tr>
-                        <td colspan="5" class="py-6 text-center text-rose-400 font-mono">Gagal memuat tabel transaksi.</td>
-                    </tr>
-                `;
+                console.error("Error load dashboard:", e);
             }
         });
     </script>
