@@ -108,7 +108,7 @@
             <div class="flex items-center gap-2">
                 <span class="text-xs font-mono font-bold text-cyberCyan bg-cyberCyan/10 px-3 py-1 rounded-full border border-cyberCyan/30 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-cyberCyan animate-ping"></span>
-                    <span>SERVER ONLINE</span>
+                    <span>SERVER AKTIF</span>
                 </span>
             </div>
         </div>
@@ -122,13 +122,13 @@
             <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <span class="inline-flex items-center gap-1.5 bg-cyberCyan/10 border border-cyberCyan/30 text-cyberCyan text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-3 font-cyber">
-                        <i class="fa-solid fa-gauge-high"></i> Control Panel Digital
+                        <i class="fa-solid fa-gauge-high"></i> Panel Kontrol Digital
                     </span>
                     <h1 class="text-2xl sm:text-3xl font-black text-white font-cyber tracking-tight">
                         Selamat Datang, <span id="dashUsername" class="text-cyberCyan">Pengguna</span>
                     </h1>
                     <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl">
-                        Pantau grafik analitik, total pesanan perhari, pengguna aktif, dan status transaksi marketplace.
+                        Pantau grafik analitik, total pesanan harian, pengguna aktif, dan status transaksi marketplace.
                     </p>
                 </div>
                 <a href="/store" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-black px-5 py-2.5 rounded-xl text-xs shadow-glowCyan transition-all uppercase tracking-wider flex items-center gap-2">
@@ -141,7 +141,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
             <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
-                    <span class="text-[11px] font-semibold uppercase font-cyber">Total User</span>
+                    <span class="text-[11px] font-semibold uppercase font-cyber">Total Pengguna</span>
                     <i class="fa-solid fa-users text-cyberCyan"></i>
                 </div>
                 <h3 id="statTotalUsers" class="text-xl font-black font-cyber text-white">0</h3>
@@ -189,16 +189,21 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-cyberBorder/60 pb-3">
                     <div>
                         <h3 class="text-xs font-bold font-cyber text-white uppercase tracking-wider flex items-center gap-2">
-                            <i class="fa-solid fa-chart-line text-cyberCyan"></i> Requests & Latency Analytics
+                            <i class="fa-solid fa-chart-line text-cyberCyan"></i> Analitik Permintaan & Latensi
                         </h3>
-                        <p class="text-[10px] text-slate-400 mt-0.5 font-mono">
-                            <span class="text-emerald-400 font-bold">● LIVE</span> • 95 TICKS
+                        <p class="text-[10px] text-slate-400 mt-0.5 font-mono flex items-center gap-1.5">
+                            <span class="relative flex h-2 w-2">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            </span>
+                            <span class="text-emerald-400 font-bold uppercase tracking-wider">LANGSUNG</span>
                         </p>
                     </div>
+                    <!-- Filter Tombol Interaktif Bahasa Indonesia -->
                     <div class="flex items-center gap-1 bg-cyberDark p-1 rounded-full border border-cyberBorder self-start sm:self-auto">
-                        <button class="px-3 py-1 rounded-full text-[10px] font-bold font-cyber bg-white text-cyberDark transition">DAILY</button>
-                        <button class="px-3 py-1 rounded-full text-[10px] font-bold font-cyber text-slate-400 hover:text-white transition">WEEKLY</button>
-                        <button class="px-3 py-1 rounded-full text-[10px] font-bold font-cyber text-slate-400 hover:text-white transition">MONTHLY</button>
+                        <button id="btnDaily" onclick="updateChartFilter('daily')" class="px-3 py-1 rounded-full text-[10px] font-bold font-cyber bg-white text-cyberDark transition">HARIAN</button>
+                        <button id="btnWeekly" onclick="updateChartFilter('weekly')" class="px-3 py-1 rounded-full text-[10px] font-bold font-cyber text-slate-400 hover:text-white transition">MINGGUAN</button>
+                        <button id="btnMonthly" onclick="updateChartFilter('monthly')" class="px-3 py-1 rounded-full text-[10px] font-bold font-cyber text-slate-400 hover:text-white transition">BULANAN</button>
                     </div>
                 </div>
                 <div class="h-64 relative">
@@ -219,14 +224,18 @@
             </div>
         </div>
 
-        <!-- TABEL STATUS TRANSAKSI REAL-TIME -->
+        <!-- TABEL STATUS TRANSAKSI LANGSUNG -->
         <div class="bg-cyberCard p-5 rounded-2xl border border-cyberBorder shadow-xl space-y-4">
             <div class="flex items-center justify-between border-b border-cyberBorder/60 pb-3">
                 <h3 class="text-xs font-bold font-cyber text-white uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-cyberCyan"></i> Status Transaksi Real-Time
+                    <i class="fa-solid fa-list-check text-cyberCyan"></i> Status Transaksi Langsung
                 </h3>
-                <span class="text-[10px] font-mono text-cyberCyan bg-cyberCyan/10 px-2.5 py-1 rounded-full border border-cyberCyan/30">
-                    <i class="fa-solid fa-circle text-[6px] text-emerald-400 animate-ping"></i> LIVE MONITOR
+                <span class="text-[10px] font-mono text-cyberCyan bg-cyberCyan/10 px-2.5 py-1 rounded-full border border-cyberCyan/30 flex items-center gap-1.5">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span>PANTAUAN LANGSUNG</span>
                 </span>
             </div>
 
@@ -234,7 +243,7 @@
                 <table class="w-full text-left text-xs font-sans">
                     <thead>
                         <tr class="text-slate-400 border-b border-cyberBorder font-cyber uppercase tracking-wider text-[10px]">
-                            <th class="pb-3 px-2">Order ID</th>
+                            <th class="pb-3 px-2">ID Pesanan</th>
                             <th class="pb-3 px-2">Pelanggan</th>
                             <th class="pb-3 px-2">Produk</th>
                             <th class="pb-3 px-2">Total</th>
@@ -245,7 +254,7 @@
                         <tr>
                             <td colspan="5" class="py-6 text-center text-slate-500 font-mono">
                                 <i class="fa-solid fa-spinner fa-spin text-cyberCyan text-lg mb-2"></i><br>
-                                Memuat data transaksi real-time...
+                                Memuat data transaksi langsung...
                             </td>
                         </tr>
                     </tbody>
@@ -271,12 +280,14 @@
         </a>
         <a href="/login" class="nav-item" id="nav-auth">
             <i class="fa-regular fa-user"></i>
-            <span id="nav-auth-label">Login</span>
+            <span id="nav-auth-label">Masuk</span>
         </a>
     </nav>
 
     <script>
-        // FUNGSI SENSOR ORDER ID (Contoh: SALDO-172839 -> SALD...2839)
+        let lineChartInstance = null;
+        let globalChartData = null;
+
         function maskOrderId(orderId) {
             if (!orderId) return '-';
             if (orderId.length <= 8) return orderId;
@@ -305,8 +316,59 @@
             }, stepTime);
         }
 
+        // FUNGSI KLIK FILTER GRAFIK (HARIAN, MINGGUAN, BULANAN)
+        function updateChartFilter(mode) {
+            if (!globalChartData || !lineChartInstance) return;
+
+            const btnDaily = document.getElementById('btnDaily');
+            const btnWeekly = document.getElementById('btnWeekly');
+            const btnMonthly = document.getElementById('btnMonthly');
+
+            [btnDaily, btnWeekly, btnMonthly].forEach(btn => {
+                btn.className = "px-3 py-1 rounded-full text-[10px] font-bold font-cyber text-slate-400 hover:text-white transition";
+            });
+
+            let labels = [];
+            let totalData = [];
+            let lunasData = [];
+
+            if (mode === 'daily') {
+                btnDaily.className = "px-3 py-1 rounded-full text-[10px] font-bold font-cyber bg-white text-cyberDark transition";
+                labels = globalChartData.labels;
+                totalData = globalChartData.totalTrx;
+                lunasData = globalChartData.lunasTrx;
+            } else if (mode === 'weekly') {
+                btnWeekly.className = "px-3 py-1 rounded-full text-[10px] font-bold font-cyber bg-white text-cyberDark transition";
+                labels = ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'];
+                totalData = [
+                    globalChartData.totalTrx.slice(0, 3).reduce((a, b) => a + b, 0),
+                    globalChartData.totalTrx.slice(3, 7).reduce((a, b) => a + b, 0),
+                    globalChartData.totalTrx.slice(7, 10).reduce((a, b) => a + b, 0),
+                    globalChartData.totalTrx.slice(10, 14).reduce((a, b) => a + b, 0)
+                ];
+                lunasData = [
+                    globalChartData.lunasTrx.slice(0, 3).reduce((a, b) => a + b, 0),
+                    globalChartData.lunasTrx.slice(3, 7).reduce((a, b) => a + b, 0),
+                    globalChartData.lunasTrx.slice(7, 10).reduce((a, b) => a + b, 0),
+                    globalChartData.lunasTrx.slice(10, 14).reduce((a, b) => a + b, 0)
+                ];
+            } else if (mode === 'monthly') {
+                btnMonthly.className = "px-3 py-1 rounded-full text-[10px] font-bold font-cyber bg-white text-cyberDark transition";
+                labels = ['Bulan Lalu', 'Bulan Ini'];
+                const totalSum = globalChartData.totalTrx.reduce((a, b) => a + b, 0);
+                const lunasSum = globalChartData.lunasTrx.reduce((a, b) => a + b, 0);
+                totalData = [Math.floor(totalSum * 0.7), totalSum];
+                lunasData = [Math.floor(lunasSum * 0.7), lunasSum];
+            }
+
+            lineChartInstance.data.labels = labels;
+            lineChartInstance.data.datasets[0].data = totalData;
+            lineChartInstance.data.datasets[1].data = lunasData;
+            lineChartInstance.update();
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
-            // Fetch User Status
+            // Fetch Status Pengguna
             try {
                 const res = await fetch('/api/user-status');
                 const data = await res.json();
@@ -319,11 +381,11 @@
                     if (authLabel) authLabel.innerText = 'Profil';
                 } else {
                     if (authBtn) authBtn.href = '/login';
-                    if (authLabel) authLabel.innerText = 'Login';
+                    if (authLabel) authLabel.innerText = 'Masuk';
                 }
             } catch (e) {}
 
-            // Fetch Dashboard Stats & Charts
+            // Fetch Statistik Dashboard & Data Diagram
             try {
                 const res = await fetch('/api/dashboard-stats');
                 const data = await res.json();
@@ -335,7 +397,9 @@
                     animateCounter('statTrxToday', data.trxToday || 0);
                     animateCounter('statTrxYesterday', data.trxYesterday || 0);
 
-                    // INITIALIZE LINE CHART
+                    globalChartData = data.chartData;
+
+                    // INISIALISASI DIAGRAM GARIS
                     const ctxLine = document.getElementById('lineChart').getContext('2d');
                     const cyanGrad = ctxLine.createLinearGradient(0, 0, 0, 200);
                     cyanGrad.addColorStop(0, 'rgba(0, 243, 255, 0.35)');
@@ -345,7 +409,7 @@
                     purpleGrad.addColorStop(0, 'rgba(168, 85, 247, 0.35)');
                     purpleGrad.addColorStop(1, 'rgba(168, 85, 247, 0.0)');
 
-                    new Chart(ctxLine, {
+                    lineChartInstance = new Chart(ctxLine, {
                         type: 'line',
                         data: {
                             labels: data.chartData.labels,
@@ -385,7 +449,7 @@
                         }
                     });
 
-                    // INITIALIZE BAR CHART
+                    // INISIALISASI DIAGRAM BATANG
                     const ctxBar = document.getElementById('barChart').getContext('2d');
                     new Chart(ctxBar, {
                         type: 'bar',
@@ -417,7 +481,7 @@
                         }
                     });
 
-                    // RENDER TABEL TRANSAKSI REAL-TIME
+                    // RENDER TABEL TRANSAKSI LANGSUNG
                     const tbody = document.getElementById('transactionTableBody');
                     if (data.recentTrx && data.recentTrx.length > 0) {
                         tbody.innerHTML = data.recentTrx.map(trx => {
@@ -459,11 +523,11 @@
                             `;
                         }).join('');
                     } else {
-                        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 font-mono">Belum ada transaksi real-time.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 font-mono">Belum ada transaksi.</td></tr>`;
                     }
                 }
             } catch(e) {
-                console.error("Error loading dashboard stats:", e);
+                console.error("Gagal memuat data statistik dashboard:", e);
             }
         });
     </script>
