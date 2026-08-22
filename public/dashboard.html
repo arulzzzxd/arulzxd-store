@@ -135,21 +135,28 @@
         </div>
 
         <!-- STATS GRID -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
-                <div class="flex items-center justify-between text-slate-400 mb-2">
-                    <span class="text-xs font-semibold">Total Pesanan</span>
-                    <i class="fa-solid fa-cart-shopping text-cyberCyan"></i>
-                </div>
-                <h3 id="statTotalTrx" class="text-xl font-bold font-cyber text-white">0</h3>
-            </div>
-            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
-                <div class="flex items-center justify-between text-slate-400 mb-2">
-                    <span class="text-xs font-semibold">Transaksi Lunas</span>
-                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
-                </div>
-                <h3 id="statSuccessTrx" class="text-xl font-bold font-cyber text-emerald-400">0</h3>
-            </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+    <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
+        <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="text-xs font-semibold">Total User</span>
+            <i class="fa-solid fa-users text-cyberCyan"></i>
+        </div>
+        <h3 id="statTotalUsers" class="text-xl font-bold font-cyber text-white">0</h3>
+    </div>
+    <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
+        <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="text-xs font-semibold">Total Pesanan</span>
+            <i class="fa-solid fa-cart-shopping text-cyberCyan"></i>
+        </div>
+        <h3 id="statTotalTrx" class="text-xl font-bold font-cyber text-white">0</h3>
+    </div>
+    <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
+        <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="text-xs font-semibold">Transaksi Lunas</span>
+            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        </div>
+        <h3 id="statSuccessTrx" class="text-xl font-bold font-cyber text-emerald-400">0</h3>
+    </div>
             <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
                     <span class="text-xs font-semibold">Status Gateway</span>
@@ -211,34 +218,34 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const res = await fetch('/api/user-status');
-                const data = await res.json();
-                const authBtn = document.getElementById('nav-auth');
-                const authLabel = document.getElementById('nav-auth-label');
+        // Fetch User Status
+        try {
+            const res = await fetch('/api/user-status');
+            const data = await res.json();
+            const authBtn = document.getElementById('nav-auth');
+            const authLabel = document.getElementById('nav-auth-label');
 
-                if (data.loggedIn && data.user) {
-                    document.getElementById('dashUsername').innerText = data.user.username;
-                    if (authBtn) authBtn.href = '/profile';
-                    if (authLabel) authLabel.innerText = 'Profil';
-                } else {
-                    if (authBtn) authBtn.href = '/login';
-                    if (authLabel) authLabel.innerText = 'Login';
-                }
-            } catch (e) {}
+            if (data.loggedIn && data.user) {
+                document.getElementById('dashUsername').innerText = data.user.username;
+                if (authBtn) authBtn.href = '/profile';
+                if (authLabel) authLabel.innerText = 'Profil';
+            } else {
+                if (authBtn) authBtn.href = '/login';
+                if (authLabel) authLabel.innerText = 'Login';
+            }
+        } catch (e) {}
 
-            try {
-                const savedOrder = localStorage.getItem('active_order_id');
-                const orderIds = savedOrder ? [savedOrder] : [];
-                const res = await fetch(`/api/user/transactions?orderIds=${orderIds.join(',')}`);
-                const data = await res.json();
-                if (data.status && data.transactions) {
-                    document.getElementById('statTotalTrx').innerText = data.transactions.length;
-                    const successCount = data.transactions.filter(t => ['settlement','success','paid','settled'].includes(t.status?.toLowerCase())).length;
-                    document.getElementById('statSuccessTrx').innerText = successCount;
-                }
-            } catch(e) {}
-        });
+        // Fetch Global Dashboard Stats
+        try {
+            const res = await fetch('/api/dashboard-stats');
+            const data = await res.json();
+            if (data.status) {
+                document.getElementById('statTotalUsers').innerText = data.totalUsers;
+                document.getElementById('statTotalTrx').innerText = data.totalTrx;
+                document.getElementById('statSuccessTrx').innerText = data.lunasTrx;
+            }
+        } catch(e) {}
+    });
     </script>
 </body>
 </html>
