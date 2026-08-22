@@ -834,7 +834,7 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
             return res.status(401).json({ status: false, message: "Silakan login terlebih dahulu untuk bertransaksi." });
         }
 
-        const { productId, qty } = req.body;
+        const { productId, qty, voucherCode } = req.body;
         const buyQty = Number(qty) || 1;
 
         if (!productId) {
@@ -854,17 +854,32 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
         }
 
         const unitPrice = dbProduct.harga_diskon || dbProduct.harga;
-        const totalPrice = unitPrice * buyQty;
+        let totalPrice = unitPrice * buyQty;
+
+        // CEK & HITUNG POTONGAN VOUCHER JIKA ADA
+        let discountAmount = 0;
+        if (voucherCode && voucherCode.trim()) {
+            const v = await VoucherV2.findOne({ code: voucherCode.trim().toUpperCase() });
+            if (v && v.usageLimit > 0 && new Date() <= new Date(v.expiredAt)) {
+                if (v.type === 'percentage') {
+                    discountAmount = Math.floor((totalPrice * v.discount) / 100);
+                } else {
+                    discountAmount = v.discount;
+                }
+            }
+        }
+
+        // Harga Akhir Setelah Potongan Voucher
+        const finalPrice = Math.max(0, totalPrice - discountAmount);
 
         const user = await UserV2.findById(req.user.id || req.user._id);
-
         if (!user) {
             return res.status(404).json({ status: false, message: "Data akun tidak ditemukan." });
         }
 
         const currentBalance = user.saldo || 0;
 
-        if (currentBalance < totalPrice) {
+        if (currentBalance < finalPrice) {
             return res.status(400).json({ 
                 status: false, 
                 insufficientBalance: true,
@@ -872,7 +887,7 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
             });
         }
 
-        user.saldo = currentBalance - totalPrice;
+        user.saldo = currentBalance - finalPrice;
         await user.save();
 
         await updateProductStockAndSold(dbProduct.nama, buyQty, false);
@@ -881,7 +896,7 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
         const orderId = `SALDO-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
         const newTransaction = new TransactionV2({
             orderId,
-            amount: totalPrice,
+            amount: finalPrice, // Menyimpan Harga Bersih Setelah Voucher
             paymentMethod: "SALDO",
             status: "success",
             type: "PURCHASE",
@@ -889,6 +904,7 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
             itemDetails: {
                 nama: dbProduct.nama,
                 harga: unitPrice,
+                harga_setelah_voucher: finalPrice,
                 kategori: dbProduct.kategori,
                 gambar: Array.isArray(dbProduct.gambar) ? dbProduct.gambar[0] : dbProduct.gambar,
                 link: dbProduct.link,
@@ -906,6 +922,7 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
             message: "Pembayaran berhasil menggunakan Saldo!",
             data: {
                 orderId: orderId,
+                amount: finalPrice,
                 productLink: dbProduct.link,
                 remainingBalance: user.saldo
             }
@@ -919,7 +936,7 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
 
 app.post('/transactions', checkAuthSession, async (req, res) => {
     try {
-        const { orderId, amount, itemDetails, qty } = req.body;
+        const { orderId, amount, itemDetails, qty, voucherCode } = req.body;
         const buyQty = Number(qty) || 1;
 
         if (!orderId || !amount) {
@@ -935,7 +952,21 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
             return res.json({ status: true, data: existingTrx });
         }
 
-        const inputAmount = Number(amount);
+        let inputAmount = Number(amount);
+
+        // HITUNG POTONGAN VOUCHER UNTUK TRANSACTION GATEWAY
+        if (voucherCode && voucherCode.trim()) {
+            const v = await VoucherV2.findOne({ code: voucherCode.trim().toUpperCase() });
+            if (v && v.usageLimit > 0 && new Date() <= new Date(v.expiredAt)) {
+                let discountAmount = 0;
+                if (v.type === 'percentage') {
+                    discountAmount = Math.floor((inputAmount * v.discount) / 100);
+                } else {
+                    discountAmount = v.discount;
+                }
+                inputAmount = Math.max(0, inputAmount - discountAmount);
+            }
+        }
 
         const paywuzRes = await axiosPaywuzWithRetry({
             method: 'post',
@@ -983,7 +1014,7 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
 
         const newTransaction = new TransactionV2({
             orderId,
-            amount: finalAmount,
+            amount: inputAmount, // Total harga bersih pembelian
             paymentNumber: qrisNumber,
             paymentMethod: "QRIS",
             type: "PURCHASE",
@@ -991,6 +1022,7 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
             status: (transactionData.status || "pending").toLowerCase(),
             itemDetails: {
                 ...itemDetails,
+                harga_setelah_voucher: inputAmount,
                 qty: buyQty,
                 buyer: uEmail || getUserIdentifier(req)
             },
@@ -2045,7 +2077,6 @@ app.get('/api/dashboard-stats', async (req, res) => {
             ])
         ]);
 
-        // Ambil data User untuk pencocokan Nama Pelanggan Real-time
         const emails = recentTrxRaw.map(t => t.userEmail).filter(Boolean);
         const users = await UserV2.find({ email: { $in: emails } }).select('email username').lean();
         const userMap = {};
@@ -2057,17 +2088,19 @@ app.get('/api/dashboard-stats', async (req, res) => {
             const emailKey = (trx.userEmail || '').toLowerCase().trim();
             const fetchedUsername = userMap[emailKey];
             
-            // Prioritas nama: Username DB -> Buyer Item -> Potongan Email -> Guest
             let cleanName = fetchedUsername || trx.itemDetails?.buyer || 'Guest';
             if (cleanName.includes('@')) {
                 cleanName = cleanName.split('@')[0];
             }
 
+            // Memastikan mengambil total harga nett setelah potongan voucher
+            const finalDisplayAmount = trx.itemDetails?.harga_setelah_voucher || trx.amount || 0;
+
             return {
                 orderId: trx.orderId,
                 pelanggan: cleanName,
                 produk: trx.itemDetails?.nama || (trx.type === 'DEPOSIT' ? 'Deposit Saldo' : 'Pembelian Marketplace'),
-                amount: trx.amount,
+                amount: finalDisplayAmount,
                 status: trx.status,
                 createdAt: trx.createdAt
             };
