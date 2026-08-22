@@ -46,7 +46,6 @@
         }
         .animated-cyber-card { animation: borderGlow 4s infinite ease-in-out; }
 
-        /* BOTTOM NAVIGATION STYLE */
         .bottom-nav-container {
             position: fixed;
             bottom: 20px;
@@ -183,7 +182,28 @@
             </div>
         </div>
 
-        <!-- DIAGRAM GABUNGAN (LINE & BAR CHART CYBERSTYLE) -->
+        <!-- KETERANGAN WARNA STATUS (LEGENDA GRAPHIC) -->
+        <div class="bg-cyberCard p-3.5 rounded-xl border border-cyberBorder flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+            <span class="font-bold text-white uppercase font-cyber flex items-center gap-1.5">
+                <i class="fa-solid fa-palette text-cyberCyan"></i> Keterangan Warna Grafik:
+            </span>
+            <div class="flex items-center gap-4 flex-wrap">
+                <span class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-[#00f3ff] shadow-[0_0_8px_#00f3ff]"></span>
+                    <span class="text-slate-200 font-medium">Total Pesanan</span>
+                </span>
+                <span class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-[#a855f7] shadow-[0_0_8px_#a855f7]"></span>
+                    <span class="text-slate-200 font-medium">Pesanan Lunas</span>
+                </span>
+                <span class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-[#f43f5e] shadow-[0_0_8px_#f43f5e]"></span>
+                    <span class="text-slate-200 font-medium">Pesanan Batal</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- DIAGRAM GABUNGAN -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 bg-cyberCard p-5 rounded-2xl border border-cyberBorder shadow-xl animated-cyber-card space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-cyberBorder/60 pb-3">
@@ -199,7 +219,6 @@
                             <span class="text-emerald-400 font-bold uppercase tracking-wider">LANGSUNG</span>
                         </p>
                     </div>
-                    <!-- Filter Tombol Interaktif Bahasa Indonesia -->
                     <div class="flex items-center gap-1 bg-cyberDark p-1 rounded-full border border-cyberBorder self-start sm:self-auto">
                         <button id="btnDaily" onclick="updateChartFilter('daily')" class="px-3 py-1 rounded-full text-[10px] font-bold font-cyber bg-white text-cyberDark transition">HARIAN</button>
                         <button id="btnWeekly" onclick="updateChartFilter('weekly')" class="px-3 py-1 rounded-full text-[10px] font-bold font-cyber text-slate-400 hover:text-white transition">MINGGUAN</button>
@@ -216,7 +235,7 @@
                     <h3 class="text-xs font-bold font-cyber text-white uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-chart-column text-purple-400"></i> Diagram Batang Pesanan
                     </h3>
-                    <p class="text-[10px] text-slate-400 mt-0.5 font-mono">Perbandingan Pesanan vs Lunas</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5 font-mono">Perbandingan Status Transaksi</p>
                 </div>
                 <div class="h-64 relative">
                     <canvas id="barChart"></canvas>
@@ -291,9 +310,7 @@
         function maskOrderId(orderId) {
             if (!orderId) return '-';
             if (orderId.length <= 8) return orderId;
-            const start = orderId.substring(0, 4);
-            const end = orderId.substring(orderId.length - 4);
-            return `${start}...${end}`;
+            return `${orderId.substring(0, 4)}...${orderId.substring(orderId.length - 4)}`;
         }
 
         function animateCounter(elementId, targetValue) {
@@ -302,8 +319,7 @@
             let start = 0;
             const duration = 1000;
             const stepTime = 20;
-            const steps = duration / stepTime;
-            const increment = targetValue / steps;
+            const increment = targetValue / (duration / stepTime);
 
             const timer = setInterval(() => {
                 start += increment;
@@ -316,7 +332,6 @@
             }, stepTime);
         }
 
-        // FUNGSI KLIK FILTER GRAFIK (HARIAN, MINGGUAN, BULANAN)
         function updateChartFilter(mode) {
             if (!globalChartData || !lineChartInstance) return;
 
@@ -329,14 +344,14 @@
             });
 
             let labels = [];
-            let totalData = [];
-            let lunasData = [];
+            let totalData = [], lunasData = [], batalData = [];
 
             if (mode === 'daily') {
                 btnDaily.className = "px-3 py-1 rounded-full text-[10px] font-bold font-cyber bg-white text-cyberDark transition";
                 labels = globalChartData.labels;
                 totalData = globalChartData.totalTrx;
                 lunasData = globalChartData.lunasTrx;
+                batalData = globalChartData.batalTrx || [];
             } else if (mode === 'weekly') {
                 btnWeekly.className = "px-3 py-1 rounded-full text-[10px] font-bold font-cyber bg-white text-cyberDark transition";
                 labels = ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'];
@@ -352,23 +367,31 @@
                     globalChartData.lunasTrx.slice(7, 10).reduce((a, b) => a + b, 0),
                     globalChartData.lunasTrx.slice(10, 14).reduce((a, b) => a + b, 0)
                 ];
+                batalData = [
+                    (globalChartData.batalTrx || []).slice(0, 3).reduce((a, b) => a + b, 0),
+                    (globalChartData.batalTrx || []).slice(3, 7).reduce((a, b) => a + b, 0),
+                    (globalChartData.batalTrx || []).slice(7, 10).reduce((a, b) => a + b, 0),
+                    (globalChartData.batalTrx || []).slice(10, 14).reduce((a, b) => a + b, 0)
+                ];
             } else if (mode === 'monthly') {
                 btnMonthly.className = "px-3 py-1 rounded-full text-[10px] font-bold font-cyber bg-white text-cyberDark transition";
                 labels = ['Bulan Lalu', 'Bulan Ini'];
                 const totalSum = globalChartData.totalTrx.reduce((a, b) => a + b, 0);
                 const lunasSum = globalChartData.lunasTrx.reduce((a, b) => a + b, 0);
+                const batalSum = (globalChartData.batalTrx || []).reduce((a, b) => a + b, 0);
                 totalData = [Math.floor(totalSum * 0.7), totalSum];
                 lunasData = [Math.floor(lunasSum * 0.7), lunasSum];
+                batalData = [Math.floor(batalSum * 0.7), batalSum];
             }
 
             lineChartInstance.data.labels = labels;
             lineChartInstance.data.datasets[0].data = totalData;
             lineChartInstance.data.datasets[1].data = lunasData;
+            lineChartInstance.data.datasets[2].data = batalData;
             lineChartInstance.update();
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            // Fetch Status Pengguna
             try {
                 const res = await fetch('/api/user-status');
                 const data = await res.json();
@@ -379,13 +402,9 @@
                     document.getElementById('dashUsername').innerText = data.user.username;
                     if (authBtn) authBtn.href = '/profile';
                     if (authLabel) authLabel.innerText = 'Profil';
-                } else {
-                    if (authBtn) authBtn.href = '/login';
-                    if (authLabel) authLabel.innerText = 'Masuk';
                 }
             } catch (e) {}
 
-            // Fetch Statistik Dashboard & Data Diagram
             try {
                 const res = await fetch('/api/dashboard-stats');
                 const data = await res.json();
@@ -399,7 +418,7 @@
 
                     globalChartData = data.chartData;
 
-                    // INISIALISASI DIAGRAM GARIS
+                    // INISIALISASI ANALITIK PERMINTAAN & LATENSI
                     const ctxLine = document.getElementById('lineChart').getContext('2d');
                     const cyanGrad = ctxLine.createLinearGradient(0, 0, 0, 200);
                     cyanGrad.addColorStop(0, 'rgba(0, 243, 255, 0.35)');
@@ -408,6 +427,10 @@
                     const purpleGrad = ctxLine.createLinearGradient(0, 0, 0, 200);
                     purpleGrad.addColorStop(0, 'rgba(168, 85, 247, 0.35)');
                     purpleGrad.addColorStop(1, 'rgba(168, 85, 247, 0.0)');
+
+                    const roseGrad = ctxLine.createLinearGradient(0, 0, 0, 200);
+                    roseGrad.addColorStop(0, 'rgba(244, 63, 94, 0.35)');
+                    roseGrad.addColorStop(1, 'rgba(244, 63, 94, 0.0)');
 
                     lineChartInstance = new Chart(ctxLine, {
                         type: 'line',
@@ -435,6 +458,17 @@
                                     fill: true,
                                     pointRadius: 4,
                                     pointBackgroundColor: '#a855f7'
+                                },
+                                {
+                                    label: 'Pesanan Batal',
+                                    data: data.chartData.batalTrx || [],
+                                    borderColor: '#f43f5e',
+                                    backgroundColor: roseGrad,
+                                    borderWidth: 3,
+                                    tension: 0.4,
+                                    fill: true,
+                                    pointRadius: 4,
+                                    pointBackgroundColor: '#f43f5e'
                                 }
                             ]
                         },
@@ -449,7 +483,7 @@
                         }
                     });
 
-                    // INISIALISASI DIAGRAM BATANG
+                    // INISIALISASI DIAGRAM BATANG PESANAN
                     const ctxBar = document.getElementById('barChart').getContext('2d');
                     new Chart(ctxBar, {
                         type: 'bar',
@@ -460,13 +494,19 @@
                                     label: 'Total',
                                     data: data.chartData.totalTrx.slice(-7),
                                     backgroundColor: '#00f3ff',
-                                    borderRadius: 6
+                                    borderRadius: 4
                                 },
                                 {
                                     label: 'Lunas',
                                     data: data.chartData.lunasTrx.slice(-7),
                                     backgroundColor: '#a855f7',
-                                    borderRadius: 6
+                                    borderRadius: 4
+                                },
+                                {
+                                    label: 'Batal',
+                                    data: (data.chartData.batalTrx || []).slice(-7),
+                                    backgroundColor: '#f43f5e',
+                                    borderRadius: 4
                                 }
                             ]
                         },
@@ -481,7 +521,7 @@
                         }
                     });
 
-                    // RENDER TABEL TRANSAKSI LANGSUNG
+                    // RENDER TABEL TRANSAKSI
                     const tbody = document.getElementById('transactionTableBody');
                     if (data.recentTrx && data.recentTrx.length > 0) {
                         tbody.innerHTML = data.recentTrx.map(trx => {
