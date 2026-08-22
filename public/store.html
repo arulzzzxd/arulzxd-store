@@ -378,7 +378,7 @@
         </div>
 
         <div class="absolute bottom-6 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
-            Arulz-XD API v2.0
+            Arulz-XD STORE v2.0
         </div>
     </div>
 
@@ -398,9 +398,6 @@
             </div>
 
             <div class="flex items-center gap-4 text-slate-300">
-                <button onclick="window.history.back()" title="Kembali" class="text-lg hover:text-cyberCyan transition relative flex items-center justify-center w-8 h-8 rounded-lg bg-cyberCard border border-cyberBorder">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
             </div>
         </div>
     </nav>
@@ -1639,34 +1636,46 @@
         }
 
         async function fetchProduk() {
-            const statusElem = document.getElementById('serverStatus');
+    const statusElem = document.getElementById('serverStatus');
+    try {
+        const response = await fetch('/database/produk');
+        if (!response.ok) throw new Error('Gagal memuat API server');
+
+        DATA_PRODUK = await response.json();
+
+        // Load ulasan untuk setiap produk agar jumlah ulasan langsung ter-update
+        await Promise.all(DATA_PRODUK.map(async (produk) => {
+            const pId = produk.Id || produk._id;
             try {
-                const response = await fetch('/database/produk');
-                if (!response.ok) throw new Error('Gagal memuat API server');
-
-                DATA_PRODUK = await response.json();
-
-                if (statusElem) {
-                    statusElem.innerText = '● ONLINE';
-                    statusElem.className = 'text-cyberCyan font-bold animate-pulse';
+                const resRev = await fetch(`/api/reviews/${pId}`);
+                if (resRev.ok && resRev.headers.get('content-type')?.includes('application/json')) {
+                    const revData = await resRev.json();
+                    REVIEWS_CACHE[pId] = revData;
                 }
+            } catch (e) {}
+        }));
 
-                generateKategoriButtons();
-                renderProduk();
-            } catch (error) {
-                console.error('Fetch Error:', error);
-                if (statusElem) {
-                    statusElem.innerText = '● OFFLINE';
-                    statusElem.className = 'text-red-500 font-bold';
-                }
+        if (statusElem) {
+            statusElem.innerText = '● ONLINE';
+            statusElem.className = 'text-cyberCyan font-bold animate-pulse';
+        }
 
-                document.getElementById('productGrid').innerHTML = `
+        generateKategoriButtons();
+        renderProduk();
+    } catch (error) {
+        console.error('Fetch Error:', error);
+        if (statusElem) {
+            statusElem.innerText = '● OFFLINE';
+            statusElem.className = 'text-red-500 font-bold';
+        }
+        
+        document.getElementById('productGrid').innerHTML = `
                     <div class="col-span-full text-center py-10 bg-red-950/30 text-red-400 text-xs font-semibold rounded-xl border border-red-800/40">
                         <i class="fa-solid fa-triangle-exclamation text-lg mb-2 block"></i> Gagal mengambil data produk.
                     </div>
                 `;
-            }
-        }
+    }
+}
 
         function renderQrisCode(qrisString) {
             const qrContainer = document.getElementById('qrcodeContainer');
