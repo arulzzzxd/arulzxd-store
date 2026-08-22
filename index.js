@@ -965,6 +965,7 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
             }
         }
 
+        // REQUEST KE GATEWAY PAYWUZ
         const paywuzRes = await axiosPaywuzWithRetry({
             method: 'post',
             url: `${PAYWUZ_BASE_URL}/transactions`,
@@ -975,14 +976,26 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
         const transactionData = paywuzRes.data?.data || paywuzRes.data;
         const qrisNumber = transactionData.paymentNumber || transactionData.qrString || transactionData.qrUrl;
 
-        // FIX VALIDASI: Memastikan itemDetails.gambar selalu berupa STRING
-        let sanitizeGambar = "https://arulz-xd.my.id/files/X1F0Cn.png";
-        if (itemDetails && itemDetails.gambar) {
-            sanitizeGambar = Array.isArray(itemDetails.gambar) 
-                ? itemDetails.gambar[0] 
-                : String(itemDetails.gambar);
+        // KALKULASI TOTAL HARGA + FEE DARI GATEWAY (SAMA SEPERTI ALUR DEPOSIT)
+        const safeNum = (val) => {
+            const num = Number(val);
+            return (!isNaN(num) && num > 0) ? num : null;
+        };
+
+        const feeFlatIdr = Number(transactionData.feeFlatIdr) || 290;
+        const feePercentBps = Number(transactionData.feePercentBps) || 70;
+        const calculatedFee = feeFlatIdr + Math.ceil((inputAmount * feePercentBps) / 10000);
+
+        let finalAmount = safeNum(transactionData.grossAmount) || 
+                          safeNum(transactionData.totalAmount) || 
+                          safeNum(transactionData.total);
+
+        if (!finalAmount) {
+            const feeVal = safeNum(transactionData.fee) || safeNum(transactionData.feeAdmin) || calculatedFee;
+            finalAmount = inputAmount + feeVal;
         }
 
+        // AMBIL LINK PRODUK JIKA ADA
         let pLink = itemDetails?.link || null;
         if (!pLink && itemDetails?.nama) {
             const dbProduct = await ProductV2.findOne({ 
@@ -994,9 +1007,10 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
         const expiredAt = new Date(Date.now() + 15 * 60 * 1000);
         const uEmail = req.user ? req.user.email.toLowerCase().trim() : null;
 
+        // PENYIMPANAN TRANSAKSI LANGSUNG
         const newTransaction = new TransactionV2({
             orderId,
-            amount: inputAmount,
+            amount: finalAmount, // Total otomatis + admin fee
             paymentNumber: qrisNumber,
             paymentMethod: "QRIS",
             type: "PURCHASE",
@@ -1004,8 +1018,8 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
             status: (transactionData.status || "pending").toLowerCase(),
             itemDetails: {
                 ...itemDetails,
-                gambar: sanitizeGambar, // string terverifikasi
-                harga_setelah_voucher: inputAmount,
+                gambar: Array.isArray(itemDetails?.gambar) ? itemDetails.gambar[0] : itemDetails?.gambar,
+                harga_setelah_voucher: finalAmount,
                 qty: buyQty,
                 buyer: uEmail || getUserIdentifier(req)
             },
