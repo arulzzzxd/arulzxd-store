@@ -2226,15 +2226,16 @@
             });
 
             try {
-                const res = await fetch('/api/store/pay-with-balance', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        productId: SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id,
-                        qty: CURRENT_QTY
-                    })
-                });
-
+                // Ganti bagian fetch pada fungsi processSaldoPayment() menjadi:
+const res = await fetch('/api/store/pay-with-balance', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        productId: SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id,
+        qty: CURRENT_QTY,
+        voucherCode: ACTIVE_VOUCHER ? ACTIVE_VOUCHER.code : null // Penambahan voucherCode
+    })
+});
                 const result = await res.json();
                 Swal.close();
 
