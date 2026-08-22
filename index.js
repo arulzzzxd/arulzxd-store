@@ -954,16 +954,13 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
 
         let inputAmount = Number(amount);
 
-        // HITUNG POTONGAN VOUCHER UNTUK TRANSACTION GATEWAY
+        // FITUR VOUCHER DISKON
         if (voucherCode && voucherCode.trim()) {
             const v = await VoucherV2.findOne({ code: voucherCode.trim().toUpperCase() });
             if (v && v.usageLimit > 0 && new Date() <= new Date(v.expiredAt)) {
-                let discountAmount = 0;
-                if (v.type === 'percentage') {
-                    discountAmount = Math.floor((inputAmount * v.discount) / 100);
-                } else {
-                    discountAmount = v.discount;
-                }
+                let discountAmount = (v.type === 'percentage') 
+                    ? Math.floor((inputAmount * v.discount) / 100) 
+                    : v.discount;
                 inputAmount = Math.max(0, inputAmount - discountAmount);
             }
         }
@@ -971,34 +968,19 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
         const paywuzRes = await axiosPaywuzWithRetry({
             method: 'post',
             url: `${PAYWUZ_BASE_URL}/transactions`,
-            data: {
-                orderId,
-                amount: inputAmount,
-                paymentMethod: "QRIS",
-                feeByMerchant: false
-            },
+            data: { orderId, amount: inputAmount, paymentMethod: "QRIS", feeByMerchant: false },
             headers: PAYWUZ_HEADERS
         });
 
         const transactionData = paywuzRes.data?.data || paywuzRes.data;
         const qrisNumber = transactionData.paymentNumber || transactionData.qrString || transactionData.qrUrl;
 
-        const safeNum = (val) => {
-            const num = Number(val);
-            return (!isNaN(num) && num > 0) ? num : null;
-        };
-
-        const feeFlatIdr = Number(transactionData.feeFlatIdr) || 290;
-        const feePercentBps = Number(transactionData.feePercentBps) || 70;
-        const calculatedFee = feeFlatIdr + Math.ceil((inputAmount * feePercentBps) / 10000);
-
-        let finalAmount = safeNum(transactionData.grossAmount) || 
-                          safeNum(transactionData.totalAmount) || 
-                          safeNum(transactionData.total);
-
-        if (!finalAmount) {
-            const feeVal = safeNum(transactionData.fee) || safeNum(transactionData.feeAdmin) || calculatedFee;
-            finalAmount = inputAmount + feeVal;
+        // FIX VALIDASI: Memastikan itemDetails.gambar selalu berupa STRING
+        let sanitizeGambar = "https://arulz-xd.my.id/files/X1F0Cn.png";
+        if (itemDetails && itemDetails.gambar) {
+            sanitizeGambar = Array.isArray(itemDetails.gambar) 
+                ? itemDetails.gambar[0] 
+                : String(itemDetails.gambar);
         }
 
         let pLink = itemDetails?.link || null;
@@ -1014,7 +996,7 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
 
         const newTransaction = new TransactionV2({
             orderId,
-            amount: inputAmount, // Total harga bersih pembelian
+            amount: inputAmount,
             paymentNumber: qrisNumber,
             paymentMethod: "QRIS",
             type: "PURCHASE",
@@ -1022,6 +1004,7 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
             status: (transactionData.status || "pending").toLowerCase(),
             itemDetails: {
                 ...itemDetails,
+                gambar: sanitizeGambar, // string terverifikasi
                 harga_setelah_voucher: inputAmount,
                 qty: buyQty,
                 buyer: uEmail || getUserIdentifier(req)
@@ -1031,11 +1014,7 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
         });
 
         await newTransaction.save();
-
-        return res.json({
-            status: true,
-            data: newTransaction
-        });
+        return res.json({ status: true, data: newTransaction });
 
     } catch (error) {
         console.error("Error Create TRX:", error.response?.data || error.message);
@@ -2071,6 +2050,11 @@ app.get('/api/dashboard-stats', async (req, res) => {
                             $sum: {
                                 $cond: [{ $in: ["$status", ["settlement", "success", "paid", "settled"]] }, 1, 0]
                             }
+                        },
+                        batal: {
+                            $sum: {
+                                $cond: [{ $in: ["$status", ["cancelled", "failed", "expire", "batal"]] }, 1, 0]
+                            }
                         }
                     }
                 }
@@ -2086,21 +2070,14 @@ app.get('/api/dashboard-stats', async (req, res) => {
 
         const recentTrx = recentTrxRaw.map(trx => {
             const emailKey = (trx.userEmail || '').toLowerCase().trim();
-            const fetchedUsername = userMap[emailKey];
-            
-            let cleanName = fetchedUsername || trx.itemDetails?.buyer || 'Guest';
-            if (cleanName.includes('@')) {
-                cleanName = cleanName.split('@')[0];
-            }
-
-            // Memastikan mengambil total harga nett setelah potongan voucher
-            const finalDisplayAmount = trx.itemDetails?.harga_setelah_voucher || trx.amount || 0;
+            let cleanName = userMap[emailKey] || trx.itemDetails?.buyer || 'Guest';
+            if (cleanName.includes('@')) cleanName = cleanName.split('@')[0];
 
             return {
                 orderId: trx.orderId,
                 pelanggan: cleanName,
                 produk: trx.itemDetails?.nama || (trx.type === 'DEPOSIT' ? 'Deposit Saldo' : 'Pembelian Marketplace'),
-                amount: finalDisplayAmount,
+                amount: trx.itemDetails?.harga_setelah_voucher || trx.amount || 0,
                 status: trx.status,
                 createdAt: trx.createdAt
             };
@@ -2109,6 +2086,7 @@ app.get('/api/dashboard-stats', async (req, res) => {
         const chartLabels = [];
         const chartTotalTrx = [];
         const chartLunasTrx = [];
+        const chartBatalTrx = [];
 
         for (let i = 13; i >= 0; i--) {
             const d = new Date(startOfToday);
@@ -2119,6 +2097,7 @@ app.get('/api/dashboard-stats', async (req, res) => {
             chartLabels.push(dateStr);
             chartTotalTrx.push(found ? found.total : 0);
             chartLunasTrx.push(found ? found.lunas : 0);
+            chartBatalTrx.push(found ? found.batal : 0);
         }
 
         res.json({
@@ -2133,7 +2112,8 @@ app.get('/api/dashboard-stats', async (req, res) => {
             chartData: {
                 labels: chartLabels,
                 totalTrx: chartTotalTrx,
-                lunasTrx: chartLunasTrx
+                lunasTrx: chartLunasTrx,
+                batalTrx: chartBatalTrx
             }
         });
     } catch (err) {
