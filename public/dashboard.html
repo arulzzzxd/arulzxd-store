@@ -39,6 +39,29 @@
             background-size: 30px 30px;
         }
 
+        /* DIGITAL ANIMATED BORDER & PULSE */
+        @keyframes borderGlow {
+            0%, 100% { border-color: rgba(0, 243, 255, 0.3); box-shadow: 0 0 10px rgba(0, 243, 255, 0.1); }
+            50% { border-color: rgba(0, 243, 255, 0.8); box-shadow: 0 0 18px rgba(0, 243, 255, 0.35); }
+        }
+        .animated-cyber-card {
+            animation: borderGlow 4s infinite ease-in-out;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(1000%); }
+        }
+        .scanline-effect::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: rgba(0, 243, 255, 0.4);
+            opacity: 0.6;
+            animation: scanline 6s linear infinite;
+        }
+
         /* BOTTOM NAVIGATION STYLE */
         .bottom-nav-container {
             position: fixed;
@@ -72,13 +95,8 @@
             position: relative;
             padding: 2px 12px;
         }
-        .nav-item i {
-            font-size: 20px;
-            transition: transform 0.2s ease;
-        }
-        .nav-item:hover, .nav-item.active {
-            color: #00f3ff;
-        }
+        .nav-item i { font-size: 20px; transition: transform 0.2s ease; }
+        .nav-item:hover, .nav-item.active { color: #00f3ff; }
         .nav-item.active i {
             transform: translateY(-2px);
             filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.8));
@@ -104,8 +122,9 @@
                 Arulz<span class="text-white">Store</span>
             </a>
             <div class="flex items-center gap-2">
-                <span class="text-xs font-mono font-bold text-cyberCyan bg-cyberCyan/10 px-3 py-1 rounded-full border border-cyberCyan/30">
-                    <i class="fa-solid fa-server text-[10px] animate-pulse"></i> SERVER ONLINE
+                <span class="text-xs font-mono font-bold text-cyberCyan bg-cyberCyan/10 px-3 py-1 rounded-full border border-cyberCyan/30 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-cyberCyan animate-ping"></span>
+                    <span>SYSTEM ONLINE</span>
                 </span>
             </div>
         </div>
@@ -114,18 +133,18 @@
     <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
 
         <!-- HEADER BANNER -->
-        <div class="p-6 sm:p-8 bg-cyberCard rounded-2xl border border-cyberBorder shadow-xl relative overflow-hidden">
+        <div class="p-6 sm:p-8 bg-cyberCard rounded-2xl border border-cyberBorder shadow-xl relative overflow-hidden scanline-effect">
             <div class="absolute -top-24 -left-24 w-48 h-48 bg-cyberCyan/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <span class="inline-flex items-center gap-1.5 bg-cyberCyan/10 border border-cyberCyan/30 text-cyberCyan text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-3 font-cyber">
-                        <i class="fa-solid fa-gauge-high"></i> Control Panel
+                        <i class="fa-solid fa-gauge-high animate-pulse"></i> Control Panel Digital
                     </span>
                     <h1 class="text-2xl sm:text-3xl font-black text-white font-cyber tracking-tight">
                         Selamat Datang, <span id="dashUsername" class="text-cyberCyan">Pengguna</span>
                     </h1>
                     <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl">
-                        Pantau aktivitas belanja, riwayat transaksi, dan layanan marketplace digital secara terpusat.
+                        Pantau statistik penjualan, total pengguna, produk aktif, serta aktivitas transaksi secara real-time.
                     </p>
                 </div>
                 <a href="/store" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-black px-5 py-2.5 rounded-xl text-xs shadow-glowCyan transition-all uppercase tracking-wider flex items-center gap-2">
@@ -135,45 +154,97 @@
         </div>
 
         <!-- STATS GRID -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-    <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
-        <div class="flex items-center justify-between text-slate-400 mb-2">
-            <span class="text-xs font-semibold">Total User</span>
-            <i class="fa-solid fa-users text-cyberCyan"></i>
-        </div>
-        <h3 id="statTotalUsers" class="text-xl font-bold font-cyber text-white">0</h3>
-    </div>
-    <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
-        <div class="flex items-center justify-between text-slate-400 mb-2">
-            <span class="text-xs font-semibold">Total Pesanan</span>
-            <i class="fa-solid fa-cart-shopping text-cyberCyan"></i>
-        </div>
-        <h3 id="statTotalTrx" class="text-xl font-bold font-cyber text-white">0</h3>
-    </div>
-    <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
-        <div class="flex items-center justify-between text-slate-400 mb-2">
-            <span class="text-xs font-semibold">Transaksi Lunas</span>
-            <i class="fa-solid fa-circle-check text-emerald-400"></i>
-        </div>
-        <h3 id="statSuccessTrx" class="text-xl font-bold font-cyber text-emerald-400">0</h3>
-    </div>
-            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
+            <!-- Total User -->
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
-                    <span class="text-xs font-semibold">Status Gateway</span>
-                    <i class="fa-solid fa-bolt text-cyberCyan"></i>
+                    <span class="text-[11px] font-semibold uppercase font-cyber">Total User</span>
+                    <i class="fa-solid fa-users text-cyberCyan"></i>
                 </div>
-                <h3 class="text-xs font-bold font-cyber text-cyberCyan">QRIS ACTIVE</h3>
+                <h3 id="statTotalUsers" class="text-xl font-black font-cyber text-white">0</h3>
             </div>
-            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md">
+
+            <!-- Total Produk -->
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
                 <div class="flex items-center justify-between text-slate-400 mb-2">
-                    <span class="text-xs font-semibold">Database</span>
-                    <i class="fa-solid fa-database text-amber-400"></i>
+                    <span class="text-[11px] font-semibold uppercase font-cyber">Total Produk</span>
+                    <i class="fa-solid fa-box-open text-purple-400"></i>
                 </div>
-                <h3 class="text-xs font-bold font-cyber text-amber-400 uppercase">SYSTEM OK</h3>
+                <h3 id="statTotalProducts" class="text-xl font-black font-cyber text-purple-400">0</h3>
+            </div>
+
+            <!-- Total Pesanan -->
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-[11px] font-semibold uppercase font-cyber">Total Pesanan</span>
+                    <i class="fa-solid fa-cart-shopping text-cyberCyan"></i>
+                </div>
+                <h3 id="statTotalTrx" class="text-xl font-black font-cyber text-white">0</h3>
+            </div>
+
+            <!-- Transaksi Lunas -->
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-[11px] font-semibold uppercase font-cyber">Pesanan Lunas</span>
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                </div>
+                <h3 id="statSuccessTrx" class="text-xl font-black font-cyber text-emerald-400">0</h3>
+            </div>
+
+            <!-- Pesanan Hari Ini -->
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-[11px] font-semibold uppercase font-cyber">Hari Ini</span>
+                    <i class="fa-solid fa-calendar-day text-amber-400 animate-bounce"></i>
+                </div>
+                <h3 id="statTrxToday" class="text-xl font-black font-cyber text-amber-400">0</h3>
+            </div>
+
+            <!-- Pesanan Hari Sebelumnya -->
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder shadow-md hover:border-cyberCyan transition">
+                <div class="flex items-center justify-between text-slate-400 mb-2">
+                    <span class="text-[11px] font-semibold uppercase font-cyber">Kemarin</span>
+                    <i class="fa-solid fa-clock-rotate-left text-slate-400"></i>
+                </div>
+                <h3 id="statTrxYesterday" class="text-xl font-black font-cyber text-slate-300">0</h3>
             </div>
         </div>
 
-        <!-- QUICK ACCESS MENU -->
+        <!-- TABEL STATUS TRANSAKSI DIGITAL MODERN -->
+        <div class="bg-cyberCard p-5 rounded-2xl border border-cyberBorder shadow-xl animated-cyber-card space-y-4">
+            <div class="flex items-center justify-between border-b border-cyberBorder/60 pb-3">
+                <h3 class="text-xs font-bold font-cyber text-white uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-cyberCyan animate-pulse"></i> Status Transaksi Terbaru
+                </h3>
+                <span class="text-[10px] font-mono text-cyberCyan bg-cyberCyan/10 px-2.5 py-1 rounded-full border border-cyberCyan/30">
+                    <i class="fa-solid fa-circle text-[6px] text-emerald-400 animate-ping"></i> LIVE MONITOR
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-sans">
+                    <thead>
+                        <tr class="text-slate-400 border-b border-cyberBorder font-cyber uppercase tracking-wider text-[10px]">
+                            <th class="pb-3 px-2">Order ID</th>
+                            <th class="pb-3 px-2">Pelanggan</th>
+                            <th class="pb-3 px-2">Produk</th>
+                            <th class="pb-3 px-2">Total</th>
+                            <th class="pb-3 px-2 text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody" class="divide-y divide-cyberBorder/40 text-slate-200">
+                        <tr>
+                            <td colspan="5" class="py-6 text-center text-slate-500 font-mono">
+                                <i class="fa-solid fa-spinner fa-spin text-cyberCyan text-lg mb-2"></i><br>
+                                Memuat data transaksi...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AKSES CEPAT MENU -->
         <div class="bg-cyberCard p-5 rounded-2xl border border-cyberBorder shadow-md space-y-4">
             <h3 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider flex items-center gap-2">
                 <i class="fa-solid fa-bolt text-cyberCyan"></i> Akses Cepat Menu
@@ -196,7 +267,7 @@
 
     </div>
 
-    <!-- BOTTOM NAVIGATION BAR (DASHBOARD, TOKO, RIWAYAT, LOGIN/PROFILE) -->
+    <!-- BOTTOM NAVIGATION BAR -->
     <nav class="bottom-nav-container">
         <a href="/dashboard" class="nav-item active" id="nav-dashboard">
             <i class="fa-solid fa-border-all"></i>
@@ -217,35 +288,109 @@
     </nav>
 
     <script>
+        // FUNGI ANIMASI HITUNG DIGITAL
+        function animateCounter(elementId, targetValue) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            let start = 0;
+            const duration = 1000;
+            const stepTime = 20;
+            const steps = duration / stepTime;
+            const increment = targetValue / steps;
+
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= targetValue) {
+                    el.innerText = targetValue.toLocaleString('id-ID');
+                    clearInterval(timer);
+                } else {
+                    el.innerText = Math.floor(start).toLocaleString('id-ID');
+                }
+            }, stepTime);
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
-        // Fetch User Status
-        try {
-            const res = await fetch('/api/user-status');
-            const data = await res.json();
-            const authBtn = document.getElementById('nav-auth');
-            const authLabel = document.getElementById('nav-auth-label');
+            // Fetch User Status
+            try {
+                const res = await fetch('/api/user-status');
+                const data = await res.json();
+                const authBtn = document.getElementById('nav-auth');
+                const authLabel = document.getElementById('nav-auth-label');
 
-            if (data.loggedIn && data.user) {
-                document.getElementById('dashUsername').innerText = data.user.username;
-                if (authBtn) authBtn.href = '/profile';
-                if (authLabel) authLabel.innerText = 'Profil';
-            } else {
-                if (authBtn) authBtn.href = '/login';
-                if (authLabel) authLabel.innerText = 'Login';
-            }
-        } catch (e) {}
+                if (data.loggedIn && data.user) {
+                    document.getElementById('dashUsername').innerText = data.user.username;
+                    if (authBtn) authBtn.href = '/profile';
+                    if (authLabel) authLabel.innerText = 'Profil';
+                } else {
+                    if (authBtn) authBtn.href = '/login';
+                    if (authLabel) authLabel.innerText = 'Login';
+                }
+            } catch (e) {}
 
-        // Fetch Global Dashboard Stats
-        try {
-            const res = await fetch('/api/dashboard-stats');
-            const data = await res.json();
-            if (data.status) {
-                document.getElementById('statTotalUsers').innerText = data.totalUsers;
-                document.getElementById('statTotalTrx').innerText = data.totalTrx;
-                document.getElementById('statSuccessTrx').innerText = data.lunasTrx;
+            // Fetch Global Dashboard Stats
+            try {
+                const res = await fetch('/api/dashboard-stats');
+                const data = await res.json();
+                if (data.status) {
+                    animateCounter('statTotalUsers', data.totalUsers || 0);
+                    animateCounter('statTotalProducts', data.totalProducts || 0);
+                    animateCounter('statTotalTrx', data.totalTrx || 0);
+                    animateCounter('statSuccessTrx', data.lunasTrx || 0);
+                    animateCounter('statTrxToday', data.trxToday || 0);
+                    animateCounter('statTrxYesterday', data.trxYesterday || 0);
+
+                    // Render Tabel Status Transaksi
+                    const tbody = document.getElementById('transactionTableBody');
+                    if (data.recentTrx && data.recentTrx.length > 0) {
+                        tbody.innerHTML = data.recentTrx.map(trx => {
+                            const status = (trx.status || 'pending').toLowerCase();
+                            let badgeClass = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+                            let statusText = 'PENDING';
+                            let icon = 'fa-spinner fa-spin';
+
+                            if (['settlement', 'success', 'paid', 'settled'].includes(status)) {
+                                badgeClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                                statusText = 'LUNAS';
+                                icon = 'fa-circle-check';
+                            } else if (['cancelled', 'failed', 'expire'].includes(status)) {
+                                badgeClass = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
+                                statusText = 'BATAL';
+                                icon = 'fa-circle-xmark';
+                            }
+
+                            const namaProduk = trx.itemDetails?.nama || 'Pembelian';
+                            const emailUser = trx.userEmail || trx.itemDetails?.buyer || 'Guest';
+
+                            return `
+                                <tr class="hover:bg-cyberBorder/30 transition">
+                                    <td class="py-3 px-2 font-mono text-[11px] text-cyberCyan font-semibold">${trx.orderId}</td>
+                                    <td class="py-3 px-2 font-medium truncate max-w-[120px]">${emailUser}</td>
+                                    <td class="py-3 px-2 text-slate-300 font-medium truncate max-w-[140px]">${namaProduk}</td>
+                                    <td class="py-3 px-2 font-mono font-bold text-white">Rp ${Number(trx.amount || 0).toLocaleString('id-ID')}</td>
+                                    <td class="py-3 px-2 text-center">
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold font-cyber px-2.5 py-0.5 rounded-full border ${badgeClass}">
+                                            <i class="fa-solid ${icon}"></i> ${statusText}
+                                        </span>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+                    } else {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="py-6 text-center text-slate-500 font-mono">Belum ada transaksi.</td>
+                            </tr>
+                        `;
+                    }
+                }
+            } catch(e) {
+                document.getElementById('transactionTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-6 text-center text-rose-400 font-mono">Gagal memuat tabel transaksi.</td>
+                    </tr>
+                `;
             }
-        } catch(e) {}
-    });
+        });
     </script>
 </body>
 </html>
