@@ -1950,23 +1950,23 @@ app.get('/api/user-status', async (req, res) => {
 
             const uEmail = activeUser.email.toLowerCase().trim();
 
-            const deposits = await TransactionV2.aggregate([
-                { $match: { userEmail: uEmail, type: 'DEPOSIT', status: { $in: ['settlement', 'success', 'paid', 'settled'] } } },
-                { $group: { _id: null, total: { $sum: '$amount' } } }
-            ]);
-
-            const purchases = await TransactionV2.aggregate([
-                { $match: { userEmail: uEmail, type: 'PURCHASE', status: { $in: ['settlement', 'success', 'paid', 'settled'] } } },
-                { $group: { _id: null, total: { $sum: '$amount' } } }
+            const [deposits, purchases, invitedUsers] = await Promise.all([
+                TransactionV2.aggregate([
+                    { $match: { userEmail: uEmail, type: 'DEPOSIT', status: { $in: ['settlement', 'success', 'paid', 'settled'] } } },
+                    { $group: { _id: null, total: { $sum: '$amount' } } }
+                ]),
+                TransactionV2.aggregate([
+                    { $match: { userEmail: uEmail, type: 'PURCHASE', status: { $in: ['settlement', 'success', 'paid', 'settled'] } } },
+                    { $group: { _id: null, total: { $sum: '$amount' } } }
+                ]),
+                UserV2.find({ referredBy: activeUser.referralCode })
+                    .select('username email createdAt')
+                    .sort({ createdAt: -1 })
+                    .lean()
             ]);
 
             const totalDeposit = deposits.length > 0 ? deposits[0].total : 0;
             const totalBelanja = purchases.length > 0 ? purchases[0].total : 0;
-
-            const invitedUsers = await UserV2.find({ referredBy: activeUser.referralCode })
-                .select('username email createdAt')
-                .sort({ createdAt: -1 })
-                .lean();
 
             res.json({
                 loggedIn: true,
@@ -1989,6 +1989,29 @@ app.get('/api/user-status', async (req, res) => {
         }
     } else {
         res.json({ loggedIn: false });
+    }
+});
+
+// ENDPOINT STATISTIK GLOBAL UNTUK DASHBOARD (GLOBAL USER, TOTAL PESANAN, & TRANSAKSI LUNAS)
+app.get('/api/dashboard-stats', async (req, res) => {
+    try {
+        const [totalUsers, totalTrx, lunasTrx] = await Promise.all([
+            UserV2.countDocuments(),
+            TransactionV2.countDocuments(),
+            TransactionV2.countDocuments({
+                status: { $in: ['settlement', 'success', 'paid', 'settled'] }
+            })
+        ]);
+
+        res.json({
+            status: true,
+            totalUsers: totalUsers,
+            totalTrx: totalTrx,
+            lunasTrx: lunasTrx
+        });
+    } catch (err) {
+        console.error("Gagal mengambil statistik dashboard:", err);
+        res.status(500).json({ status: false, message: "Gagal memuat data statistik" });
     }
 });
 
