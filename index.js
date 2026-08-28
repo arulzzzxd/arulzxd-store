@@ -1931,7 +1931,12 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboar
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/riwayat', (req, res) => res.sendFile(path.join(__dirname, 'public', 'riwayat.html')));
 app.get('/store', (req, res) => res.sendFile(path.join(__dirname, 'public', 'store.html')));
-
+app.get('/deposit', checkAuthSession, (req, res) => {
+    if (!req.user) {
+        return res.redirect('/login');
+    }
+    res.sendFile(path.join(__dirname, 'public', 'deposit.html'));
+});
 app.get('/profile', checkAuthSession, (req, res) => {
     if (!req.user) {
         return res.redirect('/login');
