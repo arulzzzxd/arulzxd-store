@@ -129,15 +129,15 @@ const voucherSchemaV2 = new mongoose.Schema({
 
 const VoucherV2 = mongoose.models.VoucherV2 || mongoose.model('VoucherV2', voucherSchemaV2);
 
-// TRANSACTION SCHEMA V2
+// TRANSACTION SCHEMA V2 (PERMANEN DI MONGODB)
 const transactionSchemaV2 = new mongoose.Schema({
-    orderId: { type: String, required: true, unique: true },
+    orderId: { type: String, required: true, unique: true, index: true },
     amount: { type: Number, required: true },
     paymentNumber: { type: String, default: null }, 
     paymentMethod: { type: String, default: "QRIS" },
     type: { type: String, enum: ['PURCHASE', 'DEPOSIT'], default: 'PURCHASE' },
     userEmail: { type: String, default: null, index: true },
-    status: { type: String, default: "pending" }, 
+    status: { type: String, default: "pending", index: true }, 
     itemDetails: {
         nama: String,
         harga: Number,
@@ -149,7 +149,7 @@ const transactionSchemaV2 = new mongoose.Schema({
         qty: Number
     },
     productLink: { type: String, default: null },
-    createdAt: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: Date.now, index: true },
     expiredAt: { type: Date, required: true },
     updatedAt: { type: Date, default: Date.now }
 });
@@ -201,6 +201,9 @@ function getUserIdentifier(req) {
     }
     return req.ip; 
 }
+
+const SUCCESS_STATUSES = ['settlement', 'success', 'paid', 'settled'];
+const CANCEL_STATUSES = ['cancelled', 'failed', 'expire', 'batal', 'expired'];
 
 app.post('/api/user/update-username', checkAuthSession, async (req, res) => {
     try {
@@ -453,7 +456,6 @@ app.get('/api/reviews/:productId', async (req, res) => {
         const { productId } = req.params;
         const reviews = await ReviewV2.find({ productId }).sort({ createdAt: -1 }).lean();
 
-        // Mengambil avatar & username terbaru dari koleksi UserV2 secara real-time
         const userIds = reviews.map(r => r.userId).filter(Boolean);
         const users = await UserV2.find({ _id: { $in: userIds } }).select('_id avatar username').lean();
         
@@ -462,7 +464,6 @@ app.get('/api/reviews/:productId', async (req, res) => {
             userMap[u._id.toString()] = u;
         });
 
-        // Sinkronisasi avatar & username ke daftar ulasan
         const updatedReviews = reviews.map(rev => {
             if (rev.userId && userMap[rev.userId]) {
                 return {
@@ -877,7 +878,6 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
         const unitPrice = dbProduct.harga_diskon || dbProduct.harga;
         let totalPrice = unitPrice * buyQty;
 
-        // PERBAIKAN: Mendukung voucher tipe 'percentage' maupun 'fixed'
         let discountAmount = 0;
         if (voucherCode && voucherCode.trim()) {
             const v = await VoucherV2.findOne({ code: voucherCode.trim().toUpperCase() });
@@ -974,7 +974,6 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
 
         let inputAmount = Number(amount);
 
-        // HITUNG POTONGAN VOUCHER DISKON
         if (voucherCode && voucherCode.trim()) {
             const v = await VoucherV2.findOne({ code: voucherCode.trim().toUpperCase() });
             if (v && v.usageLimit > 0 && new Date() <= new Date(v.expiredAt)) {
@@ -985,7 +984,6 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
             }
         }
 
-        // REQUEST KE GATEWAY PAYWUZ DENGAN HARGA SETELAH DISKON
         const paywuzRes = await axiosPaywuzWithRetry({
             method: 'post',
             url: `${PAYWUZ_BASE_URL}/transactions`,
@@ -1001,7 +999,6 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
             return (!isNaN(num) && num > 0) ? num : null;
         };
 
-        // PERBAIKAN: Gunakan inputAmount (harga bersih) untuk menghitung Admin Fee Gateway
         const feeFlatIdr = Number(transactionData.feeFlatIdr) || 290;
         const feePercentBps = Number(transactionData.feePercentBps) || 70;
         const calculatedFee = feeFlatIdr + Math.ceil((inputAmount * feePercentBps) / 10000);
@@ -1028,7 +1025,7 @@ app.post('/transactions', checkAuthSession, async (req, res) => {
 
         const newTransaction = new TransactionV2({
             orderId,
-            amount: finalAmount, // Total harga bersih + fee
+            amount: finalAmount,
             paymentNumber: qrisNumber,
             paymentMethod: "QRIS",
             type: "PURCHASE",
@@ -1099,7 +1096,7 @@ app.get('/transactions/:orderId', async (req, res) => {
         }
 
         const currentStatus = localTrx.status.toLowerCase();
-        const isSuccess = ["settlement", "success", "paid", "settled"].includes(currentStatus);
+        const isSuccess = SUCCESS_STATUSES.includes(currentStatus);
 
         if (isSuccess && !localTrx.productLink && localTrx.itemDetails?.nama) {
             const dbProduct = await ProductV2.findOne({
@@ -1159,7 +1156,7 @@ app.post('/transactions/:orderId/cancel', async (req, res) => {
             console.warn(`Gateway cancel notice for ${orderId}:`, err.message);
         }
 
-        if (["paid", "settlement", "success"].includes(prevStatus)) {
+        if (SUCCESS_STATUSES.includes(prevStatus)) {
             if (localTrx.itemDetails && localTrx.itemDetails.nama && localTrx.type !== 'DEPOSIT') {
                 const qtyPurchased = localTrx.itemDetails.qty || 1;
                 await updateProductStockAndSold(localTrx.itemDetails.nama, qtyPurchased, true);
@@ -1186,7 +1183,7 @@ app.post('/transactions/:orderId/cancel', async (req, res) => {
     }
 });
 
-// WEBHOOK DISAMARKAN & AUTO TOP-UP SALDO
+// WEBHOOK HANDLER
 app.post('/webhook', async (req, res) => {
     try {
         const signature = req.headers['x-paywuz-signature'];
@@ -1219,10 +1216,10 @@ app.post('/webhook', async (req, res) => {
                 localTrx.status = status;
                 localTrx.updatedAt = new Date();
 
-                const isPaidEvent = eventName === "transaction.paid" || ["paid", "settlement", "success"].includes(status);
-                const isCancelEvent = ["cancelled", "failed", "expire"].includes(status);
+                const isPaidEvent = eventName === "transaction.paid" || SUCCESS_STATUSES.includes(status);
+                const isCancelEvent = CANCEL_STATUSES.includes(status);
 
-                if (isPaidEvent && !["paid", "settlement", "success"].includes(prevStatus)) {
+                if (isPaidEvent && !SUCCESS_STATUSES.includes(prevStatus)) {
                     if (localTrx.type === 'DEPOSIT' && localTrx.userEmail) {
                         const depositAmount = localTrx.itemDetails?.harga || localTrx.amount;
                         await UserV2.findOneAndUpdate(
@@ -1244,7 +1241,7 @@ app.post('/webhook', async (req, res) => {
                         if (dbProduct) localTrx.productLink = dbProduct.link;
                     }
                 } 
-                else if (isCancelEvent && ["paid", "settlement", "success"].includes(prevStatus)) {
+                else if (isCancelEvent && SUCCESS_STATUSES.includes(prevStatus)) {
                     if (localTrx.type !== 'DEPOSIT' && localTrx.itemDetails && localTrx.itemDetails.nama) {
                         const qtyPurchased = localTrx.itemDetails.qty || 1;
                         await updateProductStockAndSold(localTrx.itemDetails.nama, qtyPurchased, true);
@@ -1294,7 +1291,7 @@ app.post('/api/store/manual-order', checkAuthSession, async (req, res) => {
     }
 });
 
-// RIWAYAT TRANSAKSI DARI DATABASE USER
+// RIWAYAT TRANSAKSI TERPERCAYA DARI DATABASE MONGODB
 app.get('/api/user/transactions', checkAuthSession, async (req, res) => {
     try {
         let transactions = [];
@@ -1463,7 +1460,7 @@ app.post('/auth/login', (req, res, next) => {
     })(req, res, next);
 });
 
-// REGISTER ROUTE (DENGAN BONUS KODE UNDANGAN: UNDANG = 1000, DIUNDANG = 500)
+// REGISTER ROUTE
 app.post('/auth/register', async (req, res) => {
     try {
         const { username, email, password, referralCode } = req.body;
@@ -1495,8 +1492,8 @@ app.post('/auth/register', async (req, res) => {
         if (codeToUse && codeToUse.trim()) {
             inviterUser = await UserV2.findOne({ referralCode: codeToUse.trim().toUpperCase() });
             if (inviterUser) {
-                initialSaldo = 500; // Bonus user baru yang diundang
-                inviterUser.saldo = (inviterUser.saldo || 0) + 1000; // Bonus user pengundang
+                initialSaldo = 500;
+                inviterUser.saldo = (inviterUser.saldo || 0) + 1000;
                 await inviterUser.save();
             }
         }
@@ -1589,47 +1586,11 @@ app.post('/auth/forgot-password', async (req, res) => {
             from: '"Support ArulzXD" <supportarulzxd@gmail.com>',
             to: user.email,
             subject: 'Permintaan Reset Kata Sandi',
-            html: `
-<div style="background-color: #0b0f19; padding: 40px 20px; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; min-height: 100%;">
-    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 550px; background-color: #111827; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);">
-        <tr>
-            <td style="padding: 32px 32px 24px 32px; text-align: center;">
-                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; tracking-tight: -0.025em;">
-                    Arulz<span style="color: #22d3ee;">XD</span> Store
-                </h1>
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 0 32px 24px 32px;">
-                <div style="height: 1px; background: linear-gradient(to right, transparent, rgba(6, 182, 212, 0.2), transparent);"></div>
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 0 32px 32px 32px; color: #9ca3af; font-size: 14px; line-height: 24px;">
-                <p style="margin: 0 0 16px 0; color: #ffffff; font-size: 16px; font-weight: 600;">Halo ${user.username},</p>
-                <p style="margin: 0 0 16px 0;">Kami menerima permintaan untuk mengatur ulang kata sandi akun ArulzXD Store Anda.</p>
-                <p style="margin: 0 0 24px 0;">Silakan klik tombol di bawah ini untuk membuat kata sandi baru:</p>
-                
-                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-                    <tr>
-                        <td align="center" bgcolor="#06b6d4" style="border-radius: 12px;">
-                            <a href="${resetUrl}" target="_blank" style="display: inline-block; padding: 14px 28px; font-size: 14px; font-weight: 700; color: #0f172a; text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em;">Reset Kata Sandi</a>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 0 32px 32px 32px; color: #6b7280; font-size: 12px; line-height: 20px;">
-                <p style="margin: 0 0 12px 0; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
-                    <strong style="color: #ef4444;">Penting:</strong> Link ini hanya berlaku selama <span style="color: #9ca3af; font-weight: 600;">1 jam</span> demi keamanan akun Anda.
-                </p>
-                <p style="margin: 0;">Jika Anda tidak merasa meminta reset password ini, Anda dapat mengabaikan email ini dengan aman.</p>
-            </td>
-        </tr>
-    </table>
-</div>
-`
+            html: `<div style="background-color: #0b0f19; padding: 40px 20px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                <h2>Reset Password ArulzXD</h2>
+                <p>Klik tombol di bawah ini untuk reset password akun Anda:</p>
+                <a href="${resetUrl}" style="background:#06b6d4; color:#000; padding:10px 20px; text-decoration:none; border-radius:8px; font-weight:bold;">Reset Password</a>
+            </div>`
         };
 
         await transporter.sendMail(mailOptions);
@@ -1653,48 +1614,22 @@ app.get('/reset-password/:token', async (req, res) => {
         }
 
         res.send(`
-    <!DOCTYPE html>
-    <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Buat Password Baru - ArulzXD Store</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <style>
-            body { background-color: #0b0f19; }
-            .solid-card { background: #111827; border: 1px solid rgba(255, 255, 255, 0.08); }
-        </style>
-    </head>
-    <body class="flex flex-col items-center justify-center min-h-screen p-4 antialiased text-gray-200">
-        <div class="solid-card p-8 rounded-2xl shadow-lg w-full max-w-md relative overflow-hidden">
-            <div class="text-center mb-6 relative z-10">
-                <h1 class="text-xl font-extrabold tracking-tight text-white mb-1">
-                    Atur Ulang <span class="text-cyan-400">Kata Sandi</span>
-                </h1>
-                <p class="text-xs text-gray-400">Silakan masukkan kata sandi baru Anda yang aman.</p>
-            </div>
-
-            <form action="/reset-password/${req.params.token}" method="POST" class="space-y-4 relative z-10">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">Password Baru</label>
-                    <input id="new-password" type="password" name="password" required placeholder="••••••••" 
-                        class="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 font-medium transition">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">Konfirmasi Password Baru</label>
-                    <input id="confirm-password" type="password" name="confirmPassword" required placeholder="••••••••" 
-                        class="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 font-medium transition">
-                </div>
-
-                <button type="submit" class="w-full mt-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-slate-950 font-bold py-3 rounded-xl text-sm tracking-wide uppercase">Simpan Password Baru</button>
-            </form>
-        </div>
-    </body>
-    </html>
-`);
-
+            <!DOCTYPE html>
+            <html lang="id">
+            <head>
+                <meta charset="UTF-8">
+                <title>Buat Password Baru - ArulzXD Store</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+            </head>
+            <body class="bg-slate-950 text-white flex items-center justify-center min-h-screen">
+                <form action="/reset-password/${req.params.token}" method="POST" class="bg-slate-900 p-8 rounded-2xl border border-slate-800 space-y-4 w-full max-w-md">
+                    <h2 class="text-xl font-bold">Atur Ulang Password</h2>
+                    <input type="password" name="password" required placeholder="Password baru" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm">
+                    <button type="submit" class="w-full bg-cyan-500 text-black font-bold p-3 rounded-xl text-sm uppercase">Simpan Password</button>
+                </form>
+            </body>
+            </html>
+        `);
     } catch (err) {
         res.status(500).send("Error server.");
     }
@@ -1777,8 +1712,8 @@ app.get('/auth/github/callback', async (req, res) => {
             if (refCodeFromState) {
                 inviterUser = await UserV2.findOne({ referralCode: refCodeFromState.trim().toUpperCase() });
                 if (inviterUser) {
-                    initialSaldo = 500; // Bonus diundang
-                    inviterUser.saldo = (inviterUser.saldo || 0) + 1000; // Bonus pengundang
+                    initialSaldo = 500;
+                    inviterUser.saldo = (inviterUser.saldo || 0) + 1000;
                     await inviterUser.save();
                 }
             }
@@ -1887,8 +1822,8 @@ app.get('/auth/google/callback', async (req, res) => {
             if (refCodeFromState) {
                 inviterUser = await UserV2.findOne({ referralCode: refCodeFromState.trim().toUpperCase() });
                 if (inviterUser) {
-                    initialSaldo = 500; // Bonus diundang
-                    inviterUser.saldo = (inviterUser.saldo || 0) + 1000; // Bonus pengundang
+                    initialSaldo = 500;
+                    inviterUser.saldo = (inviterUser.saldo || 0) + 1000;
                     await inviterUser.save();
                 }
             }
@@ -1978,7 +1913,7 @@ app.get('/auth/logout', (req, res, next) => {
     });
 });
 
-// GET USER STATUS LENGKAP TERMASUK AKUMULASI DEPOSIT, BELANJA, DAN LIST USER DIUNDANG
+// AKUMULASI DEPOSIT & BELANJA DARI DATABASE MONGODB PERMANEN
 app.get('/api/user-status', async (req, res) => {
     if (req.user) {
         try {
@@ -1995,11 +1930,11 @@ app.get('/api/user-status', async (req, res) => {
 
             const [deposits, purchases, invitedUsers] = await Promise.all([
                 TransactionV2.aggregate([
-                    { $match: { userEmail: uEmail, type: 'DEPOSIT', status: { $in: ['settlement', 'success', 'paid', 'settled'] } } },
+                    { $match: { userEmail: uEmail, type: 'DEPOSIT', status: { $in: SUCCESS_STATUSES } } },
                     { $group: { _id: null, total: { $sum: '$amount' } } }
                 ]),
                 TransactionV2.aggregate([
-                    { $match: { userEmail: uEmail, type: 'PURCHASE', status: { $in: ['settlement', 'success', 'paid', 'settled'] } } },
+                    { $match: { userEmail: uEmail, type: 'PURCHASE', status: { $in: SUCCESS_STATUSES } } },
                     { $group: { _id: null, total: { $sum: '$amount' } } }
                 ]),
                 UserV2.find({ referredBy: activeUser.referralCode })
@@ -2035,7 +1970,7 @@ app.get('/api/user-status', async (req, res) => {
     }
 });
 
-// ENDPOINT STATISTIK DASHBOARD LENGKAP + DATA REAL-TIME TABLE
+// ENDPOINT STATISTIK DASHBOARD LENGKAP & ANALITIK REAL-TIME
 app.get('/api/dashboard-stats', async (req, res) => {
     try {
         const startOfToday = new Date();
@@ -2060,17 +1995,15 @@ app.get('/api/dashboard-stats', async (req, res) => {
             UserV2.countDocuments(),
             ProductV2.countDocuments(),
             TransactionV2.countDocuments(),
-            TransactionV2.countDocuments({
-                status: { $in: ['settlement', 'success', 'paid', 'settled'] }
-            }),
+            TransactionV2.countDocuments({ status: { $in: SUCCESS_STATUSES } }),
             TransactionV2.countDocuments({ createdAt: { $gte: startOfToday } }),
             TransactionV2.countDocuments({
                 createdAt: { $gte: startOfYesterday, $lt: startOfToday }
             }),
             TransactionV2.find({})
                 .sort({ createdAt: -1 })
-                .limit(8)
-                .select('orderId userEmail amount status itemDetails createdAt')
+                .limit(10)
+                .select('orderId userEmail amount status itemDetails type createdAt')
                 .lean(),
             TransactionV2.aggregate([
                 { $match: { createdAt: { $gte: fourteenDaysAgo } } },
@@ -2080,12 +2013,12 @@ app.get('/api/dashboard-stats', async (req, res) => {
                         total: { $sum: 1 },
                         lunas: {
                             $sum: {
-                                $cond: [{ $in: ["$status", ["settlement", "success", "paid", "settled"]] }, 1, 0]
+                                $cond: [{ $in: ["$status", SUCCESS_STATUSES] }, 1, 0]
                             }
                         },
                         batal: {
                             $sum: {
-                                $cond: [{ $in: ["$status", ["cancelled", "failed", "expire", "batal"]] }, 1, 0]
+                                $cond: [{ $in: ["$status", CANCEL_STATUSES] }, 1, 0]
                             }
                         }
                     }
