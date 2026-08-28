@@ -9,10 +9,10 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="ArulzXD Store - Marketplace Source Code & Layanan Digital">
     <meta property="og:description" content="Penyedia Source Code, Script, & Layanan Digital Premium Terpercaya dengan Akses Super Cepat & Otomatis.">
-    <meta property="og:image" content="https://arulz-xd.my.id/files/Q2C70y.png">
+    <meta property="og:image" content="https://files.catbox.moe/kdowze.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:url" content="https://arulz-xd.my.id/">
+    <meta property="og:url" content="https://arulz-xd.my.id/store">
 
     <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
     <!-- Tailwind CSS -->
@@ -355,7 +355,7 @@
             <div class="ring-outer"></div>
             <div class="ring-middle"></div>
             <div class="ring-inner"></div>
-            <img src="https://arulz-xd.my.id/files/Q2C70y.png" alt="Logo" class="hud-avatar">
+            <img src="https://files.catbox.moe/kdowze.png" alt="Logo" class="hud-avatar">
         </div>
 
         <div class="text-center px-4">
@@ -378,7 +378,7 @@
         </div>
 
         <div class="absolute bottom-6 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
-            Arulz-XD STORE v2.0
+            BACKEND DEV - ARULZ-XD STORE v1.0
         </div>
     </div>
 
@@ -442,11 +442,27 @@
                     <p class="text-xs text-slate-400 font-medium tracking-wide">
                         Menampilkan <span id="productCount" class="font-bold text-cyberCyan">0</span> produk
                     </p>
-                    <div class="text-xs text-slate-400 font-mono">System: <span id="serverStatus" class="text-cyberCyan font-bold animate-pulse">● CONNECTING...</span></div>
+                    <div class="text-xs text-slate-400 font-mono">System: <span id="serverStatus" class="text-cyberCyan font-bold animate-pulse">● ONLINE</span></div>
                 </div>
 
                 <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 items-start">
-                    <!-- RENDER INSTAN -->
+                    <!-- SKELETON PLACEHOLDER SEMENTARA AGAR LANGSUNG TERLIHAT DUA ITEM/CARDS -->
+                    <div class="bg-cyberCard rounded-xl border border-cyberBorder overflow-hidden shadow-md animate-pulse">
+                        <div class="bg-slate-800/60 pt-[100%] w-full"></div>
+                        <div class="p-3 space-y-2">
+                            <div class="h-3 bg-slate-800/80 rounded w-3/4"></div>
+                            <div class="h-2 bg-slate-800/50 rounded w-full"></div>
+                            <div class="h-3 bg-slate-800/80 rounded w-1/2"></div>
+                        </div>
+                    </div>
+                    <div class="bg-cyberCard rounded-xl border border-cyberBorder overflow-hidden shadow-md animate-pulse">
+                        <div class="bg-slate-800/60 pt-[100%] w-full"></div>
+                        <div class="p-3 space-y-2">
+                            <div class="h-3 bg-slate-800/80 rounded w-3/4"></div>
+                            <div class="h-2 bg-slate-800/50 rounded w-full"></div>
+                            <div class="h-3 bg-slate-800/80 rounded w-1/2"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="emptyState" class="hidden text-center py-16 bg-cyberCard rounded-xl border border-cyberBorder mt-2">
@@ -1636,46 +1652,46 @@
         }
 
         async function fetchProduk() {
-    const statusElem = document.getElementById('serverStatus');
-    try {
-        const response = await fetch('/database/produk');
-        if (!response.ok) throw new Error('Gagal memuat API server');
-
-        DATA_PRODUK = await response.json();
-
-        // Load ulasan untuk setiap produk agar jumlah ulasan langsung ter-update
-        await Promise.all(DATA_PRODUK.map(async (produk) => {
-            const pId = produk.Id || produk._id;
+            const statusElem = document.getElementById('serverStatus');
             try {
-                const resRev = await fetch(`/api/reviews/${pId}`);
-                if (resRev.ok && resRev.headers.get('content-type')?.includes('application/json')) {
-                    const revData = await resRev.json();
-                    REVIEWS_CACHE[pId] = revData;
+                const response = await fetch('/database/produk');
+                if (!response.ok) throw new Error('Gagal memuat API server');
+
+                DATA_PRODUK = await response.json();
+
+                // Load ulasan untuk setiap produk agar jumlah ulasan langsung ter-update
+                await Promise.all(DATA_PRODUK.map(async (produk) => {
+                    const pId = produk.Id || produk._id;
+                    try {
+                        const resRev = await fetch(`/api/reviews/${pId}`);
+                        if (resRev.ok && resRev.headers.get('content-type')?.includes('application/json')) {
+                            const revData = await resRev.json();
+                            REVIEWS_CACHE[pId] = revData;
+                        }
+                    } catch (e) {}
+                }));
+
+                if (statusElem) {
+                    statusElem.innerText = '● ONLINE';
+                    statusElem.className = 'text-cyberCyan font-bold animate-pulse';
                 }
-            } catch (e) {}
-        }));
 
-        if (statusElem) {
-            statusElem.innerText = '● ONLINE';
-            statusElem.className = 'text-cyberCyan font-bold animate-pulse';
-        }
-
-        generateKategoriButtons();
-        renderProduk();
-    } catch (error) {
-        console.error('Fetch Error:', error);
-        if (statusElem) {
-            statusElem.innerText = '● OFFLINE';
-            statusElem.className = 'text-red-500 font-bold';
-        }
-        
-        document.getElementById('productGrid').innerHTML = `
+                generateKategoriButtons();
+                renderProduk();
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                if (statusElem) {
+                    statusElem.innerText = '● OFFLINE';
+                    statusElem.className = 'text-red-500 font-bold';
+                }
+                
+                document.getElementById('productGrid').innerHTML = `
                     <div class="col-span-full text-center py-10 bg-red-950/30 text-red-400 text-xs font-semibold rounded-xl border border-red-800/40">
                         <i class="fa-solid fa-triangle-exclamation text-lg mb-2 block"></i> Gagal mengambil data produk.
                     </div>
                 `;
-    }
-}
+            }
+        }
 
         function renderQrisCode(qrisString) {
             const qrContainer = document.getElementById('qrcodeContainer');
@@ -2173,7 +2189,6 @@
             document.getElementById('checkoutModal').classList.add('hidden');
         }
 
-        // FUNGSI PEMBAYARAN MENGGUNAKAN SALDO DEPOSIT (DENGAN SWEETALERT SALDO TIDAK TERSEDIA)
         async function processSaldoPayment() {
             if (!CURRENT_LOGGED_USER) {
                 Swal.fire({
@@ -2226,16 +2241,15 @@
             });
 
             try {
-                // Ganti bagian fetch pada fungsi processSaldoPayment() menjadi:
-const res = await fetch('/api/store/pay-with-balance', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        productId: SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id,
-        qty: CURRENT_QTY,
-        voucherCode: ACTIVE_VOUCHER ? ACTIVE_VOUCHER.code : null // Penambahan voucherCode
-    })
-});
+                const res = await fetch('/api/store/pay-with-balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productId: SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id,
+                        qty: CURRENT_QTY,
+                        voucherCode: ACTIVE_VOUCHER ? ACTIVE_VOUCHER.code : null
+                    })
+                });
                 const result = await res.json();
                 Swal.close();
 
@@ -2661,12 +2675,18 @@ const res = await fetch('/api/store/pay-with-balance', {
             }
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            await fetchCurrentUserStatus();
-            await fetchProduk();
-            await checkActiveTransaction();
+        // FUNGSI INISIALISASI UTAMA
+        async function initStorePage() {
+            await Promise.allSettled([
+                fetchCurrentUserStatus(),
+                fetchProduk(),
+                checkActiveTransaction()
+            ]);
             await checkUrlProductShare();
-        });
+        }
+
+        // Jalankan Langsung Tanpa Delay
+        initStorePage();
 
         function getPageDisplayName() {
             const path = window.location.pathname;
@@ -2679,7 +2699,7 @@ const res = await fetch('/api/store/pay-with-balance', {
                 'docs': 'Dokumentasi',
                 'doc': 'Dokumentasi',
                 'status': 'Status Server',
-                'store': 'Store API',
+                'store': 'Store',
                 'changelog': 'Changelog',
                 'uploader': 'Uploader File',
                 'pastecode': 'Pastecode',
