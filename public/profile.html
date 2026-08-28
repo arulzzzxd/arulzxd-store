@@ -196,15 +196,24 @@
                 </div>
                 <div class="border-b border-cyberBorder/30"></div>
 
-                <!-- Email & Badge Verified (Dynamic Show/Hide) -->
+                <!-- Email & Tombol Show/Hide + Verified Blue Tick TikTok Style -->
                 <div class="flex items-center justify-between">
                     <span class="text-slate-400 font-medium">Email</span>
                     <div class="text-right space-y-1">
-                        <div id="infoEmail" class="font-mono text-slate-200">-</div>
-                        <!-- Badge Terverifikasi yang bisa di-show / hide -->
-                        <div id="emailVerifiedBadge" class="hidden">
-                            <span class="inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium">
-                                <i class="fa-solid fa-check text-[9px]"></i> Terverifikasi
+                        <div class="flex items-center justify-end gap-2">
+                            <span id="infoEmail" class="font-mono text-slate-200">-</span>
+                            <button onclick="toggleEmailVisibility()" title="Tampilkan/Sembunyikan Email" class="text-slate-400 hover:text-cyberCyan transition text-xs">
+                                <i id="toggleEmailIcon" class="fa-solid fa-eye-slash"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- BADGE VERIFIED CENTANG BIRU TIKTOK STYLE -->
+                        <div id="emailVerifiedBadge" class="hidden flex justify-end">
+                            <span class="inline-flex items-center gap-1.5 text-[11px] bg-[#20d5ec]/10 text-[#20d5ec] border border-[#20d5ec]/30 px-2.5 py-0.5 rounded-full font-bold">
+                                <svg class="w-3.5 h-3.5 text-[#20d5ec] fill-current" viewBox="0 0 24 24">
+                                    <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.79-4-4-4-.495 0-.965.084-1.4.238C14.55 2.475 13.18 1.6 11.6 1.6c-1.58 0-2.95.875-3.6 2.148-.435-.154-.905-.238-1.4-.238-2.21 0-4 1.79-4 4 0 .495.084.965.238 1.4C1.575 9.55.7 10.92.7 12.5c0 1.58.875 2.95 2.148 3.6-.154.435-.238.905-.238 1.4 0 2.21 1.79 4 4 4 .495 0 .965-.084 1.4-.238.65 1.273 2.02 2.148 3.6 2.148 1.58 0 2.95-.875 3.6-2.148.435.154.905.238 1.4.238 2.21 0 4-1.79 4-4 0-.495-.084-.965-.238-1.4 1.273-.65 2.148-2.02 2.148-3.6zm-12.8 4.2l-4.2-4.2 1.4-1.4 2.8 2.8 6.8-6.8 1.4 1.4-8.2 8.2z"/>
+                                </svg>
+                                Terverifikasi
                             </span>
                         </div>
                     </div>
@@ -402,6 +411,8 @@
     <script>
         let depPollInterval = null;
         let currentDepOrderId = '';
+        let fullEmail = '';
+        let isEmailShown = false;
 
         function formatRupiah(angka) {
             return new Intl.NumberFormat('id-ID', {
@@ -421,6 +432,20 @@
             return name.substring(0, 2) + '***@' + domain;
         }
 
+        function toggleEmailVisibility() {
+            isEmailShown = !isEmailShown;
+            const emailElem = document.getElementById('infoEmail');
+            const iconElem = document.getElementById('toggleEmailIcon');
+
+            if (isEmailShown) {
+                emailElem.innerText = fullEmail;
+                iconElem.className = 'fa-solid fa-eye';
+            } else {
+                emailElem.innerText = maskEmail(fullEmail);
+                iconElem.className = 'fa-solid fa-eye-slash';
+            }
+        }
+
         async function loadUserProfile() {
             try {
                 const res = await fetch('/api/user-status');
@@ -430,19 +455,18 @@
 
                 if (data.loggedIn && data.user) {
                     const usernameVal = data.user.username || data.user.name || 'User';
-                    const emailVal = data.user.email || 'Email terdaftar';
+                    fullEmail = data.user.email || 'user@gmail.com';
 
-                    // Update Top Profile Card
+                    // Update Profile Card Atas
                     document.getElementById('profileUsername').innerText = usernameVal;
-                    document.getElementById('profileEmail').innerText = maskEmail(emailVal);
+                    document.getElementById('profileEmail').innerText = maskEmail(fullEmail);
                     
-                    // Update Informasi Akun
+                    // Update Widget Informasi Akun
                     document.getElementById('infoNama').innerText = usernameVal;
-                    document.getElementById('infoEmail').innerText = maskEmail(emailVal);
+                    document.getElementById('infoEmail').innerText = maskEmail(fullEmail);
                     document.getElementById('infoLoginMethod').innerText = data.user.loginMethod || 'Google OAuth';
                     
-                    // CEK / LOGIKA KONTROL AKUN TERVERIFIKASI EMAIL
-                    // Secara default dianggap terverifikasi jika login via Google atau data user.isVerified == true
+                    // STATUS BADGE EMAIL VERIFIED
                     const isVerified = data.user.isEmailVerified ?? data.user.isVerified ?? true;
                     const badgeElem = document.getElementById('emailVerifiedBadge');
                     if (isVerified) {
