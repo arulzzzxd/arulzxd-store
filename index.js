@@ -1629,6 +1629,56 @@ app.get('/reset-password/:token', async (req, res) => {
     }
 });
 
+// ENDPOINT SETEL / UBAH KATA SANDI USER
+app.post('/api/user/change-password', checkAuthSession, async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ status: false, message: 'Silakan login terlebih dahulu!' });
+        }
+
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+        const userId = req.user.id || req.user._id;
+
+        const user = await UserV2.findById(userId);
+        if (!user) {
+            return res.status(404).json({ status: false, message: 'User tidak ditemukan.' });
+        }
+
+        if (!newPassword || newPassword.length < 8) {
+            return res.status(400).json({ status: false, message: 'Kata sandi baru minimal 8 karakter!' });
+        }
+
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ status: false, message: 'Konfirmasi kata sandi tidak cocok!' });
+        }
+
+        // Jika user sudah memiliki kata sandi lokal, verifikasi kata sandi lama
+        if (user.password) {
+            if (!currentPassword) {
+                return res.status(400).json({ status: false, message: 'Kata sandi saat ini wajib diisi!' });
+            }
+            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            if (!isMatch) {
+                return res.status(400).json({ status: false, message: 'Kata sandi saat ini salah!' });
+            }
+        }
+
+        // Hash kata sandi baru dan update
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+
+        return res.json({
+            status: true,
+            message: user.password ? 'Kata sandi berhasil diperbarui!' : 'Kata sandi lokal berhasil disetel!'
+        });
+
+    } catch (err) {
+        console.error("Gagal ubah password:", err);
+        return res.status(500).json({ status: false, message: 'Terjadi kesalahan pada server saat mengubah kata sandi.' });
+    }
+});
+
 const GITHUB_CLIENT_ID = 'Ov23li23q78AeREkbepJ';
 const GITHUB_CLIENT_SECRET = 'd14fef7651a10f50524b7bdd0a50a199fa81065b';
 const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || "https://arulzxd.biz.id/auth/github/callback";
@@ -1962,22 +2012,25 @@ app.get('/api/user-status', async (req, res) => {
             const totalDeposit = deposits.length > 0 ? deposits[0].total : 0;
             const totalBelanja = purchases.length > 0 ? purchases[0].total : 0;
 
-            res.json({
-                loggedIn: true,
-                user: {
-                    id: activeUser._id,
-                    name: activeUser.username,
-                    username: activeUser.username,
-                    email: activeUser.email,
-                    avatar: activeUser.avatar,
-                    saldo: activeUser.saldo || 0,
-                    referralCode: activeUser.referralCode,
-                    totalDeposit: totalDeposit,
-                    totalBelanja: totalBelanja,
-                    invitedUsers: invitedUsers,
-                    createdAt: activeUser.createdAt
-                }
-            });
+            // Di dalam endpoint /api/user-status pada bagian response user:
+res.json({
+    loggedIn: true,
+    user: {
+        id: activeUser._id,
+        name: activeUser.username,
+        username: activeUser.username,
+        email: activeUser.email,
+        avatar: activeUser.avatar,
+        saldo: activeUser.saldo || 0,
+        provider: activeUser.provider || 'local',
+        hasPassword: Boolean(activeUser.password), // Flag untuk cek ketersediaan password lokal
+        referralCode: activeUser.referralCode,
+        totalDeposit: totalDeposit,
+        totalBelanja: totalBelanja,
+        invitedUsers: invitedUsers,
+        createdAt: activeUser.createdAt
+    }
+});
         } catch (err) {
             res.json({ loggedIn: true, user: req.user });
         }
