@@ -138,60 +138,12 @@
             <div class="space-y-1">
                 <div class="flex items-center justify-center gap-1.5">
                     <h2 id="profileUsername" class="text-xl font-bold font-cyber text-white">Loading...</h2>
-                    <!-- ICON VERIFIED BLUE TICK (TIKTOK STYLE) -->
-                    <span title="Terverifikasi" class="inline-flex items-center justify-center text-[#20d5ec]">
-                        <i class="fa-solid fa-circle-check text-base"></i>
-                    </span>
                     <button onclick="editUsernameModal()" title="Edit Username" class="text-cyberCyan hover:text-cyan-300 text-xs ml-1">
                         <i class="fa-solid fa-pen-to-square"></i>
                     </button>
                 </div>
                 <p id="profileEmail" class="text-xs text-slate-400 font-mono mt-0.5">-</p>
                 <p id="profileJoined" class="text-[11px] text-cyberCyan font-semibold font-mono pt-1">Terdaftar sejak: -</p>
-            </div>
-        </div>
-
-        <!-- WIDGET INFORMASI AKUN (SESUAI DESAIN GAMBAR) -->
-        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-5 shadow-xl space-y-4">
-            <div class="flex items-center gap-2 pb-2 border-b border-cyberBorder/60">
-                <i class="fa-regular fa-user text-cyberCyan text-base"></i>
-                <h3 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider">Informasi Akun</h3>
-            </div>
-            
-            <div class="space-y-3.5 text-xs">
-                <!-- Nama -->
-                <div class="flex items-center justify-between">
-                    <span class="text-slate-400 font-medium">Nama</span>
-                    <span id="infoNama" class="font-semibold text-white">Free Cus</span>
-                </div>
-                <div class="border-b border-cyberBorder/30"></div>
-
-                <!-- Email & Badge Verified -->
-                <div class="flex items-center justify-between">
-                    <span class="text-slate-400 font-medium">Email</span>
-                    <div class="text-right space-y-1">
-                        <div id="infoEmail" class="font-mono text-slate-200">f***@gmail.com</div>
-                        <span class="inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium">
-                            <i class="fa-solid fa-check text-[9px]"></i> Terverifikasi
-                        </span>
-                    </div>
-                </div>
-                <div class="border-b border-cyberBorder/30"></div>
-
-                <!-- Metode Login -->
-                <div class="flex items-center justify-between">
-                    <span class="text-slate-400 font-medium">Metode Login</span>
-                    <span id="infoLoginMethod" class="font-semibold text-slate-200">Google OAuth</span>
-                </div>
-                <div class="border-b border-cyberBorder/30"></div>
-
-                <!-- Status Akun -->
-                <div class="flex items-center justify-between">
-                    <span class="text-slate-400 font-medium">Status Akun</span>
-                    <span id="infoStatusAkun" class="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-md uppercase tracking-wider">
-                        AKTIF
-                    </span>
-                </div>
             </div>
         </div>
 
@@ -226,6 +178,53 @@
                 </div>
                 <h4 id="profileTotalBelanja" class="text-lg font-black font-cyber text-purple-400">Rp 0</h4>
                 <p class="text-[9px] text-slate-500 font-mono mt-1">Akumulasi Belanja Produk</p>
+            </div>
+        </div>
+
+        <!-- WIDGET INFORMASI AKUN (DI ATAS UNDANG TEMAN) -->
+        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-5 shadow-xl space-y-4">
+            <div class="flex items-center gap-2 pb-2 border-b border-cyberBorder/60">
+                <i class="fa-regular fa-user text-cyberCyan text-base"></i>
+                <h3 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider">Informasi Akun</h3>
+            </div>
+            
+            <div class="space-y-3.5 text-xs">
+                <!-- Nama -->
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-400 font-medium">Nama</span>
+                    <span id="infoNama" class="font-semibold text-white">-</span>
+                </div>
+                <div class="border-b border-cyberBorder/30"></div>
+
+                <!-- Email & Badge Verified (Dynamic Show/Hide) -->
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-400 font-medium">Email</span>
+                    <div class="text-right space-y-1">
+                        <div id="infoEmail" class="font-mono text-slate-200">-</div>
+                        <!-- Badge Terverifikasi yang bisa di-show / hide -->
+                        <div id="emailVerifiedBadge" class="hidden">
+                            <span class="inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium">
+                                <i class="fa-solid fa-check text-[9px]"></i> Terverifikasi
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-b border-cyberBorder/30"></div>
+
+                <!-- Metode Login -->
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-400 font-medium">Metode Login</span>
+                    <span id="infoLoginMethod" class="font-semibold text-slate-200">Google OAuth</span>
+                </div>
+                <div class="border-b border-cyberBorder/30"></div>
+
+                <!-- Status Akun -->
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-400 font-medium">Status Akun</span>
+                    <span id="infoStatusAkun" class="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-md uppercase tracking-wider">
+                        AKTIF
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -433,14 +432,25 @@
                     const usernameVal = data.user.username || data.user.name || 'User';
                     const emailVal = data.user.email || 'Email terdaftar';
 
-                    // Update nama & email di profile card dan widget informasi akun
+                    // Update Top Profile Card
                     document.getElementById('profileUsername').innerText = usernameVal;
-                    document.getElementById('profileEmail').innerText = emailVal;
+                    document.getElementById('profileEmail').innerText = maskEmail(emailVal);
                     
+                    // Update Informasi Akun
                     document.getElementById('infoNama').innerText = usernameVal;
                     document.getElementById('infoEmail').innerText = maskEmail(emailVal);
                     document.getElementById('infoLoginMethod').innerText = data.user.loginMethod || 'Google OAuth';
                     
+                    // CEK / LOGIKA KONTROL AKUN TERVERIFIKASI EMAIL
+                    // Secara default dianggap terverifikasi jika login via Google atau data user.isVerified == true
+                    const isVerified = data.user.isEmailVerified ?? data.user.isVerified ?? true;
+                    const badgeElem = document.getElementById('emailVerifiedBadge');
+                    if (isVerified) {
+                        badgeElem.classList.remove('hidden');
+                    } else {
+                        badgeElem.classList.add('hidden');
+                    }
+
                     document.getElementById('profileSaldo').innerText = formatRupiah(data.user.saldo || 0);
                     document.getElementById('profileTotalDeposit').innerText = formatRupiah(data.user.totalDeposit || 0);
                     document.getElementById('profileTotalBelanja').innerText = formatRupiah(data.user.totalBelanja || 0);
