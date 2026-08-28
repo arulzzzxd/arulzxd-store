@@ -111,13 +111,13 @@
             border-color: #00f3ff !important;
             background-color: rgba(0, 243, 255, 0.1) !important;
             color: #00f3ff !important;
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.3);
         }
     </style>
 </head>
 <body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen flex flex-col justify-between pb-32">
 
-    <!-- TOP NAVBAR (TANPA TOMBOL KELUAR) -->
+    <!-- TOP NAVBAR -->
     <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
         <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
             <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)] flex items-center gap-2">
@@ -132,7 +132,7 @@
         </div>
     </nav>
 
-    <!-- MAIN CONTAINER (FULL RESPONSIVE LAYOUT UNTUK HP & PC/LAPTOP) -->
+    <!-- MAIN CONTAINER -->
     <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-1">
         
         <!-- HEADER TITLE PAGE -->
@@ -156,10 +156,10 @@
             </div>
         </div>
 
-        <!-- GRID DUA KOLOM UNTUK PC/LAPTOP -->
+        <!-- GRID LAYOUT -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-            <!-- KOLOM KIRI: FORM & PRESET NOMINAL (7 SPAN PC) -->
+            <!-- KOLOM KIRI: FORM & PRESET NOMINAL (5.000 - 100.000 WITH RANKS) -->
             <div class="lg:col-span-7 bg-cyberCard rounded-2xl border border-cyberBorder p-5 sm:p-6 shadow-xl space-y-6">
                 
                 <div class="flex items-center justify-between border-b border-cyberBorder/60 pb-3">
@@ -167,44 +167,85 @@
                         <i class="fa-solid fa-cubes text-cyberCyan"></i> Pilih Nominal Deposit
                     </h2>
                     <span class="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-md border border-emerald-500/30">
-                        Min. Rp 1.000
+                        Min. Rp 5.000
                     </span>
                 </div>
 
-                <!-- PRESET NOMINAL GRID RESPONSIF -->
+                <!-- PRESET NOMINAL GRID 5K - 100K -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    <button onclick="setDepositAmount(1000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[9px] group-hover:text-cyberCyan">Instan</span>
-                        <span>Rp 1.000</span>
+                    
+                    <!-- Rp 5.000 (POPULER - NOVICE RANK) -->
+                    <button onclick="setDepositAmount(5000, this)" class="preset-btn bg-cyberDark/90 border border-amber-500/60 hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group relative overflow-hidden shadow-[0_0_10px_rgba(245,158,11,0.15)]">
+                        <span class="text-amber-400 font-bold text-[9px] bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/40 uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-fire text-[8px]"></i> POPULER
+                        </span>
+                        <span class="text-slate-200 font-extrabold text-sm mt-0.5">Rp 5.000</span>
+                        <span class="text-[9px] text-slate-400 font-sans">Rank: Novice</span>
                     </button>
-                    <button onclick="setDepositAmount(2000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[9px] group-hover:text-cyberCyan">Instan</span>
-                        <span>Rp 2.000</span>
-                    </button>
-                    <button onclick="setDepositAmount(5000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[9px] group-hover:text-cyberCyan">Populer</span>
-                        <span>Rp 5.000</span>
-                    </button>
+
+                    <!-- Rp 10.000 (BRONZE RANK) -->
                     <button onclick="setDepositAmount(10000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[9px] group-hover:text-cyberCyan">Populer</span>
-                        <span>Rp 10.000</span>
+                        <span class="text-amber-600 text-[9px] group-hover:text-cyberCyan uppercase font-bold tracking-wider">
+                            <i class="fa-solid fa-shield text-[8px]"></i> BRONZE
+                        </span>
+                        <span class="text-slate-200 font-extrabold text-sm">Rp 10.000</span>
+                        <span class="text-[9px] text-slate-400 font-sans">Rank: Starter</span>
                     </button>
+
+                    <!-- Rp 15.000 (SILVER RANK) -->
                     <button onclick="setDepositAmount(15000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[9px] group-hover:text-cyberCyan">Hemat</span>
-                        <span>Rp 15.000</span>
+                        <span class="text-slate-300 text-[9px] group-hover:text-cyberCyan uppercase font-bold tracking-wider">
+                            <i class="fa-solid fa-shield text-[8px]"></i> SILVER
+                        </span>
+                        <span class="text-slate-200 font-extrabold text-sm">Rp 15.000</span>
+                        <span class="text-[9px] text-slate-400 font-sans">Rank: Regular</span>
                     </button>
+
+                    <!-- Rp 20.000 (GOLD RANK) -->
                     <button onclick="setDepositAmount(20000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[9px] group-hover:text-cyberCyan">Hemat</span>
-                        <span>Rp 20.000</span>
+                        <span class="text-yellow-400 text-[9px] group-hover:text-cyberCyan uppercase font-bold tracking-wider">
+                            <i class="fa-solid fa-crown text-[8px]"></i> GOLD
+                        </span>
+                        <span class="text-slate-200 font-extrabold text-sm">Rp 20.000</span>
+                        <span class="text-[9px] text-slate-400 font-sans">Rank: Pro</span>
                     </button>
+
+                    <!-- Rp 30.000 (PLATINUM RANK) -->
                     <button onclick="setDepositAmount(30000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[9px] group-hover:text-cyberCyan">Sultan</span>
-                        <span>Rp 30.000</span>
+                        <span class="text-cyan-300 text-[9px] group-hover:text-cyberCyan uppercase font-bold tracking-wider">
+                            <i class="fa-solid fa-gem text-[8px]"></i> PLATINUM
+                        </span>
+                        <span class="text-slate-200 font-extrabold text-sm">Rp 30.000</span>
+                        <span class="text-[9px] text-slate-400 font-sans">Rank: Expert</span>
                     </button>
+
+                    <!-- Rp 50.000 (DIAMOND RANK) -->
                     <button onclick="setDepositAmount(50000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[9px] group-hover:text-cyberCyan">Sultan</span>
-                        <span>Rp 50.000</span>
+                        <span class="text-blue-400 text-[9px] group-hover:text-cyberCyan uppercase font-bold tracking-wider">
+                            <i class="fa-solid fa-diamond text-[8px]"></i> DIAMOND
+                        </span>
+                        <span class="text-slate-200 font-extrabold text-sm">Rp 50.000</span>
+                        <span class="text-[9px] text-slate-400 font-sans">Rank: Master</span>
                     </button>
+
+                    <!-- Rp 75.000 (MASTER RANK) -->
+                    <button onclick="setDepositAmount(75000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
+                        <span class="text-purple-400 text-[9px] group-hover:text-cyberCyan uppercase font-bold tracking-wider">
+                            <i class="fa-solid fa-wand-magic-sparkles text-[8px]"></i> MASTER
+                        </span>
+                        <span class="text-slate-200 font-extrabold text-sm">Rp 75.000</span>
+                        <span class="text-[9px] text-slate-400 font-sans">Rank: High Tier</span>
+                    </button>
+
+                    <!-- Rp 100.000 (SULTAN RANK) -->
+                    <button onclick="setDepositAmount(100000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
+                        <span class="text-rose-400 text-[9px] group-hover:text-cyberCyan uppercase font-bold tracking-wider">
+                            <i class="fa-solid fa-dragon text-[8px]"></i> SULTAN
+                        </span>
+                        <span class="text-slate-200 font-extrabold text-sm">Rp 100.000</span>
+                        <span class="text-[9px] text-slate-400 font-sans">Rank: Apex King</span>
+                    </button>
+
                 </div>
 
                 <!-- INPUT MANUAL & TOMBOL -->
@@ -215,7 +256,7 @@
                     <div class="flex flex-col sm:flex-row items-stretch gap-3">
                         <div class="relative flex-1">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-xs font-bold text-cyberCyan font-cyber">Rp</span>
-                            <input type="number" id="depositAmountInput" min="1000" placeholder="Ketik nominal sendiri (cth: 25000)..." 
+                            <input type="number" id="depositAmountInput" min="5000" placeholder="Ketik nominal sendiri (cth: 25000)..." 
                                    class="w-full pl-11 pr-4 py-3.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-bold font-cyber transition shadow-inner">
                         </div>
                         <button onclick="processDeposit()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-cyber font-black px-7 py-3.5 rounded-xl text-xs transition shadow-glowCyan flex items-center justify-center gap-2 uppercase tracking-wider">
@@ -238,7 +279,7 @@
 
             </div>
 
-            <!-- KOLOM KANAN: PANDUAN & KEBIJAKAN (5 SPAN PC) -->
+            <!-- KOLOM KANAN: PANDUAN & KEBIJAKAN -->
             <div class="lg:col-span-5 bg-cyberCard rounded-2xl border border-cyberBorder p-5 sm:p-6 shadow-xl space-y-4">
                 <div class="flex items-center gap-2 pb-3 border-b border-cyberBorder/60">
                     <i class="fa-solid fa-shield-halved text-cyberCyan text-base"></i>
@@ -252,7 +293,7 @@
                         </div>
                         <div>
                             <h4 class="font-bold text-white">Nominal Minimal</h4>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Pengisian saldo minimal adalah <strong class="text-cyberCyan">Rp 1.000</strong>.</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Pengisian saldo minimal adalah <strong class="text-cyberCyan">Rp 5.000</strong>.</p>
                         </div>
                     </div>
 
@@ -420,11 +461,11 @@
             const amountInput = document.getElementById('depositAmountInput');
             const amount = parseInt(amountInput.value);
 
-            if (isNaN(amount) || amount < 1000) {
+            if (isNaN(amount) || amount < 5000) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'DEPOSIT MINIMAL',
-                    text: 'Nominal deposit minimal adalah Rp 1.000',
+                    text: 'Nominal deposit minimal adalah Rp 5.000',
                     customClass: { popup: 'cyber-swal' }
                 });
                 return;
