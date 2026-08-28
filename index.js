@@ -1,26 +1,30 @@
-const express = require('express');
-const fileUpload = require('express-fileupload');
-const session = require('express-session');
-const mongoose = require('mongoose');
-const cron = require('node-cron');
-const { MongoStore } = require('connect-mongo');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcrypt');
-const rateLimit = require('express-rate-limit');
-const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
-const path = require('path');
-const fs = require('fs');
-const axios = require('axios');
-const mime = require('mime-types');
-const multer = require("multer");
-const nodemailer = require('nodemailer');
-const https = require('https');
-const http = require('http');
-const crypto = require('crypto');
-const compression = require('compression');
-const os = require('os');
+import express from 'express';
+import fileUpload from 'express-fileupload';
+import session from 'express-session';
+import mongoose from 'mongoose';
+import cron from 'node-cron';
+import MongoStore from 'connect-mongo';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import bcrypt from 'bcrypt';
+import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
+import jwt from 'jsonwebtoken';
+import path from 'path';
+import fs from 'fs';
+import axios from 'axios';
+import mime from 'mime-types';
+import multer from 'multer';
+import nodemailer from 'nodemailer';
+import https from 'https';
+import http from 'http';
+import crypto from 'crypto';
+import compression from 'compression';
+import os from 'os';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(compression());
@@ -178,7 +182,6 @@ app.use((req, res, next) => {
     res.on('finish', async () => {
         try {
             const duration = Date.now() - start;
-            // Filter hanya mencatat API dan rute utama
             if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/transactions') || req.originalUrl === '/') {
                 await SystemMetricsV2.create({
                     path: req.path,
@@ -188,9 +191,7 @@ app.use((req, res, next) => {
                     timestamp: new Date()
                 });
             }
-        } catch (e) {
-            // Mengabaikan error pencatatan metrik agar tidak mengganggu transaksi
-        }
+        } catch (e) {}
     });
     next();
 });
@@ -488,7 +489,6 @@ app.get('/api/reviews/:productId', async (req, res) => {
         const { productId } = req.params;
         const reviews = await ReviewV2.find({ productId }).sort({ createdAt: -1 }).lean();
 
-        // Mengambil avatar & username terbaru dari koleksi UserV2 secara real-time
         const userIds = reviews.map(r => r.userId).filter(Boolean);
         const users = await UserV2.find({ _id: { $in: userIds } }).select('_id avatar username').lean();
         
@@ -497,7 +497,6 @@ app.get('/api/reviews/:productId', async (req, res) => {
             userMap[u._id.toString()] = u;
         });
 
-        // Sinkronisasi avatar & username ke daftar ulasan
         const updatedReviews = reviews.map(rev => {
             if (rev.userId && userMap[rev.userId]) {
                 return {
@@ -815,7 +814,7 @@ app.post('/api/deposit', checkAuthSession, async (req, res) => {
             return res.status(400).json({ status: false, message: 'Deposit minimal adalah Rp 1.000!' });
         }
 
-        const orderId = `DEP-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+        const orderId = `TRX-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
         const paywuzRes = await axiosPaywuzWithRetry({
             method: 'post',
@@ -947,7 +946,7 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
         await updateProductStockAndSold(dbProduct.nama, buyQty, false);
         await recordProductBuyer(dbProduct.nama, user.email);
 
-        const orderId = `SALDO-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+        const orderId = `TRX-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
         const newTransaction = new TransactionV2({
             orderId,
             amount: finalPrice,
@@ -985,107 +984,6 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
     } catch (err) {
         console.error("Error Pay with balance:", err);
         return res.status(500).json({ status: false, message: "Terjadi kesalahan server saat memproses transaksi saldo." });
-    }
-});
-
-app.post('/transactions', checkAuthSession, async (req, res) => {
-    try {
-        const { orderId, amount, itemDetails, qty, voucherCode } = req.body;
-        const buyQty = Number(qty) || 1;
-
-        if (!orderId || !amount) {
-            return res.status(400).json({ 
-                status: false,
-                error: "INVALID_PAYLOAD", 
-                message: "orderId dan amount wajib diisi!" 
-            });
-        }
-
-        const existingTrx = await TransactionV2.findOne({ orderId });
-        if (existingTrx) {
-            return res.json({ status: true, data: existingTrx });
-        }
-
-        let inputAmount = Number(amount);
-
-        if (voucherCode && voucherCode.trim()) {
-            const v = await VoucherV2.findOne({ code: voucherCode.trim().toUpperCase() });
-            if (v && v.usageLimit > 0 && new Date() <= new Date(v.expiredAt)) {
-                let discountAmount = (v.type === 'percentage') 
-                    ? Math.floor((inputAmount * v.discount) / 100) 
-                    : v.discount;
-                inputAmount = Math.max(0, inputAmount - discountAmount);
-            }
-        }
-
-        const paywuzRes = await axiosPaywuzWithRetry({
-            method: 'post',
-            url: `${PAYWUZ_BASE_URL}/transactions`,
-            data: { orderId, amount: inputAmount, paymentMethod: "QRIS", feeByMerchant: false },
-            headers: PAYWUZ_HEADERS
-        });
-
-        const transactionData = paywuzRes.data?.data || paywuzRes.data;
-        const qrisNumber = transactionData.paymentNumber || transactionData.qrString || transactionData.qrUrl;
-
-        const safeNum = (val) => {
-            const num = Number(val);
-            return (!isNaN(num) && num > 0) ? num : null;
-        };
-
-        const feeFlatIdr = Number(transactionData.feeFlatIdr) || 290;
-        const feePercentBps = Number(transactionData.feePercentBps) || 70;
-        const calculatedFee = feeFlatIdr + Math.ceil((inputAmount * feePercentBps) / 10000);
-
-        let finalAmount = safeNum(transactionData.grossAmount) || 
-                          safeNum(transactionData.totalAmount) || 
-                          safeNum(transactionData.total);
-
-        if (!finalAmount) {
-            const feeVal = safeNum(transactionData.fee) || safeNum(transactionData.feeAdmin) || calculatedFee;
-            finalAmount = inputAmount + feeVal;
-        }
-
-        let pLink = itemDetails?.link || null;
-        if (!pLink && itemDetails?.nama) {
-            const dbProduct = await ProductV2.findOne({ 
-                nama: { $regex: new RegExp(`^${itemDetails.nama.trim()}$`, 'i') }
-            }).lean();
-            if (dbProduct) pLink = dbProduct.link;
-        }
-
-        const expiredAt = new Date(Date.now() + 15 * 60 * 1000);
-        const uEmail = req.user ? req.user.email.toLowerCase().trim() : null;
-
-        const newTransaction = new TransactionV2({
-            orderId,
-            amount: finalAmount, 
-            paymentNumber: qrisNumber,
-            paymentMethod: "QRIS",
-            type: "PURCHASE",
-            userEmail: uEmail,
-            status: (transactionData.status || "pending").toLowerCase(),
-            itemDetails: {
-                ...itemDetails,
-                gambar: Array.isArray(itemDetails?.gambar) ? itemDetails.gambar[0] : itemDetails?.gambar,
-                harga_setelah_voucher: finalAmount,
-                qty: buyQty,
-                buyer: uEmail || getUserIdentifier(req)
-            },
-            productLink: pLink,
-            expiredAt: expiredAt
-        });
-
-        await newTransaction.save();
-        return res.json({ status: true, data: newTransaction });
-
-    } catch (error) {
-        console.error("Error Create TRX:", error.response?.data || error.message);
-        return res.status(500).json({
-            status: false,
-            error: "CREATE_TRANSACTION_FAILED",
-            message: error.response?.data?.message || error.message || "Gagal membuat transaksi QRIS"
-        });
     }
 });
 
@@ -2025,42 +1923,41 @@ app.get('/api/user-status', async (req, res) => {
             const uEmail = activeUser.email.toLowerCase().trim();
 
             const [deposits, purchases, invitedUsers] = await Promise.all([
-    TransactionV2.aggregate([
-        { 
-            $match: { 
-                userEmail: uEmail, 
-                type: 'DEPOSIT', 
-                status: { $in: ['settlement', 'success', 'paid', 'settled'] } 
-            } 
-        },
-        { 
-            $group: { 
-                _id: null, 
-                // Mengambil itemDetails.harga (nominal murni) bukan amount (gross total + fee)
-                total: { $sum: { $ifNull: ['$itemDetails.harga', '$amount'] } } 
-            } 
-        }
-    ]),
-    TransactionV2.aggregate([
-        { 
-            $match: { 
-                userEmail: uEmail, 
-                type: 'PURCHASE', 
-                status: { $in: ['settlement', 'success', 'paid', 'settled'] } 
-            } 
-        },
-        { 
-            $group: { 
-                _id: null, 
-                total: { $sum: '$amount' } 
-            } 
-        }
-    ]),
-    UserV2.find({ referredBy: activeUser.referralCode })
-        .select('username email createdAt')
-        .sort({ createdAt: -1 })
-        .lean()
-]);
+                TransactionV2.aggregate([
+                    { 
+                        $match: { 
+                            userEmail: uEmail, 
+                            type: 'DEPOSIT', 
+                            status: { $in: ['settlement', 'success', 'paid', 'settled'] } 
+                        } 
+                    },
+                    { 
+                        $group: { 
+                            _id: null, 
+                            total: { $sum: { $ifNull: ['$itemDetails.harga', '$amount'] } } 
+                        } 
+                    }
+                ]),
+                TransactionV2.aggregate([
+                    { 
+                        $match: { 
+                            userEmail: uEmail, 
+                            type: 'PURCHASE', 
+                            status: { $in: ['settlement', 'success', 'paid', 'settled'] } 
+                        } 
+                    },
+                    { 
+                        $group: { 
+                            _id: null, 
+                            total: { $sum: '$amount' } 
+                        } 
+                    }
+                ]),
+                UserV2.find({ referredBy: activeUser.referralCode })
+                    .select('username email createdAt')
+                    .sort({ createdAt: -1 })
+                    .lean()
+            ]);
 
             const totalDeposit = deposits.length > 0 ? deposits[0].total : 0;
             const totalBelanja = purchases.length > 0 ? purchases[0].total : 0;
@@ -2224,10 +2121,8 @@ app.get('/api/dashboard-stats', async (req, res) => {
     }
 });
 
-if (require.main === module) {
-  app.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+});
 
-module.exports = app;
+export default app;
