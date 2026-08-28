@@ -446,7 +446,7 @@
                 </div>
 
                 <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 items-start">
-                    <!-- SKELETON PLACEHOLDER SEMENTARA AGAR LANGSUNG TERLIHAT DUA ITEM/CARDS -->
+                    <!-- SKELETON PLACEHOLDER -->
                     <div class="bg-cyberCard rounded-xl border border-cyberBorder overflow-hidden shadow-md animate-pulse">
                         <div class="bg-slate-800/60 pt-[100%] w-full"></div>
                         <div class="p-3 space-y-2">
@@ -675,7 +675,7 @@
             </div>
 
             <div class="overflow-y-auto p-4 sm:p-5 flex-1">
-                <!-- STEP 1: FORM UTAMA PEMILIHAN 3 METODE PEMBAYARAN -->
+                <!-- STEP 1: FORM UTAMA PEMILIHAN METODE PEMBAYARAN (SALDO & MANUAL) -->
                 <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
                     <div class="flex items-center justify-between bg-cyberDark border border-cyberBorder px-3 py-2 rounded-lg">
                         <span class="text-[11px] font-semibold text-slate-400">ID TRX:</span>
@@ -749,28 +749,12 @@
                             <i class="fa-solid fa-credit-card text-cyberCyan"></i> Pilih Metode Pembayaran <span class="text-cyberCyan">*</span>
                         </label>
 
-                        <input type="hidden" id="paymentMethodSelect" value="auto">
+                        <input type="hidden" id="paymentMethodSelect" value="saldo">
 
-                        <!-- 3 PILIHAN METODE PEMBAYARAN -->
+                        <!-- 2 PILIHAN METODE PEMBAYARAN (SALDO & MANUAL) -->
                         <div class="space-y-2.5" id="customPaymentOptions">
-                            <!-- 1. AUTOMATIC QRIS -->
-                            <div onclick="selectCyberPayment('auto')" id="opt-auto" class="cyber-option-card active p-3 rounded-xl cursor-pointer flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-lg bg-cyberCyan/10 border border-cyberCyan/30 flex items-center justify-center text-cyberCyan">
-                                        <i class="fa-solid fa-bolt text-sm animate-pulse"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-bold text-slate-100 font-cyber">Pembayaran Otomatis (QRIS Fast)</p>
-                                        <p class="text-[10px] text-slate-400">Proses instan 24 jam via GoPay, OVO, Dana, QRIS</p>
-                                    </div>
-                                </div>
-                                <div class="cyber-radio-dot">
-                                    <div class="cyber-radio-inner"></div>
-                                </div>
-                            </div>
-
-                            <!-- 2. SALDO DEPOSIT USER -->
-                            <div onclick="selectCyberPayment('saldo')" id="opt-saldo" class="cyber-option-card p-3 rounded-xl cursor-pointer flex items-center justify-between">
+                            <!-- 1. SALDO DEPOSIT USER -->
+                            <div onclick="selectCyberPayment('saldo')" id="opt-saldo" class="cyber-option-card active p-3 rounded-xl cursor-pointer flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                                         <i class="fa-solid fa-wallet text-sm"></i>
@@ -785,7 +769,7 @@
                                 </div>
                             </div>
 
-                            <!-- 3. MANUAL WHATSAPP -->
+                            <!-- 2. MANUAL WHATSAPP -->
                             <div onclick="selectCyberPayment('manual')" id="opt-manual" class="cyber-option-card p-3 rounded-xl cursor-pointer flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
@@ -828,11 +812,7 @@
 
                     <div class="pt-3 border-t border-cyberBorder">
                         <!-- TAMPIL SESUAI METODE PILIHAN -->
-                        <button type="button" id="btnPayAuto" onclick="processAutoPayment()" class="w-full bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-extrabold py-3 rounded-xl text-xs shadow-glowCyan transition-all flex items-center justify-center gap-2 tracking-wider uppercase">
-                            <i class="fa-solid fa-bolt"></i> Bayar Otomatis Sekarang
-                        </button>
-
-                        <button type="button" id="btnPaySaldo" onclick="processSaldoPayment()" class="w-full hidden bg-amber-500 hover:bg-amber-400 text-cyberDark font-cyber font-extrabold py-3 rounded-xl text-xs shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all flex items-center justify-center gap-2 tracking-wider uppercase">
+                        <button type="button" id="btnPaySaldo" onclick="processSaldoPayment()" class="w-full bg-amber-500 hover:bg-amber-400 text-cyberDark font-cyber font-extrabold py-3 rounded-xl text-xs shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all flex items-center justify-center gap-2 tracking-wider uppercase">
                             <i class="fa-solid fa-wallet"></i> Bayar Menggunakan Saldo
                         </button>
 
@@ -842,42 +822,7 @@
                     </div>
                 </form>
 
-                <!-- STEP 2: QRIS OTOMATIS -->
-                <div id="paymentStep2" class="hidden flex flex-col items-center justify-center space-y-4">
-                    <div class="w-full bg-cyberDark p-3 rounded-xl border border-cyberCyan/40 text-center shadow-glowCyanSm">
-                        <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Total yang Harus Dibayar</p>
-                        <h3 id="qrisTotalAmount" class="text-xl font-extrabold text-cyberCyan font-cyber mt-0.5 drop-shadow-[0_0_8px_rgba(0,243,255,0.6)]">Rp 0</h3>
-                        <p class="text-[10px] text-slate-500 mt-1">Order ID: <span id="qrisOrderIdText" class="font-mono text-slate-300">TRX-000000</span></p>
-                    </div>
-
-                    <div class="flex items-center justify-center gap-2 bg-red-950/50 border border-red-500/40 text-red-400 px-4 py-2 rounded-lg text-xs font-mono font-bold w-full">
-                        <i class="fa-solid fa-clock animate-pulse"></i>
-                        <span>Selesaikan Sebelum: <strong id="qrisCountdown" class="text-white text-sm">15:00</strong></span>
-                    </div>
-
-                    <div class="text-center">
-                        <p class="text-xs text-slate-300 font-semibold">Scan QRIS Otomatis untuk Membayar</p>
-                        <p class="text-[10px] text-slate-500">Mendukung GoPay, OVO, Dana, ShopeePay, & Semua Bank</p>
-                    </div>
-
-                    <div onclick="downloadQrisImage()" class="bg-white p-3 sm:p-4 rounded-xl border-2 border-cyberCyan shadow-glowCyan flex flex-col items-center justify-center relative cursor-pointer group hover:scale-[1.02] transition-all w-full max-w-[340px] sm:max-w-[420px]">
-                        <div id="qrcodeContainer" class="w-full flex justify-center items-center overflow-hidden"></div>
-                    </div>
-
-                    <button type="button" onclick="downloadQrisImage()" class="w-full bg-cyberCyan/10 hover:bg-cyberCyan border border-cyberCyan/40 text-cyberCyan hover:text-cyberDark font-cyber font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-glowCyanSm">
-                        <i class="fa-solid fa-download"></i> Unduh Gambar QRIS
-                    </button>
-
-                    <div class="flex items-center gap-2 text-xs font-mono text-amber-400 bg-amber-950/40 px-3 py-1.5 rounded-lg border border-amber-800/40 animate-pulse w-full justify-center">
-                        <i class="fa-solid fa-spinner fa-spin"></i> Menunggu Pembayaran...
-                    </div>
-
-                    <button type="button" onclick="cancelPayment()" class="w-full bg-red-950/40 hover:bg-red-900/60 border border-red-500/50 text-red-400 hover:text-red-300 font-cyber font-bold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2 tracking-wider shadow-[0_0_10px_rgba(239,68,68,0.2)]">
-                        <i class="fa-solid fa-xmark text-sm"></i> BATALKAN TRANSAKSI
-                    </button>
-                </div>
-
-                <!-- STEP 3: SUKSES -->
+                <!-- STEP 2: SUKSES -->
                 <div id="paymentStep3" class="hidden flex flex-col items-center justify-center space-y-4 text-center">
                     <div class="w-14 h-14 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(16,185,129,0.4)]">
                         <i class="fa-solid fa-check"></i>
@@ -903,7 +848,7 @@
         </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION BAR (DASHBOARD, TOKO, RIWAYAT, LOGIN/PROFILE) -->
+    <!-- BOTTOM NAVIGATION BAR -->
     <nav class="bottom-nav-container">
         <a href="/dashboard" class="nav-item" id="nav-dashboard">
             <i class="fa-solid fa-border-all"></i>
@@ -939,9 +884,6 @@
         let CURRENT_ORDER_ID = '';
         let CURRENT_QTY = 1;
         let ACTIVE_VOUCHER = null;
-        let pollingInterval = null;
-        let countdownInterval = null;
-        let qrisExpireTime = null;
 
         let currentSelectedRating = 0;
         let CURRENT_LOGGED_USER = null;
@@ -1594,7 +1536,7 @@
             }
         }
 
-        // SELEKSI 3 METODE PEMBAYARAN: AUTO, SALDO, DAN MANUAL
+        // SELEKSI METODE PEMBAYARAN: SALDO DAN MANUAL
         function selectCyberPayment(method) {
             document.getElementById('paymentMethodSelect').value = method;
 
@@ -1603,27 +1545,18 @@
             if (activeCard) activeCard.classList.add('active');
 
             const manualFields = document.getElementById('manualFieldsGroup');
-            const btnAuto = document.getElementById('btnPayAuto');
             const btnSaldo = document.getElementById('btnPaySaldo');
             const btnManual = document.getElementById('btnPayManual');
             const usernameInput = document.getElementById('usernameInput');
 
             if (method === 'manual') {
                 manualFields.classList.remove('hidden');
-                btnAuto.classList.add('hidden');
                 btnSaldo.classList.add('hidden');
                 btnManual.classList.remove('hidden');
                 usernameInput.setAttribute('required', 'true');
-            } else if (method === 'saldo') {
-                manualFields.classList.add('hidden');
-                btnAuto.classList.add('hidden');
-                btnSaldo.classList.remove('hidden');
-                btnManual.classList.add('hidden');
-                usernameInput.removeAttribute('required');
             } else {
                 manualFields.classList.add('hidden');
-                btnAuto.classList.remove('hidden');
-                btnSaldo.classList.add('hidden');
+                btnSaldo.classList.remove('hidden');
                 btnManual.classList.add('hidden');
                 usernameInput.removeAttribute('required');
                 usernameInput.value = '';
@@ -1659,7 +1592,6 @@
 
                 DATA_PRODUK = await response.json();
 
-                // Load ulasan untuk setiap produk agar jumlah ulasan langsung ter-update
                 await Promise.all(DATA_PRODUK.map(async (produk) => {
                     const pId = produk.Id || produk._id;
                     try {
@@ -1690,78 +1622,6 @@
                         <i class="fa-solid fa-triangle-exclamation text-lg mb-2 block"></i> Gagal mengambil data produk.
                     </div>
                 `;
-            }
-        }
-
-        function renderQrisCode(qrisString) {
-            const qrContainer = document.getElementById('qrcodeContainer');
-            qrContainer.innerHTML = '';
-
-            new QRCode(qrContainer, {
-                text: qrisString,
-                width: 500,
-                height: 500,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        }
-
-        async function checkActiveTransaction() {
-            const savedOrderId = localStorage.getItem('active_order_id');
-            const savedProduct = localStorage.getItem('active_order_product');
-            if (!savedOrderId) return;
-
-            try {
-                if (savedProduct) {
-                    SELECTED_PRODUCT = JSON.parse(savedProduct);
-                }
-
-                const res = await fetch(`/transactions/${savedOrderId}`);
-                if (!res.ok) return;
-                const result = await res.json();
-
-                if ((result.status || result.data) && result.data) {
-                    const status = (result.data.status || "").toLowerCase();
-
-                    if (status === "pending") {
-                        CURRENT_ORDER_ID = result.data.orderId;
-                        qrisExpireTime = new Date(result.data.expiredAt).getTime();
-
-                        document.getElementById('qrisTotalAmount').innerText = formatRupiah(result.data.amount);
-                        document.getElementById('qrisOrderIdText').innerText = CURRENT_ORDER_ID;
-
-                        renderQrisCode(result.data.paymentNumber);
-
-                        document.getElementById('orderForm').classList.add('hidden');
-                        document.getElementById('paymentStep3').classList.add('hidden');
-                        document.getElementById('paymentStep2').classList.remove('hidden');
-                        document.getElementById('checkoutModal').classList.remove('hidden');
-
-                        startCountdown(qrisExpireTime);
-                        startStatusPolling();
-                    } else if (["settlement", "success", "paid", "settled"].includes(status)) {
-                        CURRENT_ORDER_ID = result.data.orderId;
-                        
-                        if (SELECTED_PRODUCT) {
-                            recordPurchasedProduct(SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id);
-                        }
-
-                        localStorage.removeItem('active_order_id');
-                        localStorage.removeItem('active_order_product');
-                        
-                        onPaymentSuccess(result.data.productLink || (SELECTED_PRODUCT ? SELECTED_PRODUCT.link : null) || "#");
-                        document.getElementById('checkoutModal').classList.remove('hidden');
-                    } else {
-                        localStorage.removeItem('active_order_id');
-                        localStorage.removeItem('active_order_product');
-                    }
-                } else {
-                    localStorage.removeItem('active_order_id');
-                    localStorage.removeItem('active_order_product');
-                }
-            } catch (err) {
-                console.error("Gagal mengecek transaksi aktif:", err);
             }
         }
 
@@ -1950,14 +1810,6 @@
         }
 
         function openCheckoutModal(index) {
-            const activeOrderId = localStorage.getItem('active_order_id');
-            const activeProduct = localStorage.getItem('active_order_product');
-
-            if (activeOrderId && activeProduct) {
-                checkActiveTransaction();
-                return;
-            }
-
             SELECTED_PRODUCT = DATA_PRODUK[index];
             if (!SELECTED_PRODUCT || (SELECTED_PRODUCT.stok !== undefined && SELECTED_PRODUCT.stok <= 0)) return;
 
@@ -1990,10 +1842,9 @@
             document.getElementById('qtyInput').value = CURRENT_QTY;
             updateTotalPrice();
 
-            selectCyberPayment('auto');
+            selectCyberPayment('saldo');
 
             document.getElementById('orderForm').classList.remove('hidden');
-            document.getElementById('paymentStep2').classList.add('hidden');
             document.getElementById('paymentStep3').classList.add('hidden');
 
             document.getElementById('checkoutModal').classList.remove('hidden');
@@ -2178,14 +2029,6 @@
         }
 
         function closeCheckoutModal() {
-            if (pollingInterval) clearInterval(pollingInterval);
-            if (countdownInterval) clearInterval(countdownInterval);
-
-            if (!document.getElementById('paymentStep3').classList.contains('hidden')) {
-                localStorage.removeItem('active_order_id');
-                localStorage.removeItem('active_order_product');
-            }
-
             document.getElementById('checkoutModal').classList.add('hidden');
         }
 
@@ -2285,223 +2128,8 @@
             }
         }
 
-        async function processAutoPayment() {
-            const btnAuto = document.getElementById('btnPayAuto');
-            btnAuto.disabled = true;
-            btnAuto.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memuat QRIS...`;
-
-            Swal.fire({
-                title: 'GENERATING QRIS',
-                text: 'Sedang menghubungkan gateway...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-                customClass: {
-                    popup: 'cyber-swal',
-                    title: 'cyber-swal-title',
-                    htmlContainer: 'cyber-swal-text'
-                }
-            });
-
-            try {
-                const calc = calculateFinalTotal();
-
-                const res = await fetch('/transactions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        orderId: CURRENT_ORDER_ID,
-                        amount: calc.total,
-                        qty: CURRENT_QTY,
-                        itemDetails: SELECTED_PRODUCT,
-                        voucherCode: ACTIVE_VOUCHER ? ACTIVE_VOUCHER.code : null
-                    })
-                });
-
-                const result = await res.json();
-                if (!result.status) throw new Error(result.message || "Gagal menghasilkan QRIS");
-
-                localStorage.setItem('active_order_id', CURRENT_ORDER_ID);
-                localStorage.setItem('active_order_product', JSON.stringify(SELECTED_PRODUCT));
-
-                const qrisString = result.data.paymentNumber;
-                qrisExpireTime = result.data.expiredAt ? new Date(result.data.expiredAt).getTime() : new Date().getTime() + (15 * 60 * 1000);
-
-                const finalAmount = (result.data && result.data.amount) ? result.data.amount : calc.total;
-
-                document.getElementById('qrisTotalAmount').innerText = formatRupiah(finalAmount);
-                document.getElementById('qrisOrderIdText').innerText = CURRENT_ORDER_ID;
-
-                renderQrisCode(qrisString);
-
-                Swal.close();
-
-                document.getElementById('orderForm').classList.add('hidden');
-                document.getElementById('paymentStep2').classList.remove('hidden');
-
-                startCountdown(qrisExpireTime);
-                startStatusPolling();
-
-            } catch (err) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'TRANSAKSI GAGAL',
-                    text: err.message,
-                    customClass: {
-                        popup: 'cyber-swal',
-                        title: 'cyber-swal-title',
-                        htmlContainer: 'cyber-swal-text',
-                        confirmButton: 'cyber-swal-confirm'
-                    }
-                });
-            } finally {
-                btnAuto.disabled = false;
-                btnAuto.innerHTML = `<i class="fa-solid fa-bolt"></i> Bayar Otomatis Sekarang`;
-            }
-        }
-
-        function startCountdown(expireTimestamp) {
-            if (countdownInterval) clearInterval(countdownInterval);
-
-            countdownInterval = setInterval(() => {
-                const now = new Date().getTime();
-                const distance = expireTimestamp - now;
-
-                if (distance <= 0) {
-                    clearInterval(countdownInterval);
-                    if (pollingInterval) clearInterval(pollingInterval);
-                    localStorage.removeItem('active_order_id');
-                    localStorage.removeItem('active_order_product');
-                    document.getElementById('qrisCountdown').innerText = "00:00";
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'WAKTU HABIS',
-                        text: 'Batas waktu pembayaran 15 menit telah berakhir.',
-                        customClass: {
-                            popup: 'cyber-swal',
-                            title: 'cyber-swal-title',
-                            htmlContainer: 'cyber-swal-text',
-                            confirmButton: 'cyber-swal-confirm'
-                        }
-                    });
-                    closeCheckoutModal();
-                    return;
-                }
-
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                document.getElementById('qrisCountdown').innerText = 
-                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
-
-        function downloadQrisImage() {
-            const qrCanvas = document.querySelector('#qrcodeContainer canvas');
-            const qrImg = document.querySelector('#qrcodeContainer img');
-
-            if (!qrCanvas && (!qrImg || !qrImg.src)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'GAGAL UNDUH',
-                    text: 'Gambar QRIS belum selesai dimuat, silakan tunggu beberapa detik.',
-                    customClass: { popup: 'cyber-swal' }
-                });
-                return;
-            }
-
-            const padding = 30;
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-
-            const processDownload = (sourceElement) => {
-                const srcWidth = sourceElement.width || 500;
-                const srcHeight = sourceElement.height || 500;
-
-                tempCanvas.width = srcWidth + (padding * 2);
-                tempCanvas.height = srcHeight + (padding * 2);
-
-                tempCtx.fillStyle = "#FFFFFF";
-                tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-                tempCtx.drawImage(sourceElement, padding, padding, srcWidth, srcHeight);
-
-                const imageURI = tempCanvas.toDataURL("image/png", 1.0);
-
-                const downloadLink = document.createElement('a');
-                downloadLink.href = imageURI;
-                downloadLink.download = `QRIS_${CURRENT_ORDER_ID}.png`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-            };
-
-            if (qrCanvas) {
-                processDownload(qrCanvas);
-            } else if (qrImg) {
-                const imgObj = new Image();
-                imgObj.crossOrigin = "Anonymous";
-                imgObj.onload = () => processDownload(imgObj);
-                imgObj.src = qrImg.src;
-            }
-        }
-
-        function startStatusPolling() {
-            if (pollingInterval) clearInterval(pollingInterval);
-
-            pollingInterval = setInterval(async () => {
-                try {
-                    const res = await fetch(`/transactions/${CURRENT_ORDER_ID}`);
-                    if (!res.ok) return;
-                    const result = await res.json();
-
-                    if ((result.status || result.data) && result.data) {
-                        const status = (result.data.status || "").toLowerCase();
-
-                        if (["settlement", "success", "paid", "settled"].includes(status)) {
-                            clearInterval(pollingInterval);
-                            if (countdownInterval) clearInterval(countdownInterval);
-
-                            if (SELECTED_PRODUCT) {
-                                recordPurchasedProduct(SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id);
-                            }
-
-                            localStorage.removeItem('active_order_id');
-                            localStorage.removeItem('active_order_product');
-
-                            const finalLink = result.data.productLink || (SELECTED_PRODUCT ? SELECTED_PRODUCT.link : null) || "#";
-                            onPaymentSuccess(finalLink);
-                            
-                            fetchProduk();
-                        } else if (status === "cancelled" || status === "failed") {
-                            clearInterval(pollingInterval);
-                            if (countdownInterval) clearInterval(countdownInterval);
-                            localStorage.removeItem('active_order_id');
-                            localStorage.removeItem('active_order_product');
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'TRANSAKSI BATAL / GAGAL',
-                                text: 'Transaksi telah dibatalkan atau gagal diproses.',
-                                customClass: {
-                                    popup: 'cyber-swal',
-                                    title: 'cyber-swal-title',
-                                    htmlContainer: 'cyber-swal-text',
-                                    confirmButton: 'cyber-swal-confirm'
-                                }
-                            });
-                            closeCheckoutModal();
-                        }
-                    }
-                } catch (e) {
-                    console.error("Error polling status:", e);
-                }
-            }, 3000);
-        }
-
         function onPaymentSuccess(productLink) {
             document.getElementById('orderForm').classList.add('hidden');
-            document.getElementById('paymentStep2').classList.add('hidden');
             document.getElementById('paymentStep3').classList.remove('hidden');
 
             const linkElem = document.getElementById('productDownloadLink');
@@ -2520,49 +2148,6 @@
                     htmlContainer: 'cyber-swal-text'
                 }
             });
-        }
-
-        async function cancelPayment() {
-            const confirmResult = await Swal.fire({
-                title: 'BATALKAN TRANSAKSI?',
-                text: 'Apakah Anda yakin ingin membatalkan pembayaran QRIS ini?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Batalkan',
-                cancelButtonText: 'Kembali',
-                customClass: {
-                    popup: 'cyber-swal',
-                    title: 'cyber-swal-title',
-                    htmlContainer: 'cyber-swal-text',
-                    confirmButton: 'cyber-swal-cancel',
-                    cancelButton: 'cyber-swal-confirm'
-                }
-            });
-
-            if (confirmResult.isConfirmed) {
-                if (pollingInterval) clearInterval(pollingInterval);
-                if (countdownInterval) clearInterval(countdownInterval);
-                localStorage.removeItem('active_order_id');
-                localStorage.removeItem('active_order_product');
-                try {
-                    await fetch(`/transactions/${CURRENT_ORDER_ID}/cancel`, { method: 'POST' });
-                } catch (e) {}
-
-                Swal.fire({
-                    icon: 'info',
-                    title: 'DIBATALKAN',
-                    text: 'Transaksi berhasil dibatalkan.',
-                    timer: 2000,
-                    showConfirmButton: false,
-                    customClass: {
-                        popup: 'cyber-swal',
-                        title: 'cyber-swal-title',
-                        htmlContainer: 'cyber-swal-text'
-                    }
-                });
-
-                closeCheckoutModal();
-            }
         }
 
         function shareProduk(index) {
@@ -2679,8 +2264,7 @@
         async function initStorePage() {
             await Promise.allSettled([
                 fetchCurrentUserStatus(),
-                fetchProduk(),
-                checkActiveTransaction()
+                fetchProduk()
             ]);
             await checkUrlProductShare();
         }
