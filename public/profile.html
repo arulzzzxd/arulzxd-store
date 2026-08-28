@@ -170,7 +170,7 @@
                 <h4 id="profileTotalDeposit" class="text-lg font-black font-cyber text-emerald-400">Rp 0</h4>
                 <p class="text-[9px] text-slate-500 font-mono mt-1">Akumulasi Depo Berhasil</p>
             </div>
-            
+
             <div class="bg-cyberCard p-4 rounded-2xl border border-cyberBorder shadow-lg relative overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-wider">Total Belanja</span>
@@ -181,13 +181,13 @@
             </div>
         </div>
 
-        <!-- WIDGET INFORMASI AKUN (DI ATAS UNDANG TEMAN) -->
+        <!-- WIDGET INFORMASI AKUN -->
         <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-5 shadow-xl space-y-4">
             <div class="flex items-center gap-2 pb-2 border-b border-cyberBorder/60">
                 <i class="fa-regular fa-user text-cyberCyan text-base"></i>
                 <h3 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider">Informasi Akun</h3>
             </div>
-            
+
             <div class="space-y-3.5 text-xs">
                 <!-- Nama -->
                 <div class="flex items-center justify-between">
@@ -206,7 +206,7 @@
                                 <i id="toggleEmailIcon" class="fa-solid fa-eye-slash"></i>
                             </button>
                         </div>
-                        
+
                         <!-- BADGE VERIFIED CENTANG BIRU TIKTOK STYLE -->
                         <div id="emailVerifiedBadge" class="hidden flex justify-end">
                             <span class="inline-flex items-center gap-1.5 text-[11px] bg-[#20d5ec]/10 text-[#20d5ec] border border-[#20d5ec]/30 px-2.5 py-0.5 rounded-full font-bold">
@@ -235,6 +235,59 @@
                     </span>
                 </div>
             </div>
+        </div>
+
+        <!-- WIDGET UBAH / SETEL KATA SANDI (DIBAWAH INFORMASI AKUN) -->
+        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-5 shadow-xl space-y-4">
+            <div class="flex items-center gap-2 pb-2 border-b border-cyberBorder/60">
+                <i class="fa-solid fa-key text-cyberCyan text-base"></i>
+                <h3 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider">Ubah Kata Sandi</h3>
+            </div>
+
+            <!-- BANNER INFORMASI DARI OAUTH/GOOGLE LOGGED IN -->
+            <div id="noPasswordAlert" class="hidden bg-amber-500/10 border border-amber-500/30 p-3.5 rounded-xl flex items-start gap-3">
+                <div class="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <i class="fa-solid fa-circle-info text-sm"></i>
+                </div>
+                <p class="text-xs text-amber-200/90 leading-relaxed">
+                    Anda terhubung menggunakan <strong id="oauthProviderName" class="text-amber-400">Google</strong> dan belum memiliki kata sandi lokal. Setel kata sandi di bawah untuk mengaktifkan login email.
+                </p>
+            </div>
+
+            <form id="changePasswordForm" onsubmit="submitChangePassword(event)" class="space-y-3.5">
+                <!-- FIELD KATA SANDI SAAT INI (TAMPIL HANYA JIKA USER SUDAH PUNYA PASS) -->
+                <div id="currentPasswordContainer" class="hidden">
+                    <label class="block text-[11px] font-bold font-cyber text-slate-300 uppercase tracking-wider mb-1">
+                        Kata Sandi Saat Ini
+                    </label>
+                    <input type="password" id="currentPasswordInput" placeholder="Masukkan kata sandi saat ini..." 
+                           class="w-full px-3.5 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-medium transition">
+                </div>
+
+                <!-- FIELD KATA SANDI BARU -->
+                <div>
+                    <label class="block text-[11px] font-bold font-cyber text-slate-300 uppercase tracking-wider mb-1">
+                        Kata Sandi Baru
+                    </label>
+                    <input type="password" id="newPasswordInput" required placeholder="Min. 8 karakter" 
+                           class="w-full px-3.5 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-medium transition">
+                </div>
+
+                <!-- FIELD KONFIRMASI KATA SANDI BARU -->
+                <div>
+                    <label class="block text-[11px] font-bold font-cyber text-slate-300 uppercase tracking-wider mb-1">
+                        Konfirmasi Kata Sandi Baru
+                    </label>
+                    <input type="password" id="confirmPasswordInput" required placeholder="Ulangi kata sandi baru..." 
+                           class="w-full px-3.5 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-medium transition">
+                </div>
+
+                <div class="flex justify-end pt-1">
+                    <button type="submit" id="btnSubmitPassword" class="bg-blue-600 hover:bg-blue-500 text-white font-cyber font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-lg flex items-center gap-2 uppercase tracking-wider">
+                        <i class="fa-solid fa-key"></i> <span id="btnSubmitPasswordText">Setel Kata Sandi</span>
+                    </button>
+                </div>
+            </form>
         </div>
 
         <!-- WIDGET REFERAL UNDANGAN -->
@@ -362,7 +415,7 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h3 class="text-sm font-bold font-cyber text-cyberCyan uppercase">Scan QRIS Top Up Saldo</h3>
-            
+
             <div class="bg-cyberDark p-3 rounded-xl border border-cyberBorder">
                 <p class="text-[10px] text-slate-400 uppercase">Total Deposit</p>
                 <h4 id="depTotalAmountText" class="text-xl font-black font-cyber text-cyberCyan">Rp 0</h4>
@@ -413,6 +466,7 @@
         let currentDepOrderId = '';
         let fullEmail = '';
         let isEmailShown = false;
+        let userHasPassword = false;
 
         function formatRupiah(angka) {
             return new Intl.NumberFormat('id-ID', {
@@ -456,16 +510,19 @@
                 if (data.loggedIn && data.user) {
                     const usernameVal = data.user.username || data.user.name || 'User';
                     fullEmail = data.user.email || 'user@gmail.com';
+                    userHasPassword = data.user.hasPassword || false;
 
                     // Update Profile Card Atas
                     document.getElementById('profileUsername').innerText = usernameVal;
                     document.getElementById('profileEmail').innerText = maskEmail(fullEmail);
-                    
+
                     // Update Widget Informasi Akun
                     document.getElementById('infoNama').innerText = usernameVal;
                     document.getElementById('infoEmail').innerText = maskEmail(fullEmail);
-                    document.getElementById('infoLoginMethod').innerText = data.user.loginMethod || 'Google OAuth';
                     
+                    const providerStr = data.user.provider ? data.user.provider.toUpperCase() : 'LOCAL';
+                    document.getElementById('infoLoginMethod').innerText = providerStr === 'LOCAL' ? 'Email & Password' : `${providerStr} OAuth`;
+
                     // STATUS BADGE EMAIL VERIFIED
                     const isVerified = data.user.isEmailVerified ?? data.user.isVerified ?? true;
                     const badgeElem = document.getElementById('emailVerifiedBadge');
@@ -473,6 +530,27 @@
                         badgeElem.classList.remove('hidden');
                     } else {
                         badgeElem.classList.add('hidden');
+                    }
+
+                    // ATUR TAMPILAN FITUR KATA SANDI
+                    const noPasswordAlert = document.getElementById('noPasswordAlert');
+                    const currentPasswordContainer = document.getElementById('currentPasswordContainer');
+                    const btnSubmitPasswordText = document.getElementById('btnSubmitPasswordText');
+                    const currentPasswordInput = document.getElementById('currentPasswordInput');
+
+                    if (!userHasPassword) {
+                        // Tampilkan banner peringatan (Gambar 1)
+                        noPasswordAlert.classList.remove('hidden');
+                        currentPasswordContainer.classList.add('hidden');
+                        currentPasswordInput.removeAttribute('required');
+                        btnSubmitPasswordText.innerText = 'Setel Kata Sandi';
+                        document.getElementById('oauthProviderName').innerText = providerStr;
+                    } else {
+                        // Tampilkan field kata sandi saat ini (Gambar 2)
+                        noPasswordAlert.classList.add('hidden');
+                        currentPasswordContainer.classList.remove('hidden');
+                        currentPasswordInput.setAttribute('required', 'required');
+                        btnSubmitPasswordText.innerText = 'Ubah Kata Sandi';
                     }
 
                     document.getElementById('profileSaldo').innerText = formatRupiah(data.user.saldo || 0);
@@ -502,6 +580,77 @@
                     window.location.href = '/login';
                 }
             } catch(e) {}
+        }
+
+        async function submitChangePassword(e) {
+            e.preventDefault();
+
+            const currentPassword = document.getElementById('currentPasswordInput').value;
+            const newPassword = document.getElementById('newPasswordInput').value;
+            const confirmPassword = document.getElementById('confirmPasswordInput').value;
+
+            if (newPassword.length < 8) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'PERINGATAN',
+                    text: 'Kata sandi baru minimal 8 karakter!',
+                    customClass: { popup: 'cyber-swal' }
+                });
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'PERINGATAN',
+                    text: 'Konfirmasi kata sandi tidak cocok!',
+                    customClass: { popup: 'cyber-swal' }
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'MEMPROSES...',
+                text: 'Memperbarui kata sandi Anda',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); },
+                customClass: { popup: 'cyber-swal' }
+            });
+
+            try {
+                const res = await fetch('/api/user/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        currentPassword,
+                        newPassword,
+                        confirmPassword
+                    })
+                });
+
+                const result = await res.json();
+                Swal.close();
+
+                if (result.status) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'BERHASIL',
+                        text: result.message,
+                        customClass: { popup: 'cyber-swal' }
+                    });
+                    document.getElementById('changePasswordForm').reset();
+                    loadUserProfile();
+                } else {
+                    throw new Error(result.message || 'Gagal mengubah kata sandi');
+                }
+            } catch(err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'GAGAL',
+                    text: err.message,
+                    customClass: { popup: 'cyber-swal' }
+                });
+            }
         }
 
         function renderInvitedUsers(users) {
@@ -726,7 +875,7 @@
                 try {
                     await fetch(`/transactions/${currentDepOrderId}/cancel`, { method: 'POST' });
                 } catch(e) {}
-                
+
                 if (depPollInterval) clearInterval(depPollInterval);
                 localStorage.removeItem('active_deposit_order_id');
                 closeDepositModal();
