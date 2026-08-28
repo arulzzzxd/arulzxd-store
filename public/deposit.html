@@ -26,26 +26,26 @@
                         cyberBorder: '#162a45'
                     },
                     boxShadow: {
-                        glowCyan: '0 0 15px rgba(0, 243, 255, 0.35)',
-                        glowCyanSm: '0 0 8px rgba(0, 243, 255, 0.25)',
+                        glowCyan: '0 0 20px rgba(0, 243, 255, 0.35)',
+                        glowCyanSm: '0 0 10px rgba(0, 243, 255, 0.25)',
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #050b14; color: #e2e8f0; overflow-x: hidden; }
+        body { background-color: #050b14; color: #e2e8f0; min-height: 100vh; }
         .bg-cyber-grid {
             background-image: linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
                               linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
+            background-size: 32px 32px;
         }
         .swal2-popup.cyber-swal {
             background: #0a1628 !important;
             border: 1px solid #162a45 !important;
-            border-radius: 16px !important;
+            border-radius: 20px !important;
             color: #e2e8f0 !important;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.25) !important;
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.3) !important;
             font-family: 'Plus Jakarta Sans', sans-serif !important;
         }
         #depQrcodeContainer canvas, #depQrcodeContainer img {
@@ -109,140 +109,245 @@
     }
     </style>
 </head>
-<body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen pb-32">
+<body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen flex flex-col justify-between pb-32">
 
     <!-- TOP NAVBAR -->
     <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
-        <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)]">
-                Arulz<span class="text-white">Store</span>
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+            <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)] flex items-center gap-2">
+                <i class="fa-solid fa-bolt text-cyberCyan text-xl"></i>
+                <span>Arulz<span class="text-white">Store</span></span>
             </a>
-            <a href="/auth/logout" class="text-xs bg-red-600/20 border-2 border-red-500/60 text-red-400 hover:bg-red-600 hover:text-white font-cyber font-extrabold px-4 py-2 rounded-xl transition shadow-[0_0_12px_rgba(239,68,68,0.4)] flex items-center gap-2 uppercase tracking-wider">
-                <i class="fa-solid fa-right-from-bracket text-sm"></i> Keluar
-            </a>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-cyber font-bold bg-cyberCyan/10 border border-cyberCyan/30 text-cyberCyan px-3 py-1 rounded-full uppercase tracking-wider">
+                    <i class="fa-solid fa-shield-halved mr-1"></i> QRIS Ready
+                </span>
+            </div>
         </div>
     </nav>
 
-    <div class="max-w-3xl mx-auto px-4 py-6 space-y-6">
-
-        <!-- WIDGET SALDO SAAT INI -->
-        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl relative overflow-hidden">
-            <div class="flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-widest block">Saldo Akun Anda</span>
-                    <h3 id="depSaldoVal" class="text-2xl sm:text-3xl font-black font-cyber text-cyberCyan drop-shadow-[0_0_10px_rgba(0,243,255,0.6)] mt-0.5">Rp 0</h3>
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-1">
+        
+        <!-- HEADER TITLE PAGE -->
+        <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-cyberCard/60 border border-cyberBorder p-5 rounded-2xl backdrop-blur-md">
+            <div>
+                <h1 class="text-xl sm:text-2xl font-extrabold font-cyber text-white flex items-center gap-2">
+                    <i class="fa-solid fa-wallet text-cyberCyan"></i> Deposit Saldo Instan
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">Isi ulang saldo akun Anda secara otomatis 24/7 menggunakan QRIS All Payment.</p>
+            </div>
+            
+            <!-- WIDGET SALDO AKUN -->
+            <div class="bg-cyberDark/80 border border-cyberCyan/30 p-4 rounded-xl flex items-center justify-between md:justify-end gap-4 min-w-[240px]">
+                <div class="text-left md:text-right">
+                    <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-widest block">Saldo Saat Ini</span>
+                    <h3 id="depSaldoVal" class="text-xl sm:text-2xl font-black font-cyber text-cyberCyan drop-shadow-[0_0_10px_rgba(0,243,255,0.6)]">Rp 0</h3>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-cyberCyan/10 border border-cyberCyan/30 flex items-center justify-center text-cyberCyan text-xl shadow-glowCyanSm">
-                    <i class="fa-solid fa-wallet"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- FORM DEPOSIT -->
-        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl space-y-4">
-            <div class="flex items-center justify-between">
-                <label class="block text-xs font-bold font-cyber text-slate-300 uppercase tracking-wider">
-                    <i class="fa-solid fa-circle-plus text-cyberCyan"></i> Deposit Saldo Instan
-                </label>
-                <span class="text-[10px] text-slate-400 font-mono">Minimal Rp 1.000</span>
-            </div>
-
-            <!-- PRESET NOMINAL DEPOSIT -->
-            <div class="grid grid-cols-4 gap-2">
-                <button onclick="setDepositAmount(1000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">1.000</button>
-                <button onclick="setDepositAmount(2000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">2.000</button>
-                <button onclick="setDepositAmount(5000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">5.000</button>
-                <button onclick="setDepositAmount(10000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">10.000</button>
-                <button onclick="setDepositAmount(15000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">15.000</button>
-                <button onclick="setDepositAmount(20000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">20.000</button>
-                <button onclick="setDepositAmount(30000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">30.000</button>
-                <button onclick="setDepositAmount(50000)" class="preset-btn bg-cyberDark border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-2 rounded-xl text-xs transition">50.000</button>
-            </div>
-
-            <!-- INPUT NOMINAL MANUAL -->
-            <div class="flex items-center gap-2 pt-2">
-                <div class="relative flex-1">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-xs font-bold text-slate-400">Rp</span>
-                    <input type="number" id="depositAmountInput" min="1000" placeholder="Ketik nominal sendiri..." 
-                           class="w-full pl-9 pr-3 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-bold font-cyber transition">
-                </div>
-                <button onclick="processDeposit()" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-extrabold px-5 py-2.5 rounded-xl text-xs transition shadow-glowCyan flex items-center gap-1.5 uppercase tracking-wider">
-                    <i class="fa-solid fa-bolt"></i> Top Up
-                </button>
-            </div>
-
-            <!-- PANDUAN ISI SALDO -->
-            <div class="mt-4 pt-4 border-t border-cyberBorder/60 space-y-3">
-                <h4 class="text-xs font-bold font-cyber text-cyberCyan flex items-center gap-1.5 uppercase tracking-wider">
-                    <i class="fa-solid fa-circle-info"></i> Panduan & Kebijakan Deposit Saldo
-                </h4>
-                <div class="text-[11px] text-slate-300 space-y-2.5 leading-relaxed bg-cyberDark/60 p-3.5 rounded-xl border border-cyberBorder">
-                    <div>
-                        <p class="font-bold text-white flex items-center gap-1">
-                            <i class="fa-solid fa-money-bill-wave text-emerald-400 text-[10px]"></i> Minimal Pengisian Saldo
-                        </p>
-                        <p class="text-slate-400 mt-0.5">Minimal pengisian saldo adalah <strong class="text-cyberCyan">Rp 1.000</strong>.</p>
-                    </div>
-                    <div>
-                        <p class="font-bold text-white flex items-center gap-1">
-                            <i class="fa-solid fa-qrcode text-cyberCyan text-[10px]"></i> Metode Transfer QRIS Instan
-                        </p>
-                        <p class="text-slate-400 mt-0.5">Proses transfer menggunakan kode QRIS instan dari e-wallet (DANA, OVO, GoPay, ShopeePay) atau bank transfer (BCA, Mandiri, BNI, BRI, dll).</p>
-                    </div>
-                    <div>
-                        <p class="font-bold text-white flex items-center gap-1">
-                            <i class="fa-solid fa-clock text-amber-400 text-[10px]"></i> Verifikasi Otomatis 24 Jam
-                        </p>
-                        <p class="text-slate-400 mt-0.5">Verifikasi pembayaran diproses secara otomatis oleh sistem 24 jam non-stop dalam hitungan detik setelah transaksi sukses.</p>
-                    </div>
-                    <div>
-                        <p class="font-bold text-white flex items-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-red-400 text-[10px]"></i> Kebijakan Deposit
-                        </p>
-                        <p class="text-slate-400 mt-0.5">Kebijakan pengisian saldo bersifat final dan tidak dapat di-refund / ditarik kembali.</p>
-                    </div>
+                <div class="w-10 h-10 rounded-xl bg-cyberCyan/10 border border-cyberCyan/40 flex items-center justify-center text-cyberCyan text-lg shadow-glowCyanSm shrink-0">
+                    <i class="fa-solid fa-coins"></i>
                 </div>
             </div>
         </div>
 
-    </div>
+        <!-- GRID DUA KOLOM UNTUK PC/LAPTOP -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- KOLOM KIRI: FORM & PRESET NOMINAL (7 SPAN PC) -->
+            <div class="lg:col-span-7 bg-cyberCard rounded-2xl border border-cyberBorder p-5 sm:p-6 shadow-xl space-y-6">
+                
+                <div class="flex items-center justify-between border-b border-cyberBorder/60 pb-3">
+                    <h2 class="text-xs sm:text-sm font-bold font-cyber text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-cubes text-cyberCyan"></i> Pilih Nominal Deposit
+                    </h2>
+                    <span class="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-md border border-emerald-500/30">
+                        Min. Rp 1.000
+                    </span>
+                </div>
+
+                <!-- PRESET NOMINAL GRID 5.000 - 100.000 DENGAN RANK & POPULER -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    
+                    <!-- 5.000 - POPULER -->
+                    <button onclick="setDepositAmount(5000, this)" class="preset-btn relative bg-cyberDark/90 border-2 border-cyberCyan text-slate-100 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group shadow-[0_0_12px_rgba(0,243,255,0.2)]">
+                        <span class="absolute -top-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-black text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-glowCyanSm">
+                            🔥 Populer
+                        </span>
+                        <span class="text-cyberCyan font-extrabold text-[10px]">Super Hemat</span>
+                        <span class="text-sm">Rp 5.000</span>
+                    </button>
+
+                    <!-- 10.000 -->
+                    <button onclick="setDepositAmount(10000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
+                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">Hemat</span>
+                        <span class="text-sm">Rp 10.000</span>
+                    </button>
+
+                    <!-- 20.000 -->
+                    <button onclick="setDepositAmount(20000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
+                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">Reguler</span>
+                        <span class="text-sm">Rp 20.000</span>
+                    </button>
+
+                    <!-- 30.000 -->
+                    <button onclick="setDepositAmount(30000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
+                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">Pro</span>
+                        <span class="text-sm">Rp 30.000</span>
+                    </button>
+
+                    <!-- 50.000 -->
+                    <button onclick="setDepositAmount(50000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
+                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">VIP</span>
+                        <span class="text-sm">Rp 50.000</span>
+                    </button>
+
+                    <!-- 75.000 -->
+                    <button onclick="setDepositAmount(75000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
+                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">MVP</span>
+                        <span class="text-sm">Rp 75.000</span>
+                    </button>
+
+                    <!-- 90.000 -->
+                    <button onclick="setDepositAmount(90000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
+                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">Sultan</span>
+                        <span class="text-sm">Rp 90.000</span>
+                    </button>
+
+                    <!-- 100.000 -->
+                    <button onclick="setDepositAmount(100000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
+                        <span class="text-amber-400 font-extrabold text-[10px]">Super Sultan</span>
+                        <span class="text-sm">Rp 100.000</span>
+                    </button>
+
+                </div>
+
+                <!-- INPUT MANUAL & TOMBOL -->
+                <div class="space-y-3 pt-2">
+                    <label class="block text-[11px] font-bold font-cyber text-slate-300 uppercase tracking-wider">
+                        Atau Ketik Nominal Custom
+                    </label>
+                    <div class="flex flex-col sm:flex-row items-stretch gap-3">
+                        <div class="relative flex-1">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-xs font-bold text-cyberCyan font-cyber">Rp</span>
+                            <input type="number" id="depositAmountInput" min="1000" placeholder="Ketik nominal sendiri (cth: 25000)..." 
+                                   class="w-full pl-11 pr-4 py-3.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-bold font-cyber transition shadow-inner">
+                        </div>
+                        <button onclick="processDeposit()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-cyber font-black px-7 py-3.5 rounded-xl text-xs transition shadow-glowCyan flex items-center justify-center gap-2 uppercase tracking-wider">
+                            <i class="fa-solid fa-bolt text-sm"></i> <span>Bayar QRIS</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DUKUNGAN METODE PEMBAYARAN -->
+                <div class="pt-4 border-t border-cyberBorder/60 space-y-2">
+                    <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-wider block">Mendukung Pembayaran QRIS:</span>
+                    <div class="flex flex-wrap items-center gap-2 text-xs font-mono font-semibold text-slate-300">
+                        <span class="bg-cyberDark px-2.5 py-1 rounded-lg border border-cyberBorder/80"><i class="fa-solid fa-wallet text-blue-400 mr-1"></i> DANA</span>
+                        <span class="bg-cyberDark px-2.5 py-1 rounded-lg border border-cyberBorder/80"><i class="fa-solid fa-wallet text-purple-400 mr-1"></i> OVO</span>
+                        <span class="bg-cyberDark px-2.5 py-1 rounded-lg border border-cyberBorder/80"><i class="fa-solid fa-wallet text-emerald-400 mr-1"></i> GoPay</span>
+                        <span class="bg-cyberDark px-2.5 py-1 rounded-lg border border-cyberBorder/80"><i class="fa-solid fa-wallet text-orange-400 mr-1"></i> ShopeePay</span>
+                        <span class="bg-cyberDark px-2.5 py-1 rounded-lg border border-cyberBorder/80"><i class="fa-solid fa-building-columns text-cyan-400 mr-1"></i> M-Banking</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- KOLOM KANAN: PANDUAN & KEBIJAKAN (5 SPAN PC) -->
+            <div class="lg:col-span-5 bg-cyberCard rounded-2xl border border-cyberBorder p-5 sm:p-6 shadow-xl space-y-4">
+                <div class="flex items-center gap-2 pb-3 border-b border-cyberBorder/60">
+                    <i class="fa-solid fa-shield-halved text-cyberCyan text-base"></i>
+                    <h3 class="text-xs sm:text-sm font-bold font-cyber text-slate-200 uppercase tracking-wider">Panduan & Ketentuan</h3>
+                </div>
+
+                <div class="space-y-3.5 text-xs text-slate-300 leading-relaxed">
+                    <div class="bg-cyberDark/60 p-3.5 rounded-xl border border-cyberBorder flex items-start gap-3">
+                        <div class="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-money-bill-wave text-xs"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white">Nominal Minimal</h4>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Pengisian saldo minimal adalah <strong class="text-cyberCyan">Rp 1.000</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-cyberDark/60 p-3.5 rounded-xl border border-cyberBorder flex items-start gap-3">
+                        <div class="w-7 h-7 rounded-lg bg-cyberCyan/10 border border-cyberCyan/30 text-cyberCyan flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-qrcode text-xs"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white">Sistem QRIS Otomatis</h4>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Cukup scan QRIS menggunakan aplikasi e-wallet atau bank apa saja pilihan Anda.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-cyberDark/60 p-3.5 rounded-xl border border-cyberBorder flex items-start gap-3">
+                        <div class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-clock text-xs"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white">Proses Real-time 24 Jam</h4>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Saldo langsung masuk secara otomatis ke akun Anda dalam hitungan detik setelah transfer sukses.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-cyberDark/60 p-3.5 rounded-xl border border-cyberBorder flex items-start gap-3">
+                        <div class="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-ban text-xs"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white">Non-Refundable</h4>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Setiap pengisian saldo bersifat final dan tidak dapat ditarik kembali ke rekening/e-wallet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
 
     <!-- MODAL POPUP QRIS DEPOSIT -->
     <div id="depositModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-cyberCard w-full max-w-md rounded-2xl border border-cyberCyan/40 p-5 space-y-4 text-center relative shadow-glowCyan">
-            <button onclick="closeDepositModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg">
+        <div class="bg-cyberCard w-full max-w-md rounded-2xl border border-cyberCyan/40 p-6 space-y-4 text-center relative shadow-glowCyan">
+            <button onclick="closeDepositModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-sm font-bold font-cyber text-cyberCyan uppercase">Scan QRIS Top Up Saldo</h3>
-
-            <div class="bg-cyberDark p-3 rounded-xl border border-cyberBorder">
-                <p class="text-[10px] text-slate-400 uppercase">Total Deposit</p>
-                <h4 id="depTotalAmountText" class="text-xl font-black font-cyber text-cyberCyan">Rp 0</h4>
-                <p class="text-[10px] text-slate-500 font-mono mt-0.5">Order ID: <span id="depOrderIdText">-</span></p>
+            
+            <div class="space-y-1">
+                <h3 class="text-base font-bold font-cyber text-cyberCyan uppercase">Scan QRIS Pembayaran</h3>
+                <p class="text-xs text-slate-400">Gunakan E-Wallet atau Bank Apps untuk scan</p>
             </div>
 
-            <div class="bg-white p-3 rounded-xl border-2 border-cyberCyan shadow-glowCyan inline-block">
+            <div class="bg-cyberDark p-3.5 rounded-xl border border-cyberBorder">
+                <p class="text-[10px] text-slate-400 font-cyber uppercase">Total Pembayaran Deposit</p>
+                <h4 id="depTotalAmountText" class="text-2xl font-black font-cyber text-cyberCyan mt-0.5">Rp 0</h4>
+                <p class="text-[10px] text-slate-500 font-mono mt-1">Order ID: <span id="depOrderIdText" class="text-slate-300">-</span></p>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-2xl border-2 border-cyberCyan shadow-glowCyan inline-block">
                 <div id="depQrcodeContainer"></div>
             </div>
 
-            <p class="text-xs text-slate-300 animate-pulse font-mono">
-                <i class="fa-solid fa-spinner fa-spin text-cyberCyan"></i> Menunggu Pembayaran...
-            </p>
+            <div class="flex items-center justify-center gap-2 text-xs text-cyberCyan animate-pulse font-mono bg-cyberCyan/10 py-2 rounded-xl border border-cyberCyan/20">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Menunggu Pembayaran Masuk...</span>
+            </div>
 
-            <div class="flex items-center gap-2">
-                <button onclick="cancelDepositTransaction()" class="w-1/2 bg-red-950/60 hover:bg-red-900/80 border border-red-800/60 text-red-400 text-xs font-bold py-2.5 rounded-xl transition">
-                    Batalkan Transaksi
+            <div class="flex items-center gap-2 pt-1">
+                <button onclick="cancelDepositTransaction()" class="w-1/2 bg-red-950/60 hover:bg-red-900/80 border border-red-800/60 text-red-400 text-xs font-bold py-3 rounded-xl transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-trash-can"></i> Batalkan
                 </button>
-                <button onclick="closeDepositModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2.5 rounded-xl border border-cyberBorder transition">
-                    Tutup Modal
+                <button onclick="closeDepositModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-3 rounded-xl border border-cyberBorder transition">
+                    Tutup
                 </button>
             </div>
         </div>
     </div>
 
-    <nav class="bottom-nav-container">
+    <!-- BOTTOM NAVIGATION BAR (MENTAHAN) -->
+<nav class="bottom-nav-container">
     <!-- Menu 1: Dashboard (Icon Rumah) -->
-    <a href="/dashboard" class="nav-item active" id="nav-dashboard">
+    <a href="/dashboard" class="nav-item" id="nav-dashboard">
         <i class="fa-solid fa-house"></i>
         <span>Dashboard</span>
     </a>
@@ -254,7 +359,7 @@
     </a>
 
     <!-- Menu 3: Deposit -->
-    <a href="/deposit" class="nav-item" id="nav-deposit">
+    <a href="/deposit" class="nav-item active" id="nav-deposit">
         <i class="fa-solid fa-wallet"></i>
         <span>Deposit</span>
     </a>
@@ -284,8 +389,12 @@
             }).format(angka || 0);
         }
 
-        function setDepositAmount(val) {
+        function setDepositAmount(val, btnElem) {
             document.getElementById('depositAmountInput').value = val;
+            
+            // Highlight preset aktif
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            if (btnElem) btnElem.classList.add('active');
         }
 
         async function loadDepositPageData() {
@@ -318,8 +427,8 @@
                     qContainer.innerHTML = '';
                     new QRCode(qContainer, {
                         text: result.data.paymentNumber,
-                        width: 260,
-                        height: 260
+                        width: 240,
+                        height: 240
                     });
 
                     document.getElementById('depositModal').classList.remove('hidden');
@@ -373,8 +482,8 @@
                     qContainer.innerHTML = '';
                     new QRCode(qContainer, {
                         text: result.data.paymentNumber,
-                        width: 260,
-                        height: 260
+                        width: 240,
+                        height: 240
                     });
 
                     document.getElementById('depositModal').classList.remove('hidden');
