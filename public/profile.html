@@ -102,21 +102,26 @@
             border-radius: 50%;
             box-shadow: 0 0 10px #00f3ff;
         }
-        .floating-chat-btn {
+/* FLOATING CHAT BUTTON OVER NAV PROFILE */
+.floating-chat-btn {
     position: fixed;
-    bottom: 95px;
-    right: 8%;
-    z-index: 10000;
-    transition: all 0.3s ease;
-}
-@media (min-width: 520px) {
-    .floating-chat-btn {
-        right: calc(50% - 210px);
-    }
-}
-.chat-drawer {
+    bottom: 82px;
+    right: calc(50% - 200px);
+    z-index: 100001;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+@media (max-width: 480px) {
+    .floating-chat-btn {
+        right: 8%;
+    }
+}
+
+.chat-drawer {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100002 !important;
+}
+
 .chat-drawer.hidden-drawer {
     opacity: 0;
     transform: translateY(20px) scale(0.95);
@@ -126,16 +131,17 @@
     </style>
 </head>
 <body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen pb-32">
-<!-- FLOATING CHAT BUTTON (Melayang Tepat di Atas Menu Profil) -->
+<!-- FLOATING CHAT BUTTON -->
 <div class="floating-chat-btn">
-    <button onclick="toggleChatWindow()" class="relative group bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.6)] transition-all transform hover:scale-110 active:scale-95">
+    <button type="button" onclick="toggleChatWindow()" class="relative group bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.8)] transition-all transform hover:scale-110 active:scale-95 cursor-pointer">
         <i class="fa-solid fa-comment-dots text-xl sm:text-2xl"></i>
         <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-cyberDark rounded-full animate-pulse"></span>
     </button>
 </div>
 
-<!-- CHAT COPILOT DRAWER -->
-<div id="chatDrawer" class="chat-drawer hidden-drawer fixed bottom-28 right-4 sm:right-10 z-[10001] w-[92vw] max-w-sm h-[480px] bg-cyberCard border border-cyberCyan/50 rounded-2xl shadow-glowCyan flex flex-col overflow-hidden backdrop-blur-xl">
+<!-- CHAT COPILOT DRAWER WINDOW -->
+<div id="chatDrawer" class="chat-drawer hidden-drawer fixed bottom-28 right-4 sm:right-10 w-[92vw] max-w-sm h-[480px] bg-cyberCard border border-cyberCyan/50 rounded-2xl shadow-glowCyan flex flex-col overflow-hidden backdrop-blur-xl">
+    <!-- Header -->
     <div class="bg-cyberDark p-3.5 border-b border-cyberBorder flex items-center justify-between">
         <div class="flex items-center gap-2.5">
             <div class="relative">
@@ -147,19 +153,22 @@
                 <p class="text-[9px] text-cyberCyan font-mono">Customer Support (Real-time)</p>
             </div>
         </div>
-        <button onclick="toggleChatWindow()" class="text-slate-400 hover:text-white p-1">
+        <button type="button" onclick="toggleChatWindow()" class="text-slate-400 hover:text-white p-1">
             <i class="fa-solid fa-xmark text-lg"></i>
         </button>
     </div>
 
+    <!-- Messages Container -->
     <div id="chatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 text-xs">
         <div class="bg-cyberDark/80 p-3 rounded-xl border border-cyberBorder max-w-[85%] text-slate-200">
             Halo! Ada yang bisa dibantu mengenai akun atau transaksi Anda?
         </div>
     </div>
 
+    <!-- Media Preview -->
     <div id="chatMediaPreview" class="hidden px-3 py-1 bg-cyberDark border-t border-cyberBorder flex gap-2 overflow-x-auto"></div>
 
+    <!-- Input Form -->
     <form onsubmit="sendChatMessage(event)" class="p-2.5 bg-cyberDark border-t border-cyberBorder flex items-center gap-2">
         <label for="chatImageInput" title="Kirim Gambar" class="w-8 h-8 rounded-lg bg-cyberCard border border-cyberBorder hover:border-cyberCyan text-slate-400 hover:text-cyberCyan flex items-center justify-center cursor-pointer transition">
             <i class="fa-solid fa-image text-xs"></i>
@@ -173,6 +182,7 @@
         </button>
     </form>
 </div>
+
 
     <!-- TOP NAVBAR -->
     <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
@@ -740,6 +750,97 @@
                 });
             }
         }
+        
+        const socket = typeof io !== 'undefined' ? io() : null;
+let selectedChatImageBase64 = null;
+
+function toggleChatWindow() {
+    const drawer = document.getElementById('chatDrawer');
+    if (drawer) {
+        drawer.classList.toggle('hidden-drawer');
+    }
+}
+
+function handleChatImageSelect(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            selectedChatImageBase64 = e.target.result;
+            const container = document.getElementById('chatMediaPreview');
+            container.classList.remove('hidden');
+            container.innerHTML = `
+                <div class="relative w-12 h-12 rounded border border-cyberCyan overflow-hidden">
+                    <img src="${selectedChatImageBase64}" class="w-full h-full object-cover">
+                    <button type="button" onclick="clearChatImage()" class="absolute top-0 right-0 bg-red-600 text-white w-4 h-4 text-[9px] flex items-center justify-center">×</button>
+                </div>
+            `;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function clearChatImage() {
+    selectedChatImageBase64 = null;
+    const input = document.getElementById('chatImageInput');
+    if (input) input.value = '';
+    const container = document.getElementById('chatMediaPreview');
+    if (container) {
+        container.classList.add('hidden');
+        container.innerHTML = '';
+    }
+}
+
+function appendMessageUI(msg) {
+    const box = document.getElementById('chatMessages');
+    if (!box) return;
+    
+    const isMe = msg.sender === (document.getElementById('profileUsername')?.innerText || 'User');
+    let imgHtml = msg.image ? `<img src="${msg.image}" class="rounded-lg mb-1 max-h-36 object-cover border border-cyberBorder">` : '';
+    const alignClass = isMe ? 'ml-auto bg-cyberCyan/20 border-cyberCyan/40 text-slate-100' : 'bg-cyberDark/80 border-cyberBorder text-slate-200';
+    
+    box.innerHTML += `
+        <div class="p-2.5 rounded-xl border max-w-[85%] ${alignClass} space-y-1">
+            ${imgHtml}
+            <div>${msg.text || ''}</div>
+        </div>
+    `;
+    box.scrollTop = box.scrollHeight;
+}
+
+async function sendChatMessage(e) {
+    e.preventDefault();
+    const input = document.getElementById('chatTextInput');
+    const text = input ? input.value.trim() : '';
+
+    if (!text && !selectedChatImageBase64) return;
+
+    const payload = {
+        text: text,
+        image: selectedChatImageBase64,
+        sender: document.getElementById('profileUsername')?.innerText || 'User'
+    };
+
+    if (socket) socket.emit('send_support_message', payload);
+    
+    try {
+        await fetch('/api/chat/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    } catch(err) {}
+
+    appendMessageUI(payload);
+    if (input) input.value = '';
+    clearChatImage();
+}
+
+if (socket) {
+    socket.on('receive_support_message', (msg) => {
+        appendMessageUI(msg);
+    });
+}
+
 
         document.addEventListener('DOMContentLoaded', loadUserProfile);
     </script>
