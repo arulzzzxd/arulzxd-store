@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin CS - Live Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050b14; font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- TOP NAVBAR -->
+    <header class="bg-[#111827] border-b border-[#162a45] px-6 py-3.5 flex items-center justify-between shrink-0">
+        <h1 class="text-lg font-bold text-[#f95700] flex items-center gap-2">
+            <i class="fa-solid fa-headset text-xl"></i> Admin CS Live Chat Dashboard
+        </h1>
+        <a href="/dashboard" class="text-xs bg-[#162a45] hover:bg-slate-700 px-3.5 py-2 rounded-xl text-slate-200 transition">
+            Kembali ke Web
+        </a>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- SIDEBAR DAFTAR ROOM CHAT USER -->
+        <div class="w-full md:w-80 bg-[#0a1628] border-r border-[#162a45] flex flex-col shrink-0">
+            <div class="p-3 border-b border-[#162a45]">
+                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Daftar Chat User</h2>
+            </div>
+            <div id="roomListContainer" class="flex-1 overflow-y-auto divide-y divide-[#162a45]">
+                <div class="p-4 text-center text-xs text-slate-500">Memuat daftar chat...</div>
+            </div>
+        </div>
+
+        <!-- WINDOW ISI CHAT -->
+        <div class="hidden md:flex flex-1 flex-col bg-[#050b14]">
+            
+            <!-- HEADER ACTIVE CHAT USER -->
+            <div id="activeChatHeader" class="bg-[#111827] p-4 border-b border-[#162a45] flex items-center justify-between">
+                <div>
+                    <h3 id="activeUserTitle" class="text-sm font-bold text-white">Pilih User untuk Memulai Chat</h3>
+                    <p id="activeUserEmail" class="text-xs text-slate-400 font-mono">-</p>
+                </div>
+            </div>
+
+            <!-- HISTORY CHAT MESSAGES -->
+            <div id="adminChatMessages" class="flex-1 p-4 overflow-y-auto space-y-3">
+                <div class="text-center text-xs text-slate-500 my-auto">Pilih salah satu room chat di sebelah kiri.</div>
+            </div>
+
+            <!-- FORM BALAS CHAT -->
+            <form id="adminReplyForm" onsubmit="sendAdminReply(event)" class="p-3 bg-[#111827] border-t border-[#162a45] flex items-center gap-2">
+                <input type="text" id="adminReplyInput" disabled placeholder="Pilih user terlebih dahulu..." 
+                       class="flex-1 bg-[#050b14] border border-[#162a45] rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#f95700] transition">
+                <button type="submit" id="btnAdminSend" disabled class="px-5 py-2.5 rounded-xl bg-[#f95700] hover:bg-[#e04e00] disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold text-xs transition">
+                    Kirim Balasan
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+    <script>
+        let currentSelectedUserEmail = null;
+
+        async function loadRoomList() {
+            try {
+                const res = await fetch('/api/admin/chat-rooms');
+                const data = await res.json();
+                const container = document.getElementById('roomListContainer');
+
+                if (data.status && data.rooms) {
+                    if (data.rooms.length === 0) {
+                        container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Belum ada chat masuk.</div>`;
+                        return;
+                    }
+
+                    container.innerHTML = data.rooms.map(room => {
+                        const email = room._id;
+                        const activeClass = currentSelectedUserEmail === email ? 'bg-[#162a45]' : 'hover:bg-[#111827]';
+                        const timeStr = new Date(room.updatedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+                        return `
+                            <div onclick="selectUserChat('${email}', '${room.senderName}')" class="p-3.5 cursor-pointer transition ${activeClass}">
+                                <div class="flex items-center justify-between mb-1">
+                                    <h4 class="text-xs font-bold text-white truncate">${room.senderName || 'User'}</h4>
+                                    <span class="text-[9px] text-slate-400 font-mono">${timeStr}</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 truncate">${room.lastMessage}</p>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch(e) {}
+        }
+
+        async function selectUserChat(email, name) {
+            currentSelectedUserEmail = email;
+            document.getElementById('activeUserTitle').innerText = name || 'User';
+            document.getElementById('activeUserEmail').innerText = email;
+
+            document.getElementById('adminReplyInput').disabled = false;
+            document.getElementById('btnAdminSend').disabled = false;
+            document.getElementById('adminReplyInput').placeholder = `Balas pesan ke ${email}...`;
+
+            loadAdminChatMessages();
+            loadRoomList();
+        }
+
+        async function loadAdminChatMessages() {
+            if (!currentSelectedUserEmail) return;
+
+            try {
+                const res = await fetch(`/api/admin/chat-history?userEmail=${encodeURIComponent(currentSelectedUserEmail)}`);
+                const data = await res.json();
+                const container = document.getElementById('adminChatMessages');
+
+                if (data.status && data.messages) {
+                    container.innerHTML = data.messages.map(msg => {
+                        const isOwner = msg.sender === 'owner';
+                        const alignClass = isOwner ? 'justify-end' : 'justify-start';
+                        const bgClass = isOwner ? 'bg-[#f95700] text-white rounded-br-none' : 'bg-[#111827] border border-[#162a45] text-slate-200 rounded-bl-none';
+                        const timeStr = new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+                        return `
+                            <div class="flex ${alignClass}">
+                                <div class="max-w-[75%] p-3 rounded-2xl text-xs space-y-1 ${bgClass}">
+                                    <p class="leading-relaxed break-words">${msg.message}</p>
+                                    <span class="text-[9px] opacity-70 block text-right font-mono">${timeStr}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    container.scrollTop = container.scrollHeight;
+                }
+            } catch(e) {}
+        }
+
+        async function sendAdminReply(e) {
+            e.preventDefault();
+            const input = document.getElementById('adminReplyInput');
+            const message = input.value.trim();
+
+            if (!currentSelectedUserEmail || !message) return;
+
+            input.value = '';
+
+            try {
+                await fetch('/api/bantuan/reply-owner', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userEmail: currentSelectedUserEmail, message })
+                });
+                loadAdminChatMessages();
+                loadRoomList();
+            } catch(e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRoomList();
+            setInterval(() => {
+                loadRoomList();
+                if (currentSelectedUserEmail) loadAdminChatMessages();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

@@ -106,6 +106,56 @@
 </head>
 <body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen pb-32">
 
+<!-- FLOATING LIVE CHAT WIDGET POP-UP -->
+<div id="liveChatWidgetContainer">
+    <!-- TOMBOL BOLA MENGAPUNG (FLOATING BUTTON) -->
+    <button id="floatingChatToggleBtn" onclick="toggleChatWidget()" title="Bantuan CS" 
+            class="fixed bottom-24 right-5 z-[99999] flex items-center justify-center w-12 h-12 rounded-full bg-[#f95700] text-white shadow-[0_0_20px_rgba(249,87,0,0.6)] hover:scale-110 transition-all duration-200">
+        <i class="fa-solid fa-comment-dots text-xl"></i>
+        <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-950 rounded-full"></span>
+    </button>
+
+    <!-- BOX WINDOW CHAT POP-UP MENGAPUNG -->
+    <div id="floatingChatWindow" class="fixed bottom-28 right-5 z-[99999] hidden w-[90%] max-w-[360px] sm:w-[380px] h-[520px] bg-[#0a1628] border border-[#162a45] rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(249,87,0,0.3)] overflow-hidden flex flex-col transition-all duration-300">
+        
+        <!-- HEADER WINDOW -->
+        <div class="bg-[#111827] p-3.5 border-b border-[#162a45] flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="relative">
+                    <div class="w-9 h-9 rounded-full bg-[#f95700] text-white flex items-center justify-center font-bold text-base shadow-[0_0_10px_rgba(249,87,0,0.5)]">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#0a1628] rounded-full"></span>
+                </div>
+                <div>
+                    <h3 class="text-xs font-bold text-white">Customer Support</h3>
+                    <p class="text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online
+                    </p>
+                </div>
+            </div>
+            <button onclick="toggleChatWidget()" class="text-slate-400 hover:text-white text-base transition p-1">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- AREA MESSAGES CHAT -->
+        <div id="widgetChatMessages" class="flex-1 p-3 overflow-y-auto space-y-2.5 bg-[#050b14]/70 scroll-smooth">
+            <div class="text-center text-[11px] text-slate-500 my-2">Memuat pesan...</div>
+        </div>
+
+        <!-- FORM KIRIM PESAN -->
+        <form id="widgetChatForm" onsubmit="sendWidgetMessage(event)" class="p-2.5 bg-[#111827] border-t border-[#162a45] flex items-center gap-2">
+            <input type="text" id="widgetChatInput" required placeholder="Tuliskan pesan Anda..." 
+                   class="flex-1 bg-[#050b14] border border-[#162a45] rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#f95700] transition">
+            <button type="submit" class="w-9 h-9 rounded-xl bg-[#f95700] hover:bg-[#e04e00] text-white flex items-center justify-center transition shadow-[0_0_8px_rgba(249,87,0,0.4)] shrink-0">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+        </form>
+
+    </div>
+</div>
+
     <!-- TOP NAVBAR -->
     <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
         <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -367,14 +417,6 @@
             <i class="fa-regular fa-user"></i>
             <span id="nav-auth-label">Profil</span>
         </a>
-        
-        <!-- FLOATING SUPPORT BUTTON DENGAN INDIKATOR ONLINE HIJAU -->
-<a href="/bantuan" title="Bantuan & Live Chat" class="fixed bottom-24 right-5 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-[#f95700] text-white shadow-[0_0_20px_rgba(249,87,0,0.6)] hover:scale-110 transition-transform duration-200">
-    <i class="fa-solid fa-comment-dots text-xl"></i>
-    <!-- Badge Indikator Status Online -->
-    <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-950 rounded-full"></span>
-</a>
-
     </nav>
 
     <script>
@@ -682,6 +724,80 @@
         }
         
         document.addEventListener('DOMContentLoaded', loadUserProfile);
+        let widgetChatInterval = null;
+
+    function toggleChatWidget() {
+        const windowEl = document.getElementById('floatingChatWindow');
+        const isHidden = windowEl.classList.contains('hidden');
+
+        if (isHidden) {
+            windowEl.classList.remove('hidden');
+            loadWidgetMessages();
+            if (!widgetChatInterval) widgetChatInterval = setInterval(loadWidgetMessages, 3000);
+        } else {
+            windowEl.classList.add('hidden');
+            if (widgetChatInterval) {
+                clearInterval(widgetChatInterval);
+                widgetChatInterval = null;
+            }
+        }
+    }
+
+    async function loadWidgetMessages() {
+        try {
+            const res = await fetch('/api/bantuan/messages');
+            const data = await res.json();
+            const container = document.getElementById('widgetChatMessages');
+
+            if (data.status && data.messages) {
+                if (data.messages.length === 0) {
+                    container.innerHTML = `
+                        <div class="bg-[#111827] p-3 rounded-xl border border-[#162a45] text-xs text-slate-300 space-y-1">
+                            <p class="font-bold text-[#f95700]">Halo! Selamat datang 👋</p>
+                            <p class="text-[10px] text-slate-400">Silakan kirim pertanyaan Anda. Tim Customer Service kami siap membantu.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = data.messages.map(msg => {
+                    const isUser = msg.sender === 'user';
+                    const alignClass = isUser ? 'justify-end' : 'justify-start';
+                    const bgClass = isUser ? 'bg-[#f95700] text-white rounded-br-none' : 'bg-[#111827] border border-[#162a45] text-slate-200 rounded-bl-none';
+                    const timeStr = new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+                    return `
+                        <div class="flex ${alignClass}">
+                            <div class="max-w-[82%] p-2.5 rounded-2xl text-[11px] space-y-1 ${bgClass}">
+                                <p class="leading-relaxed break-words">${msg.message}</p>
+                                <span class="text-[8px] opacity-70 block text-right font-mono">${timeStr}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.scrollTop = container.scrollHeight;
+            }
+        } catch(e) {}
+    }
+
+    async function sendWidgetMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById('widgetChatInput');
+        const message = input.value.trim();
+        if (!message) return;
+
+        input.value = '';
+
+        try {
+            await fetch('/api/bantuan/send-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+            loadWidgetMessages();
+        } catch(e) {}
+    }
     </script>
 </body>
 </html>
