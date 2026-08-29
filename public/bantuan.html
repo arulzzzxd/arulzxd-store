@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pusat Bantuan & Live Chat - ArulzXD Store</title>
+    <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        cyber: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        cyberCyan: '#00f3ff',
+                        cyberDark: '#050b14',
+                        cyberCard: '#0a1628',
+                        cyberBorder: '#162a45'
+                    },
+                    boxShadow: {
+                        glowCyan: '0 0 15px rgba(0, 243, 255, 0.35)',
+                        glowCyanSm: '0 0 8px rgba(0, 243, 255, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #050b14; color: #e2e8f0; overflow-x: hidden; }
+        .bg-cyber-grid {
+            background-image: linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* BOTTOM NAVIGATION STYLE */
+        .bottom-nav-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 480px;
+            background: rgba(10, 22, 40, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 28px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 10px;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding: 2px 12px;
+        }
+        .nav-item i { font-size: 20px; transition: transform 0.2s ease; }
+        .nav-item:hover, .nav-item.active { color: #00f3ff; }
+        .nav-item.active i {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.8));
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 6px;
+            height: 6px;
+            background-color: #00f3ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00f3ff;
+        }
+
+        /* FLOATING COPILOT BUTTON OVER NAV PROFILE */
+        .floating-chat-btn {
+            position: fixed;
+            bottom: 95px;
+            right: 5%;
+            z-index: 10000;
+            transition: all 0.3s ease;
+        }
+        @media (min-width: 520px) {
+            .floating-chat-btn {
+                right: calc(50% - 220px);
+            }
+        }
+
+        .chat-drawer {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chat-drawer.hidden-drawer {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen pb-36">
+
+    <!-- TOP NAVBAR -->
+    <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)]">
+                Arulz<span class="text-white">Store</span>
+            </a>
+            <span class="text-xs bg-cyberCyan/10 border border-cyberCyan/40 text-cyberCyan font-cyber font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <i class="fa-solid fa-headset"></i> Pusat Bantuan
+            </span>
+        </div>
+    </nav>
+
+    <!-- CONTENT BANTUAN FAQ -->
+    <div class="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        <div class="p-6 bg-cyberCard rounded-2xl border border-cyberBorder shadow-xl relative overflow-hidden">
+            <h1 class="text-2xl font-black text-white font-cyber flex items-center gap-2">
+                <i class="fa-solid fa-circle-question text-cyberCyan"></i> Ada yang Bisa Kami Bantu?
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">
+                Gunakan Copilot Chat AI / Live Support Customer Service real-time kami jika mengalami kendala transaksi.
+            </p>
+        </div>
+
+        <div class="space-y-3">
+            <h3 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider">Pertanyaan Sering Diajukan (FAQ)</h3>
+            
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder space-y-1">
+                <h4 class="text-xs font-bold text-cyberCyan">Bagaimana cara melakukan deposit saldo?</h4>
+                <p class="text-xs text-slate-400">Masuk ke menu Deposit, pilih nominal yang diinginkan, dan lakukan scan QRIS[span_11](start_span)[span_11](end_span). Saldo akan terisi otomatis[span_12](start_span)[span_12](end_span).</p>
+            </div>
+            <div class="bg-cyberCard p-4 rounded-xl border border-cyberBorder space-y-1">
+                <h4 class="text-xs font-bold text-cyberCyan">Berapa lama proses transaksi otomatis?</h4>
+                <p class="text-xs text-slate-400">Seluruh pesanan diproses dalam hitungan 1-5 detik setelah pembayaran terverifikasi oleh gateway[span_13](start_span)[span_13](end_span)[span_14](start_span)[span_14](end_span).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING CHAT BUTTON (Mengapung Tepat di Atas Nav Profile) -->
+    <div class="floating-chat-btn">
+        <button onclick="toggleChatWindow()" class="relative group bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.6)] transition-all transform hover:scale-110 active:scale-95">
+            <i class="fa-solid fa-comment-dots text-2xl"></i>
+            <span class="absolute top-0 right-0 w-4 h-4 bg-emerald-500 border-2 border-cyberDark rounded-full animate-pulse"></span>
+        </button>
+    </div>
+
+    <!-- CHAT SUPPORT / COPILOT WINDOW DRAWER -->
+    <div id="chatDrawer" class="chat-drawer hidden-drawer fixed bottom-28 right-4 sm:right-10 z-[10001] w-[92vw] max-w-sm h-[500px] bg-cyberCard border border-cyberCyan/50 rounded-2xl shadow-glowCyan flex flex-col overflow-hidden backdrop-blur-xl">
+        <!-- Chat Header -->
+        <div class="bg-cyberDark p-3.5 border-b border-cyberBorder flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="relative">
+                    <img src="https://files.catbox.moe/kdowze.png" class="w-8 h-8 rounded-full border border-cyberCyan">
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-cyberDark"></span>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold font-cyber text-white">ArulzXD Copilot</h4>
+                    <p class="text-[9px] text-cyberCyan font-mono">Live Support (Online)</p>
+                </div>
+            </div>
+            <button onclick="toggleChatWindow()" class="text-slate-400 hover:text-white p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div id="chatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 text-xs">
+            <div class="bg-cyberDark/80 p-3 rounded-xl border border-cyberBorder max-w-[85%] text-slate-200">
+                Halo! 👋 Ada yang bisa saya bantu terkait produk atau transaksi Anda?
+            </div>
+        </div>
+
+        <!-- Media Preview Area -->
+        <div id="chatMediaPreview" class="hidden px-3 py-1 bg-cyberDark border-t border-cyberBorder flex gap-2 overflow-x-auto"></div>
+
+        <!-- Chat Input Form -->
+        <form onsubmit="sendChatMessage(event)" class="p-2.5 bg-cyberDark border-t border-cyberBorder flex items-center gap-2">
+            <label for="chatImageInput" title="Kirim Gambar" class="w-8 h-8 rounded-lg bg-cyberCard border border-cyberBorder hover:border-cyberCyan text-slate-400 hover:text-cyberCyan flex items-center justify-center cursor-pointer transition">
+                <i class="fa-solid fa-image text-xs"></i>
+            </label>
+            <input type="file" id="chatImageInput" accept="image/*" class="hidden" onchange="handleChatImageSelect(this)">
+
+            <input type="text" id="chatTextInput" placeholder="Ketik pesan..." class="flex-1 bg-cyberCard border border-cyberBorder rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-cyberCyan transition">
+
+            <button type="submit" class="w-8 h-8 rounded-lg bg-cyberCyan text-cyberDark font-bold flex items-center justify-center hover:bg-cyan-300 transition shadow-glowCyanSm">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <nav class="bottom-nav-container">
+        <a href="/dashboard" class="nav-item" id="nav-dashboard">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/store" class="nav-item" id="nav-toko">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span>Toko</span>
+        </a>
+        <a href="/deposit" class="nav-item" id="nav-deposit">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Deposit</span>
+        </a>
+        <a href="/riwayat" class="nav-item" id="nav-riwayat">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>Riwayat</span>
+        </a>
+        <a href="/profile" class="nav-item" id="nav-auth">
+            <i class="fa-regular fa-user"></i>
+            <span id="nav-auth-label">Profil</span>
+        </a>
+    </nav>
+
+    <script>
+        const socket = io();
+        let selectedChatImageBase64 = null;
+        let currentUser = null;
+
+        function toggleChatWindow() {
+            const drawer = document.getElementById('chatDrawer');
+            drawer.classList.toggle('hidden-drawer');
+        }
+
+        async function initChatUser() {
+            try {
+                const res = await fetch('/api/user-status');
+                const data = await res.json();
+                if (data.loggedIn && data.user) {
+                    currentUser = data.user;
+                    document.getElementById('nav-auth-label').innerText = 'Profil';
+                }
+                loadChatHistory();
+            } catch(e) {}
+        }
+
+        function handleChatImageSelect(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedChatImageBase64 = e.target.result;
+                    const container = document.getElementById('chatMediaPreview');
+                    container.classList.remove('hidden');
+                    container.innerHTML = `
+                        <div class="relative w-12 h-12 rounded border border-cyberCyan overflow-hidden">
+                            <img src="${selectedChatImageBase64}" class="w-full h-full object-cover">
+                            <button onclick="clearChatImage()" class="absolute top-0 right-0 bg-red-600 text-white w-4 h-4 text-[9px] flex items-center justify-center">×</button>
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function clearChatImage() {
+            selectedChatImageBase64 = null;
+            document.getElementById('chatImageInput').value = '';
+            document.getElementById('chatMediaPreview').classList.add('hidden');
+            document.getElementById('chatMediaPreview').innerHTML = '';
+        }
+
+        async function loadChatHistory() {
+            try {
+                const res = await fetch('/api/chat/history');
+                const data = await res.json();
+                if (data.status && data.messages) {
+                    const box = document.getElementById('chatMessages');
+                    box.innerHTML = '';
+                    data.messages.forEach(msg => appendMessageUI(msg));
+                }
+            } catch(e) {}
+        }
+
+        function appendMessageUI(msg) {
+            const box = document.getElementById('chatMessages');
+            const isMe = currentUser && (msg.sender === currentUser.username || msg.sender === currentUser.email);
+            
+            let imgHtml = msg.image ? `<img src="${msg.image}" class="rounded-lg mb-1 max-h-36 object-cover border border-cyberBorder">` : '';
+            
+            const alignClass = isMe ? 'ml-auto bg-cyberCyan/20 border-cyberCyan/40 text-slate-100' : 'bg-cyberDark/80 border-cyberBorder text-slate-200';
+            
+            box.innerHTML += `
+                <div class="p-2.5 rounded-xl border max-w-[85%] ${alignClass} space-y-1">
+                    ${imgHtml}
+                    <div>${msg.text || ''}</div>
+                </div>
+            `;
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendChatMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatTextInput');
+            const text = input.value.trim();
+
+            if (!text && !selectedChatImageBase64) return;
+
+            const payload = {
+                text: text,
+                image: selectedChatImageBase64,
+                sender: currentUser ? currentUser.username : 'Guest'
+            };
+
+            // Kirim via Socket.io / API
+            socket.emit('send_support_message', payload);
+            
+            // Simpan ke MongoDB via backend
+            try {
+                await fetch('/api/chat/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch(e) {}
+
+            appendMessageUI(payload);
+            input.value = '';
+            clearChatImage();
+        }
+
+        socket.on('receive_support_message', (msg) => {
+            appendMessageUI(msg);
+        });
+
+        document.addEventListener('DOMContentLoaded', initChatUser);
+    </script>
+</body>
+</html>
