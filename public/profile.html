@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -100,9 +102,77 @@
             border-radius: 50%;
             box-shadow: 0 0 10px #00f3ff;
         }
+        .floating-chat-btn {
+    position: fixed;
+    bottom: 95px;
+    right: 8%;
+    z-index: 10000;
+    transition: all 0.3s ease;
+}
+@media (min-width: 520px) {
+    .floating-chat-btn {
+        right: calc(50% - 210px);
+    }
+}
+.chat-drawer {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.chat-drawer.hidden-drawer {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    pointer-events: none;
+}
+
     </style>
 </head>
 <body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen pb-32">
+<!-- FLOATING CHAT BUTTON (Melayang Tepat di Atas Menu Profil) -->
+<div class="floating-chat-btn">
+    <button onclick="toggleChatWindow()" class="relative group bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.6)] transition-all transform hover:scale-110 active:scale-95">
+        <i class="fa-solid fa-comment-dots text-xl sm:text-2xl"></i>
+        <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-cyberDark rounded-full animate-pulse"></span>
+    </button>
+</div>
+
+<!-- CHAT COPILOT DRAWER -->
+<div id="chatDrawer" class="chat-drawer hidden-drawer fixed bottom-28 right-4 sm:right-10 z-[10001] w-[92vw] max-w-sm h-[480px] bg-cyberCard border border-cyberCyan/50 rounded-2xl shadow-glowCyan flex flex-col overflow-hidden backdrop-blur-xl">
+    <div class="bg-cyberDark p-3.5 border-b border-cyberBorder flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+            <div class="relative">
+                <img src="https://files.catbox.moe/kdowze.png" class="w-8 h-8 rounded-full border border-cyberCyan">
+                <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-cyberDark"></span>
+            </div>
+            <div>
+                <h4 class="text-xs font-bold font-cyber text-white">ArulzXD Copilot</h4>
+                <p class="text-[9px] text-cyberCyan font-mono">Customer Support (Real-time)</p>
+            </div>
+        </div>
+        <button onclick="toggleChatWindow()" class="text-slate-400 hover:text-white p-1">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+    </div>
+
+    <div id="chatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 text-xs">
+        <div class="bg-cyberDark/80 p-3 rounded-xl border border-cyberBorder max-w-[85%] text-slate-200">
+            Halo! Ada yang bisa dibantu mengenai akun atau transaksi Anda?
+        </div>
+    </div>
+
+    <div id="chatMediaPreview" class="hidden px-3 py-1 bg-cyberDark border-t border-cyberBorder flex gap-2 overflow-x-auto"></div>
+
+    <form onsubmit="sendChatMessage(event)" class="p-2.5 bg-cyberDark border-t border-cyberBorder flex items-center gap-2">
+        <label for="chatImageInput" title="Kirim Gambar" class="w-8 h-8 rounded-lg bg-cyberCard border border-cyberBorder hover:border-cyberCyan text-slate-400 hover:text-cyberCyan flex items-center justify-center cursor-pointer transition">
+            <i class="fa-solid fa-image text-xs"></i>
+        </label>
+        <input type="file" id="chatImageInput" accept="image/*" class="hidden" onchange="handleChatImageSelect(this)">
+
+        <input type="text" id="chatTextInput" placeholder="Ketik pesan..." class="flex-1 bg-cyberCard border border-cyberBorder rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-cyberCyan transition">
+
+        <button type="submit" class="w-8 h-8 rounded-lg bg-cyberCyan text-cyberDark font-bold flex items-center justify-center hover:bg-cyan-300 transition shadow-glowCyanSm">
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+        </button>
+    </form>
+</div>
 
     <!-- TOP NAVBAR -->
     <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
