@@ -6,63 +6,63 @@
     <title>Dashboard Admin CS - Live Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { background-color: #050b14; font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0; }
+        .font-cyber { font-family: 'Orbitron', sans-serif; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
     <!-- TOP NAVBAR -->
-    <header class="bg-[#111827] border-b border-[#162a45] px-4 py-3 flex items-center justify-between shrink-0">
+    <header class="bg-[#0a1628] border-b border-[#162a45] px-4 py-3 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2">
-            <!-- Tombol Kembali jika di HP sedang membuka chat -->
             <button id="btnBackToRooms" onclick="backToRoomList()" class="hidden text-slate-300 hover:text-white mr-1 text-sm">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
-            <h1 class="text-sm sm:text-base font-bold text-[#f95700] flex items-center gap-2">
-                <i class="fa-solid fa-headset text-lg"></i> Admin CS Live Chat
+            <h1 class="text-xs sm:text-sm font-bold font-cyber text-[#f95700] flex items-center gap-2">
+                <i class="fa-solid fa-headset text-base"></i> Admin CS Live Chat
             </h1>
         </div>
-        <a href="/dashboard" class="text-[11px] bg-[#162a45] hover:bg-slate-700 px-3 py-1.5 rounded-xl text-slate-200 transition">
+        <a href="/dashboard" class="text-[10px] font-cyber font-bold bg-[#162a45] hover:bg-slate-700 px-3 py-1.5 rounded-xl text-slate-200 transition">
             Kembali ke Web
         </a>
     </header>
 
-    <!-- MAIN DASHBOARD CONTAINER -->
+    <!-- MAIN DASHBOARD -->
     <div class="flex-1 flex overflow-hidden relative">
 
         <!-- SIDEBAR DAFTAR ROOM CHAT USER -->
         <div id="roomSidebar" class="w-full md:w-80 bg-[#0a1628] border-r border-[#162a45] flex flex-col shrink-0">
             <div class="p-3 border-b border-[#162a45]">
-                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Daftar Chat User</h2>
+                <h2 class="text-xs font-bold font-cyber text-slate-300 uppercase tracking-wider">Daftar Chat User</h2>
             </div>
             <div id="roomListContainer" class="flex-1 overflow-y-auto divide-y divide-[#162a45]">
-                <div class="p-4 text-center text-xs text-slate-500">Memuat daftar chat...</div>
+                <div class="p-4 text-center text-xs text-slate-500 font-mono">Memuat daftar chat...</div>
             </div>
         </div>
 
-        <!-- AREA CHAT USER (RESPONSIVE HP & LAPTOP) -->
+        <!-- AREA CHAT USER -->
         <div id="chatViewArea" class="hidden md:flex flex-1 flex-col bg-[#050b14] absolute md:relative inset-0 z-10 md:z-auto">
             
-            <!-- HEADER ACTIVE CHAT USER -->
-            <div id="activeChatHeader" class="bg-[#111827] p-3.5 border-b border-[#162a45] flex items-center justify-between">
+            <!-- HEADER CHAT -->
+            <div id="activeChatHeader" class="bg-[#0a1628] p-3.5 border-b border-[#162a45] flex items-center justify-between">
                 <div>
-                    <h3 id="activeUserTitle" class="text-xs sm:text-sm font-bold text-white">Pilih User untuk Memulai Chat</h3>
+                    <h3 id="activeUserTitle" class="text-xs sm:text-sm font-bold font-cyber text-[#00f3ff]">Pilih User untuk Memulai Chat</h3>
                     <p id="activeUserEmail" class="text-[10px] text-slate-400 font-mono">-</p>
                 </div>
             </div>
 
-            <!-- HISTORY CHAT MESSAGES -->
-            <div id="adminChatMessages" class="flex-1 p-3 sm:p-4 overflow-y-auto space-y-2.5">
-                <div class="text-center text-xs text-slate-500 my-auto">Pilih salah satu room chat untuk membalas.</div>
+            <!-- HISTORY MESSAGES -->
+            <div id="adminChatMessages" class="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3">
+                <div class="text-center text-xs text-slate-500 font-mono my-auto">Pilih salah satu room chat di sebelah kiri.</div>
             </div>
 
             <!-- FORM BALAS CHAT -->
-            <form id="adminReplyForm" onsubmit="sendAdminReply(event)" class="p-2.5 bg-[#111827] border-t border-[#162a45] flex items-center gap-2">
+            <form id="adminReplyForm" onsubmit="sendAdminReply(event)" class="p-2.5 bg-[#0a1628] border-t border-[#162a45] flex items-center gap-2">
                 <input type="text" id="adminReplyInput" disabled placeholder="Pilih user terlebih dahulu..." 
-                       class="flex-1 bg-[#050b14] border border-[#162a45] rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#f95700] transition">
-                <button type="submit" id="btnAdminSend" disabled class="px-4 py-2 rounded-xl bg-[#f95700] hover:bg-[#e04e00] disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold text-xs transition shrink-0">
+                       class="flex-1 bg-[#050b14] border border-[#162a45] rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#00f3ff] transition">
+                <button type="submit" id="btnAdminSend" disabled class="px-4 py-2 rounded-xl bg-[#f95700] hover:bg-[#e04e00] disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold font-cyber text-xs transition shrink-0">
                     Kirim
                 </button>
             </form>
@@ -82,7 +82,7 @@
 
                 if (data.status && data.rooms) {
                     if (data.rooms.length === 0) {
-                        container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Belum ada chat masuk.</div>`;
+                        container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500 font-mono">Belum ada chat masuk.</div>`;
                         return;
                     }
 
@@ -94,7 +94,7 @@
                         return `
                             <div onclick="selectUserChat('${email}', '${room.senderName || email}')" class="p-3.5 cursor-pointer transition ${activeClass}">
                                 <div class="flex items-center justify-between mb-1">
-                                    <h4 class="text-xs font-bold text-white truncate">${room.senderName || 'User'}</h4>
+                                    <h4 class="text-xs font-bold text-slate-100 truncate">${room.senderName || 'User'}</h4>
                                     <span class="text-[9px] text-slate-400 font-mono">${timeStr}</span>
                                 </div>
                                 <p class="text-[10px] text-slate-400 truncate">${room.lastMessage}</p>
@@ -112,9 +112,8 @@
 
             document.getElementById('adminReplyInput').disabled = false;
             document.getElementById('btnAdminSend').disabled = false;
-            document.getElementById('adminReplyInput').placeholder = `Balas ke ${email}...`;
+            document.getElementById('adminReplyInput').placeholder = `Balas pesan ke ${name}...`;
 
-            // Tampilkan Layar Chat jika dibuka melalui HP
             const chatViewArea = document.getElementById('chatViewArea');
             const roomSidebar = document.getElementById('roomSidebar');
             const btnBack = document.getElementById('btnBackToRooms');
@@ -130,13 +129,9 @@
         }
 
         function backToRoomList() {
-            const chatViewArea = document.getElementById('chatViewArea');
-            const roomSidebar = document.getElementById('roomSidebar');
-            const btnBack = document.getElementById('btnBackToRooms');
-
-            chatViewArea.classList.add('hidden');
-            roomSidebar.classList.remove('hidden');
-            btnBack.classList.add('hidden');
+            document.getElementById('chatViewArea').classList.add('hidden');
+            document.getElementById('roomSidebar').classList.remove('hidden');
+            document.getElementById('btnBackToRooms').classList.add('hidden');
         }
 
         async function loadAdminChatMessages() {
@@ -151,14 +146,23 @@
                     container.innerHTML = data.messages.map(msg => {
                         const isOwner = msg.sender === 'owner';
                         const alignClass = isOwner ? 'justify-end' : 'justify-start';
-                        const bgClass = isOwner ? 'bg-[#f95700] text-white rounded-br-none' : 'bg-[#111827] border border-[#162a45] text-slate-200 rounded-bl-none';
+                        
+                        const bgClass = isOwner 
+                            ? 'bg-[#f95700] text-white rounded-br-none' 
+                            : 'bg-[#0a1628] border border-[#162a45] text-slate-200 rounded-bl-none';
+                        
                         const timeStr = new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                        const displayName = isOwner ? 'Owner CS' : (msg.senderName || 'User');
+                        const nameColor = isOwner ? 'text-amber-200' : 'text-[#00f3ff]';
 
                         return `
                             <div class="flex ${alignClass}">
                                 <div class="max-w-[80%] p-2.5 rounded-2xl text-xs space-y-1 ${bgClass}">
-                                    <p class="leading-relaxed break-words">${msg.message}</p>
-                                    <span class="text-[8px] opacity-70 block text-right font-mono">${timeStr}</span>
+                                    <div class="flex items-center justify-between gap-2 border-b border-white/10 pb-1">
+                                        <span class="font-bold font-cyber text-[10px] ${nameColor}">${displayName}</span>
+                                        <span class="text-[8px] opacity-75 font-mono">${timeStr}</span>
+                                    </div>
+                                    <p class="leading-relaxed break-words pt-0.5">${msg.message}</p>
                                 </div>
                             </div>
                         `;
