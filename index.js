@@ -1252,40 +1252,85 @@ app.get('/api/user/transactions', checkAuthSession, async (req, res) => {
         return res.status(500).json({ status: false, message: "Gagal mengambil riwayat transaksi" });
     }
 });
-
-// CHAT SUPPORT SCHEMA
-const chatSchemaV2 = new mongoose.Schema({
-    sender: { type: String, default: 'Guest' },
-    text: { type: String, default: '' },
-    image: { type: String, default: null }, // Base64 / URL
-    createdAt: { type: Date, default: Date.now }
+// ====================================================
+// CHAT & COPILOT SYSTEM SCHEMA
+// ====================================================
+const supportChatSchema = new mongoose.Schema({
+    sessionId: { type: String, required: true, index: true },
+    userEmail: { type: String, default: 'Guest' },
+    username: { type: String, default: 'Pengunjung' },
+    messages: [{
+        sender: { type: String, enum: ['user', 'copilot', 'owner'], required: true },
+        text: { type: String, required: true },
+        timestamp: { type: Date, default: Date.now }
+    }],
+    status: { type: String, enum: ['active', 'closed'], default: 'active' },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
 });
 
-const ChatV2 = mongoose.models.ChatV2 || mongoose.model('ChatV2', chatSchemaV2);
+const SupportChat = mongoose.models.SupportChat || mongoose.model('SupportChat', supportChatSchema);
 
-// ENDPOINT AMBIL RIWAYAT CHAT
-app.get('/api/chat/history', async (req, res) => {
+// EMAIL OWNER RESMI
+const OWNER_EMAIL = 'supportarulzxd@gmail.com'; 
+
+// ROUTE HALAMAN BANTUAN
+app.get('/bantuan', checkAuthSession, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'bantuan.html'));
+});
+
+// GET / POST MONGODB CHAT ENDPOINTS
+app.get('/api/support/messages/:sessionId', async (req, res) => {
     try {
-        const messages = await ChatV2.find().sort({ createdAt: 1 }).limit(50);
-        res.json({ status: true, messages });
-    } catch (err) {
-        res.status(500).json({ status: false, message: 'Gagal memuat pesan' });
+        let chat = await SupportChat.findOne({ sessionId: req.params.sessionId }).lean();
+        if (!chat) {
+            return res.json({ status: true, messages: [] });
+        }
+        res.json({ status: true, messages: chat.messages });
+    } catch (e) {
+        res.status(500).json({ status: false, message: 'Gagal mengambil riwayat pesan' });
     }
 });
 
-// ENDPOINT SIMPAN CHAT KE MONGODB
-app.post('/api/chat/send', checkAuthSession, async (req, res) => {
+app.post('/api/support/send', checkAuthSession, async (req, res) => {
     try {
-        const { text, image, sender } = req.body;
-        const newMsg = new ChatV2({
-            sender: req.user ? req.user.username : (sender || 'Guest'),
-            text,
-            image
-        });
-        await newMsg.save();
-        res.json({ status: true, message: 'Pesan terkirim!' });
-    } catch (err) {
-        res.status(500).json({ status: false, message: 'Gagal menyimpan chat' });
+        const { sessionId, text, mode } = req.body; // mode: 'copilot' atau 'owner'
+        if (!text || !text.trim()) return res.status(400).json({ status: false, message: 'Pesan kosong' });
+
+        const userEmail = req.user ? req.user.email : 'guest@arulzxd.biz.id';
+        const username = req.user ? req.user.username : 'Pengunjung';
+        const isOwner = req.user && req.user.email.toLowerCase() === OWNER_EMAIL;
+
+        let chat = await SupportChat.findOne({ sessionId });
+        if (!chat) {
+            chat = new SupportChat({ sessionId, userEmail, username, messages: [] });
+        }
+
+        const senderType = isOwner ? 'owner' : 'user';
+        chat.messages.push({ sender: senderType, text: text.trim(), timestamp: new Date() });
+
+        // RESPON OTOMATIS COPILOT AI
+        if (mode === 'copilot' && !isOwner) {
+            let aiReply = "Halo! Saya Copilot AI ArulzXD Store. Ada yang bisa saya bantu terkait produk, deposit QRIS, atau status pesanan?";
+            const query = text.toLowerCase();
+            
+            if (query.includes('deposit') || query.includes('topup')) {
+                aiReply = "Untuk melakukan deposit saldo, silakan buka menu Deposit di bottom navigation, pilih nominal mulai Rp 1.000, lalu bayar melalui QRIS.";
+            } else if (query.includes('produk') || query.includes('beli')) {
+                aiReply = "Anda dapat melihat katalog lengkap di menu Toko. Pilih produk, tentukan kuantitas, dan Anda dapat membayar via Saldo atau WhatsApp.";
+            } else if (query.includes('owner') || query.includes('admin') || query.includes('cs')) {
+                aiReply = "Anda dapat mengklik tombol 'Chat CS Owner' di bagian atas untuk terhubung langsung dengan Owner via live chat.";
+            }
+
+            chat.messages.push({ sender: 'copilot', text: aiReply, timestamp: new Date() });
+        }
+
+        chat.updatedAt = new Date();
+        await chat.save();
+
+        res.json({ status: true, messages: chat.messages });
+    } catch (e) {
+        res.status(500).json({ status: false, message: 'Gagal mengirim pesan' });
     }
 });
 
