@@ -1252,147 +1252,131 @@ app.get('/api/user/transactions', checkAuthSession, async (req, res) => {
         return res.status(500).json({ status: false, message: "Gagal mengambil riwayat transaksi" });
     }
 });
-const OWNER_EMAIL = 'supportarulzxd@gmail.com'; 
 
-// ROUTE HALAMAN BANTUAN
-app.get('/bantuan', checkAuthSession, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'bantuan.html'));
-});
-
-
-// ====================================================
-// SUPPORT CHAT SCHEMA (Isolasi Chat per User & Username)
-// ====================================================
-const supportChatSchema = new mongoose.Schema({
-    sessionId: { type: String, required: true, index: true },
-    userId: { type: String, default: null, index: true },
-    username: { type: String, default: 'Guest' },
-    messages: [{
-        sender: { type: String, required: true }, // 'user', 'ai', 'owner'
-        senderName: { type: String, required: true },
-        text: { type: String, required: true },
-        timestamp: { type: Date, default: Date.now }
-    }],
+// CHAT MESSAGE SCHEMA & MODEL
+const chatMessageSchema = new mongoose.Schema({
+    userEmail: { type: String, required: true, index: true },
+    sender: { type: String, enum: ['user', 'owner'], required: true },
+    senderName: { type: String, default: 'Guest' },
+    message: { type: String, required: true, trim: true },
     createdAt: { type: Date, default: Date.now }
 });
 
-const SupportChatV2 = mongoose.models.SupportChatV2 || mongoose.model('SupportChatV2', supportChatSchema);
+const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage', chatMessageSchema);
 
-// Helper Call Copilot / AI Service
-async function getCopilotResponse(userPrompt) {
+// Konfigurasi Transporter Nodemailer untuk Kirim Notifikasi Email Ke Owner
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: 'supportarulzxd@gmail.com',
+        pass: 'matsgyapivykobdv'
+    },
+    tls: { rejectUnauthorized: false }
+});
+
+const OWNER_EMAIL = 'supportarulzxd@gmail.com'; // Email Owner
+
+// 1. GET: Ambil Riwayat Chat Berdasarkan User Session
+app.get('/api/bantuan/messages', checkAuthSession, async (req, res) => {
     try {
-        // Menggunakan endpoint Copilot / Notrack AI Proxy yang sudah tersedia di backend
-        const response = await axios.post('https://api.notrack.ai/v1/chat', {
-            model: 'copilot',
-            messages: [
-                { role: 'system', content: 'Anda adalah Copilot AI, asisten resmi dari ArulzXD Store. Jawab pertanyaan pengguna dengan ramah, jelas, dan profesional.' },
-                { role: 'user', content: userPrompt }
-            ]
-        }, { timeout: 10000 });
-
-        if (response.data && response.data.reply) {
-            return response.data.reply;
-        }
-    } catch (err) {
-        console.error("Gagal memanggil Copilot AI API, fallback ke jawaban standar:", err.message);
-    }
-    return "Halo! Saya Copilot AI ArulzXD. Ada yang bisa saya bantu terkait pesanan atau layanan kami?";
-}
-
-// Endpoint Ambil Riwayat Chat (Hanya milik User yang bersangkutan)
-app.get('/api/support/history', checkAuthSession, async (req, res) => {
-    try {
-        let sessionId = req.query.sessionId || req.cookies.chat_session;
-        let userId = req.user ? (req.user.id || req.user._id).toString() : null;
-        let username = req.user ? (req.user.username || req.user.name) : 'Guest';
-
-        if (!sessionId) {
-            sessionId = 'session_' + crypto.randomBytes(8).toString('hex');
-            res.cookie('chat_session', sessionId, { maxAge: 30 * 24 * 60 * 60 * 1000 });
+        const userEmail = getUserIdentifier(req);
+        if (!userEmail) {
+            return res.status(400).json({ status: false, message: 'Identifier user tidak valid.' });
         }
 
-        // Cari chat berdasarkan userId jika login, atau sessionId jika guest
-        let chatQuery = userId ? { userId } : { sessionId };
-        let chat = await SupportChatV2.findOne(chatQuery);
-
-        if (!chat) {
-            chat = new SupportChatV2({
-                sessionId,
-                userId,
-                username,
-                messages: [{
-                    sender: 'ai',
-                    senderName: 'Copilot AI',
-                    text: `Halo ${username}! Saya Copilot AI. Ada yang bisa dibantu hari ini?`,
-                    timestamp: new Date()
-                }]
-            });
-            await chat.save();
-        }
-
-        return res.json({
-            status: true,
-            sessionId: chat.sessionId,
-            username: chat.username,
-            messages: chat.messages
-        });
-    } catch (err) {
-        return res.status(500).json({ status: false, message: 'Gagal memuat riwayat chat.' });
+        const messages = await ChatMessage.find({ userEmail }).sort({ createdAt: 1 }).lean();
+        return res.json({ status: true, messages });
+    } catch (error) {
+        return res.status(500).json({ status: false, message: 'Gagal mengambil riwayat pesan.' });
     }
 });
 
-// Endpoint Kirim Pesan & Respon Otomatis Copilot AI
-app.post('/api/support/send', checkAuthSession, async (req, res) => {
+// 2. POST: Kirim Pesan Bantuan dari User ke Owner (+ Kirim Email Notifikasi)
+app.post('/api/bantuan/send-user', checkAuthSession, async (req, res) => {
     try {
-        const { text, mode } = req.body;
-        let sessionId = req.body.sessionId || req.cookies.chat_session;
-        let userId = req.user ? (req.user.id || req.user._id).toString() : null;
-        let username = req.user ? (req.user.username || req.user.name) : 'Guest';
-
-        if (!text || !text.trim()) {
+        const { message } = req.body;
+        if (!message || !message.trim()) {
             return res.status(400).json({ status: false, message: 'Pesan tidak boleh kosong!' });
         }
 
-        let chatQuery = userId ? { userId } : { sessionId };
-        let chat = await SupportChatV2.findOne(chatQuery);
+        const userEmail = getUserIdentifier(req);
+        const senderName = req.user ? req.user.username : 'User Guest';
 
-        if (!chat) {
-            chat = new SupportChatV2({ sessionId, userId, username, messages: [] });
-        }
-
-        // Tambahkan pesan user
-        chat.messages.push({
+        // Simpan pesan user secara permanen di MongoDB
+        const newMsg = new ChatMessage({
+            userEmail,
             sender: 'user',
-            senderName: username,
-            text: text.trim(),
-            timestamp: new Date()
+            senderName,
+            message: message.trim()
         });
+        await newMsg.save();
 
-        // Simpan terlebih dahulu
-        await chat.save();
+        // Buat URL Balasan Instan khusus Owner
+        const host = req.get('host');
+        const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+        const replyUrl = `${protocol}://${host}/bantuan/owner-reply?userEmail=${encodeURIComponent(userEmail)}`;
 
-        // Jika mode CS Live Chat / AI Copilot
-        if (mode !== 'owner') {
-            const aiReplyText = await getCopilotResponse(text);
-            chat.messages.push({
-                sender: 'ai',
-                senderName: 'Copilot AI',
-                text: aiReplyText,
-                timestamp: new Date()
-            });
-            await chat.save();
-        }
+        // Kirim email notifikasi pesan baru ke Owner
+        const mailOptions = {
+            from: '"Live Chat Customer Service" <supportarulzxd@gmail.com>',
+            to: OWNER_EMAIL,
+            subject: `[LIVE CHAT CS] Pesan Bantuan Baru dari ${senderName} (${userEmail})`,
+            html: `
+                <div style="background-color: #0b0f19; padding: 30px; font-family: sans-serif; color: #e2e8f0;">
+                    <div style="max-width: 600px; margin: 0 auto; background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 24px;">
+                        <h2 style="color: #f95700; margin-top: 0;">Pesan Bantuan Baru</h2>
+                        <p><strong>Pengirim:</strong> ${senderName} (${userEmail})</p>
+                        <p><strong>Waktu:</strong> ${new Date().toLocaleString('id-ID')}</p>
+                        <hr style="border-color: #374151;" />
+                        <div style="background: #030712; padding: 15px; border-radius: 8px; border-left: 4px solid #f95700; margin: 20px 0;">
+                            <p style="margin: 0; white-space: pre-wrap; color: #ffffff;">${message.trim()}</p>
+                        </div>
+                        <a href="${replyUrl}" target="_blank" style="display: inline-block; padding: 12px 24px; background-color: #f95700; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; text-transform: uppercase;">Balas Chat User Ini</a>
+                    </div>
+                </div>
+            `
+        };
 
-        return res.json({
-            status: true,
-            messages: chat.messages
-        });
-    } catch (err) {
-        console.error("Error CS Send Chat:", err);
+        transporter.sendMail(mailOptions).catch(err => console.error("Gagal kirim email owner:", err.message));
+
+        return res.json({ status: true, message: 'Pesan berhasil terkirim!', data: newMsg });
+    } catch (error) {
         return res.status(500).json({ status: false, message: 'Gagal mengirim pesan.' });
     }
 });
 
+// 3. POST: Balasan dari Owner ke Session User Spesifik
+app.post('/api/bantuan/reply-owner', async (req, res) => {
+    try {
+        const { userEmail, message } = req.body;
+        if (!userEmail || !message || !message.trim()) {
+            return res.status(400).json({ status: false, message: 'Data email user dan pesan wajib diisi!' });
+        }
+
+        const replyMsg = new ChatMessage({
+            userEmail: userEmail.toLowerCase().trim(),
+            sender: 'owner',
+            senderName: 'Customer Service (Owner)',
+            message: message.trim()
+        });
+        await replyMsg.save();
+
+        return res.json({ status: true, message: 'Balasan Owner berhasil dikirim ke user!', data: replyMsg });
+    } catch (error) {
+        return res.status(500).json({ status: false, message: 'Gagal menyimpan balasan owner.' });
+    }
+});
+
+// 4. ROUTE: Halaman /bantuan & Halaman Balas Bantuan Khusus Owner
+app.get('/bantuan', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'bantuan.html'));
+});
+
+app.get('/bantuan/owner-reply', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'owner-reply.html'));
+});
 // AUTHENTICATION & LOGIN/REGISTER HANDLERS
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
