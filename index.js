@@ -1348,6 +1348,7 @@ app.post('/api/bantuan/send-user', checkAuthSession, async (req, res) => {
 });
 
 // 3. POST: Balasan dari Owner ke Session User Spesifik
+// POST: Balasan dari Owner ke Session User
 app.post('/api/bantuan/reply-owner', async (req, res) => {
     try {
         const { userEmail, message } = req.body;
@@ -1358,12 +1359,12 @@ app.post('/api/bantuan/reply-owner', async (req, res) => {
         const replyMsg = new ChatMessage({
             userEmail: userEmail.toLowerCase().trim(),
             sender: 'owner',
-            senderName: 'Customer Service (Owner)',
+            senderName: 'Owner CS', // Nama sender khusus Owner
             message: message.trim()
         });
         await replyMsg.save();
 
-        return res.json({ status: true, message: 'Balasan Owner berhasil dikirim ke user!', data: replyMsg });
+        return res.json({ status: true, message: 'Balasan Owner berhasil dikirim!', data: replyMsg });
     } catch (error) {
         return res.status(500).json({ status: false, message: 'Gagal menyimpan balasan owner.' });
     }
