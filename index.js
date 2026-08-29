@@ -1377,6 +1377,62 @@ app.get('/bantuan', (req, res) => {
 app.get('/bantuan/owner-reply', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'owner-reply.html'));
 });
+
+// MEMERIKSA STATUS ROLE ADMIN/OWNER
+const checkAdminRole = (req, res, next) => {
+    if (!req.user) return res.status(401).json({ status: false, message: 'Silakan login terlebih dahulu!' });
+    const ownerEmail = 'supportarulzxd@gmail.com'; // Sesuaikan email owner Anda
+    if (req.user.email?.toLowerCase().trim() === ownerEmail) {
+        req.isAdmin = true;
+        return next();
+    }
+    return res.status(403).json({ status: false, message: 'Akses ditolak! Khusus Admin/Owner.' });
+};
+
+// 1. ENDPOINT KHUSUS ADMIN: Mengambil semua daftar sesi room chat dari seluruh user
+app.get('/api/admin/chat-rooms', checkAuthSession, checkAdminRole, async (req, res) => {
+    try {
+        const rooms = await ChatMessage.aggregate([
+            { $sort: { createdAt: -1 } },
+            { 
+                $group: {
+                    _id: "$userEmail",
+                    lastMessage: { $first: "$message" },
+                    senderName: { $first: "$senderName" },
+                    lastSender: { $first: "$sender" },
+                    updatedAt: { $first: "$createdAt" }
+                }
+            },
+            { $sort: { updatedAt: -1 } }
+        ]);
+        return res.json({ status: true, rooms });
+    } catch (e) {
+        return res.status(500).json({ status: false, message: 'Gagal memuat daftar room chat.' });
+    }
+});
+
+// 2. ENDPOINT KHUSUS ADMIN: Mengambil seluruh riwayat pesan dari user tertentu
+app.get('/api/admin/chat-history', checkAuthSession, checkAdminRole, async (req, res) => {
+    try {
+        const { userEmail } = req.query;
+        if (!userEmail) return res.status(400).json({ status: false, message: 'Email user wajib diisi.' });
+
+        const messages = await ChatMessage.find({ userEmail: userEmail.toLowerCase().trim() }).sort({ createdAt: 1 }).lean();
+        return res.json({ status: true, messages });
+    } catch (e) {
+        return res.status(500).json({ status: false, message: 'Gagal memuat pesan.' });
+    }
+});
+
+// 3. ROUTE HALAMAN PANEL ADMIN CS WEBSITE
+app.get('/admin/livechat', checkAuthSession, (req, res) => {
+    const ownerEmail = 'supportarulzxd@gmail.com';
+    if (!req.user || req.user.email?.toLowerCase().trim() !== ownerEmail) {
+        return res.redirect('/dashboard');
+    }
+    res.sendFile(path.join(__dirname, 'public', 'admin-chat.html'));
+});
+
 // AUTHENTICATION & LOGIN/REGISTER HANDLERS
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
