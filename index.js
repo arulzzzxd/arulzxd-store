@@ -1252,6 +1252,14 @@ app.get('/api/user/transactions', checkAuthSession, async (req, res) => {
         return res.status(500).json({ status: false, message: "Gagal mengambil riwayat transaksi" });
     }
 });
+const OWNER_EMAIL = 'supportarulzxd@gmail.com'; 
+
+// ROUTE HALAMAN BANTUAN
+app.get('/bantuan', checkAuthSession, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'bantuan.html'));
+});
+
+
 // ====================================================
 // SUPPORT CHAT SCHEMA (Isolasi Chat per User & Username)
 // ====================================================
