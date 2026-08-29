@@ -88,109 +88,77 @@
     </main>
 
     <script>
-        let currentMode = 'copilot';
-        let sessionId = localStorage.getItem('support_session_id') || 'SESS-' + Date.now();
-        localStorage.setItem('support_session_id', sessionId);
-        let currentUserEmail = '';
+    let sessionId = '';
+    let currentMode = 'ai'; // 'ai' atau 'owner'
 
-        async function initChat() {
-            try {
-                const res = await fetch('/api/user-status');
-                const data = await res.json();
-                if (data.loggedIn && data.user) {
-                    currentUserEmail = data.user.email.toLowerCase();
-                    if (currentUserEmail === 'supportarulzxd@gmail.com') {
-                        document.getElementById('ownerBadge').classList.remove('hidden');
-                    }
-                }
-            } catch(e) {}
-
-            fetchMessages();
-            setInterval(fetchMessages, 3000); // Polling pesan otomatis
-        }
-
-        function switchChatMode(mode) {
-            currentMode = mode;
-            const btnCopilot = document.getElementById('btnModeCopilot');
-            const btnOwner = document.getElementById('btnModeOwner');
-            const icon = document.getElementById('chatHeaderIcon');
-            const title = document.getElementById('chatTitle');
-
-            if (mode === 'copilot') {
-                btnCopilot.className = "px-3 py-1.5 rounded-lg text-xs font-bold font-cyber bg-cyberCyan text-cyberDark transition";
-                btnOwner.className = "px-3 py-1.5 rounded-lg text-xs font-bold font-cyber text-slate-400 hover:text-white transition";
-                icon.className = "fa-solid fa-robot text-lg";
-                title.innerText = "Copilot AI Assistant";
-            } else {
-                btnOwner.className = "px-3 py-1.5 rounded-lg text-xs font-bold font-cyber bg-cyberCyan text-cyberDark transition";
-                btnCopilot.className = "px-3 py-1.5 rounded-lg text-xs font-bold font-cyber text-slate-400 hover:text-white transition";
-                icon.className = "fa-solid fa-headset text-lg";
-                title.innerText = "Live Chat Owner CS";
+    async function initChat() {
+        try {
+            const res = await fetch('/api/support/history');
+            const data = await res.json();
+            if (data.status) {
+                sessionId = data.sessionId;
+                renderMessages(data.messages);
             }
+        } catch (e) {
+            console.error("Gagal inisialisasi chat:", e);
         }
+    }
 
-        async function fetchMessages() {
-            try {
-                const res = await fetch(`/api/support/messages/${sessionId}`);
-                const data = await res.json();
-                if (data.status && data.messages) {
-                    renderMessages(data.messages);
-                }
-            } catch(e) {}
-        }
+    function renderMessages(messages) {
+        const container = document.getElementById('chatMessages');
+        if (!container) return;
 
-        function renderMessages(messages) {
-            const container = document.getElementById('chatMessages');
-            if (messages.length === 0) {
-                container.innerHTML = `<div class="text-center text-slate-500 py-8">Belum ada percakapan. Silakan ketik pesan pertama Anda.</div>`;
-                return;
-            }
+        container.innerHTML = messages.map(m => {
+            const isUser = m.sender === 'user';
+            const alignClass = isUser ? 'justify-end' : 'justify-start';
+            const bgClass = isUser 
+                ? 'bg-cyberCyan/20 border-cyberCyan/40 text-cyan-100' 
+                : 'bg-slate-800/80 border-slate-700 text-slate-200';
+            const senderLabel = isUser ? (m.senderName || 'Anda') : (m.senderName || 'Copilot AI');
 
-            container.innerHTML = messages.map(m => {
-                const isUser = m.sender === 'user';
-                const alignClass = isUser ? 'justify-end' : 'justify-start';
-                const bgClass = isUser 
-                    ? 'bg-cyberCyan/10 border-cyberCyan/30 text-slate-100 rounded-br-none' 
-                    : (m.sender === 'owner' ? 'bg-amber-500/10 border-amber-500/30 text-amber-200 rounded-bl-none' : 'bg-cyberCard border-cyberBorder text-slate-200 rounded-bl-none');
-                
-                const senderLabel = isUser ? 'Anda' : (m.sender === 'owner' ? 'CS Owner' : 'Copilot AI');
-
-                return `
-                    <div class="flex ${alignClass}">
-                        <div class="max-w-[80%] border p-3 rounded-2xl ${bgClass} space-y-1">
-                            <span class="text-[9px] font-bold font-cyber uppercase tracking-wider block opacity-70">${senderLabel}</span>
-                            <p class="leading-relaxed">${m.text}</p>
-                            <span class="text-[8px] opacity-40 block text-right font-mono">${new Date(m.timestamp).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})}</span>
-                        </div>
+            return `
+                <div class="flex ${alignClass} mb-3">
+                    <div class="max-w-[80%] border p-3 rounded-2xl ${bgClass} space-y-1 shadow-md">
+                        <span class="text-[9px] font-bold font-cyber uppercase tracking-wider block opacity-70">
+                            <i class="${isUser ? 'fa-solid fa-user' : 'fa-solid fa-robot'} mr-1"></i> ${senderLabel}
+                        </span>
+                        <p class="leading-relaxed text-sm whitespace-pre-wrap">${m.text}</p>
+                        <span class="text-[8px] opacity-40 block text-right font-mono">
+                            ${new Date(m.timestamp).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})}
+                        </span>
                     </div>
-                `;
-            }).join('');
+                </div>
+            `;
+        }).join('');
 
-            container.scrollTop = container.scrollHeight;
+        container.scrollTop = container.scrollHeight;
+    }
+
+    async function sendMessage(e) {
+        if (e) e.preventDefault();
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+
+        try {
+            const res = await fetch('/api/support/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId, text, mode: currentMode })
+            });
+            const data = await res.json();
+            if (data.status) {
+                renderMessages(data.messages);
+            }
+        } catch(e) {
+            console.error("Gagal mengirim pesan:", e);
         }
+    }
 
-        async function sendMessage(e) {
-            e.preventDefault();
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
+    document.addEventListener('DOMContentLoaded', initChat);
+</script>
 
-            input.value = '';
-
-            try {
-                const res = await fetch('/api/support/send', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sessionId, text, mode: currentMode })
-                });
-                const data = await res.json();
-                if (data.status) {
-                    renderMessages(data.messages);
-                }
-            } catch(e) {}
-        }
-
-        document.addEventListener('DOMContentLoaded', initChat);
-    </script>
 </body>
 </html>
