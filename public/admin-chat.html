@@ -14,20 +14,26 @@
 <body class="h-screen flex flex-col overflow-hidden">
 
     <!-- TOP NAVBAR -->
-    <header class="bg-[#111827] border-b border-[#162a45] px-6 py-3.5 flex items-center justify-between shrink-0">
-        <h1 class="text-lg font-bold text-[#f95700] flex items-center gap-2">
-            <i class="fa-solid fa-headset text-xl"></i> Admin CS Live Chat Dashboard
-        </h1>
-        <a href="/dashboard" class="text-xs bg-[#162a45] hover:bg-slate-700 px-3.5 py-2 rounded-xl text-slate-200 transition">
+    <header class="bg-[#111827] border-b border-[#162a45] px-4 py-3 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2">
+            <!-- Tombol Kembali jika di HP sedang membuka chat -->
+            <button id="btnBackToRooms" onclick="backToRoomList()" class="hidden text-slate-300 hover:text-white mr-1 text-sm">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <h1 class="text-sm sm:text-base font-bold text-[#f95700] flex items-center gap-2">
+                <i class="fa-solid fa-headset text-lg"></i> Admin CS Live Chat
+            </h1>
+        </div>
+        <a href="/dashboard" class="text-[11px] bg-[#162a45] hover:bg-slate-700 px-3 py-1.5 rounded-xl text-slate-200 transition">
             Kembali ke Web
         </a>
     </header>
 
-    <!-- MAIN DASHBOARD CONTENT -->
-    <div class="flex-1 flex overflow-hidden">
+    <!-- MAIN DASHBOARD CONTAINER -->
+    <div class="flex-1 flex overflow-hidden relative">
 
         <!-- SIDEBAR DAFTAR ROOM CHAT USER -->
-        <div class="w-full md:w-80 bg-[#0a1628] border-r border-[#162a45] flex flex-col shrink-0">
+        <div id="roomSidebar" class="w-full md:w-80 bg-[#0a1628] border-r border-[#162a45] flex flex-col shrink-0">
             <div class="p-3 border-b border-[#162a45]">
                 <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Daftar Chat User</h2>
             </div>
@@ -36,28 +42,28 @@
             </div>
         </div>
 
-        <!-- WINDOW ISI CHAT -->
-        <div class="hidden md:flex flex-1 flex-col bg-[#050b14]">
+        <!-- AREA CHAT USER (RESPONSIVE HP & LAPTOP) -->
+        <div id="chatViewArea" class="hidden md:flex flex-1 flex-col bg-[#050b14] absolute md:relative inset-0 z-10 md:z-auto">
             
             <!-- HEADER ACTIVE CHAT USER -->
-            <div id="activeChatHeader" class="bg-[#111827] p-4 border-b border-[#162a45] flex items-center justify-between">
+            <div id="activeChatHeader" class="bg-[#111827] p-3.5 border-b border-[#162a45] flex items-center justify-between">
                 <div>
-                    <h3 id="activeUserTitle" class="text-sm font-bold text-white">Pilih User untuk Memulai Chat</h3>
-                    <p id="activeUserEmail" class="text-xs text-slate-400 font-mono">-</p>
+                    <h3 id="activeUserTitle" class="text-xs sm:text-sm font-bold text-white">Pilih User untuk Memulai Chat</h3>
+                    <p id="activeUserEmail" class="text-[10px] text-slate-400 font-mono">-</p>
                 </div>
             </div>
 
             <!-- HISTORY CHAT MESSAGES -->
-            <div id="adminChatMessages" class="flex-1 p-4 overflow-y-auto space-y-3">
-                <div class="text-center text-xs text-slate-500 my-auto">Pilih salah satu room chat di sebelah kiri.</div>
+            <div id="adminChatMessages" class="flex-1 p-3 sm:p-4 overflow-y-auto space-y-2.5">
+                <div class="text-center text-xs text-slate-500 my-auto">Pilih salah satu room chat untuk membalas.</div>
             </div>
 
             <!-- FORM BALAS CHAT -->
-            <form id="adminReplyForm" onsubmit="sendAdminReply(event)" class="p-3 bg-[#111827] border-t border-[#162a45] flex items-center gap-2">
+            <form id="adminReplyForm" onsubmit="sendAdminReply(event)" class="p-2.5 bg-[#111827] border-t border-[#162a45] flex items-center gap-2">
                 <input type="text" id="adminReplyInput" disabled placeholder="Pilih user terlebih dahulu..." 
-                       class="flex-1 bg-[#050b14] border border-[#162a45] rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#f95700] transition">
-                <button type="submit" id="btnAdminSend" disabled class="px-5 py-2.5 rounded-xl bg-[#f95700] hover:bg-[#e04e00] disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold text-xs transition">
-                    Kirim Balasan
+                       class="flex-1 bg-[#050b14] border border-[#162a45] rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#f95700] transition">
+                <button type="submit" id="btnAdminSend" disabled class="px-4 py-2 rounded-xl bg-[#f95700] hover:bg-[#e04e00] disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold text-xs transition shrink-0">
+                    Kirim
                 </button>
             </form>
 
@@ -86,7 +92,7 @@
                         const timeStr = new Date(room.updatedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
                         return `
-                            <div onclick="selectUserChat('${email}', '${room.senderName}')" class="p-3.5 cursor-pointer transition ${activeClass}">
+                            <div onclick="selectUserChat('${email}', '${room.senderName || email}')" class="p-3.5 cursor-pointer transition ${activeClass}">
                                 <div class="flex items-center justify-between mb-1">
                                     <h4 class="text-xs font-bold text-white truncate">${room.senderName || 'User'}</h4>
                                     <span class="text-[9px] text-slate-400 font-mono">${timeStr}</span>
@@ -106,10 +112,31 @@
 
             document.getElementById('adminReplyInput').disabled = false;
             document.getElementById('btnAdminSend').disabled = false;
-            document.getElementById('adminReplyInput').placeholder = `Balas pesan ke ${email}...`;
+            document.getElementById('adminReplyInput').placeholder = `Balas ke ${email}...`;
+
+            // Tampilkan Layar Chat jika dibuka melalui HP
+            const chatViewArea = document.getElementById('chatViewArea');
+            const roomSidebar = document.getElementById('roomSidebar');
+            const btnBack = document.getElementById('btnBackToRooms');
+
+            chatViewArea.classList.remove('hidden');
+            if (window.innerWidth < 768) {
+                roomSidebar.classList.add('hidden');
+                btnBack.classList.remove('hidden');
+            }
 
             loadAdminChatMessages();
             loadRoomList();
+        }
+
+        function backToRoomList() {
+            const chatViewArea = document.getElementById('chatViewArea');
+            const roomSidebar = document.getElementById('roomSidebar');
+            const btnBack = document.getElementById('btnBackToRooms');
+
+            chatViewArea.classList.add('hidden');
+            roomSidebar.classList.remove('hidden');
+            btnBack.classList.add('hidden');
         }
 
         async function loadAdminChatMessages() {
@@ -129,9 +156,9 @@
 
                         return `
                             <div class="flex ${alignClass}">
-                                <div class="max-w-[75%] p-3 rounded-2xl text-xs space-y-1 ${bgClass}">
+                                <div class="max-w-[80%] p-2.5 rounded-2xl text-xs space-y-1 ${bgClass}">
                                     <p class="leading-relaxed break-words">${msg.message}</p>
-                                    <span class="text-[9px] opacity-70 block text-right font-mono">${timeStr}</span>
+                                    <span class="text-[8px] opacity-70 block text-right font-mono">${timeStr}</span>
                                 </div>
                             </div>
                         `;
