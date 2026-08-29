@@ -1253,6 +1253,42 @@ app.get('/api/user/transactions', checkAuthSession, async (req, res) => {
     }
 });
 
+// CHAT SUPPORT SCHEMA
+const chatSchemaV2 = new mongoose.Schema({
+    sender: { type: String, default: 'Guest' },
+    text: { type: String, default: '' },
+    image: { type: String, default: null }, // Base64 / URL
+    createdAt: { type: Date, default: Date.now }
+});
+
+const ChatV2 = mongoose.models.ChatV2 || mongoose.model('ChatV2', chatSchemaV2);
+
+// ENDPOINT AMBIL RIWAYAT CHAT
+app.get('/api/chat/history', async (req, res) => {
+    try {
+        const messages = await ChatV2.find().sort({ createdAt: 1 }).limit(50);
+        res.json({ status: true, messages });
+    } catch (err) {
+        res.status(500).json({ status: false, message: 'Gagal memuat pesan' });
+    }
+});
+
+// ENDPOINT SIMPAN CHAT KE MONGODB
+app.post('/api/chat/send', checkAuthSession, async (req, res) => {
+    try {
+        const { text, image, sender } = req.body;
+        const newMsg = new ChatV2({
+            sender: req.user ? req.user.username : (sender || 'Guest'),
+            text,
+            image
+        });
+        await newMsg.save();
+        res.json({ status: true, message: 'Pesan terkirim!' });
+    } catch (err) {
+        res.status(500).json({ status: false, message: 'Gagal menyimpan chat' });
+    }
+});
+
 // AUTHENTICATION & LOGIN/REGISTER HANDLERS
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
