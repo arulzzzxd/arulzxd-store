@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Reply Panel - Live Chat CS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h2 class="text-base font-bold text-[#f95700] flex items-center gap-2">
+                <i class="fa-solid fa-reply"></i> Panel Balasan CS Owner
+            </h2>
+            <span class="text-xs text-slate-400 font-mono" id="targetUserLabel">User: -</span>
+        </div>
+
+        <form id="ownerForm" onsubmit="sendOwnerReply(event)" class="space-y-3">
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Pesan Balasan ke User</label>
+                <textarea id="replyMessage" rows="4" required placeholder="Tuliskan jawaban bantuan..."
+                          class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-[#f95700]"></textarea>
+            </div>
+
+            <button type="submit" id="btnSubmitReply" class="w-full bg-[#f95700] hover:bg-[#e04e00] text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition">
+                Kirim Balasan Sekarang
+            </button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const userEmail = urlParams.get('userEmail');
+
+        if (userEmail) {
+            document.getElementById('targetUserLabel').innerText = `User: ${userEmail}`;
+        }
+
+        async function sendOwnerReply(e) {
+            e.preventDefault();
+            const message = document.getElementById('replyMessage').value.trim();
+
+            if (!userEmail || !message) {
+                Swal.fire('Error', 'User Email atau Pesan tidak boleh kosong.', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/bantuan/reply-owner', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userEmail, message })
+                });
+
+                const result = await res.json();
+                if (result.status) {
+                    Swal.fire('Berhasil!', 'Balasan berhasil dikirimkan ke live chat user.', 'success');
+                    document.getElementById('ownerForm').reset();
+                } else {
+                    Swal.fire('Gagal', result.message || 'Terjadi kesalahan.', 'error');
+                }
+            } catch(err) {
+                Swal.fire('Error', 'Gagal terhubung ke server.', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
