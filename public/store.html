@@ -2163,42 +2163,39 @@
         }
 
         function shareProduk(index) {
-            const produk = DATA_PRODUK[index];
-            if (!produk) return;
+    const produk = DATA_PRODUK[index];
+    if (!produk) return;
 
-            const productId = produk.Id || produk._id;
-            const shareUrl = `${window.location.origin}/store/${productId}`;
+    const productId = produk.Id || produk._id;
+    // URL menuju ke route handler dynamic Open Graph
+    const shareUrl = `${window.location.origin}/store/${productId}`;
 
-            if (navigator.share) {
-                navigator.share({
-                    title: produk.nama,
-                    text: `Beli ${produk.nama} di ArulzXD Store!`,
-                    url: shareUrl
-                }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(shareUrl).then(() => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'LINK BERHASIL DISALIN!',
-                        text: 'Tautan checkout produk telah disalin ke papan klip.',
-                        timer: 2000,
-                        showConfirmButton: false,
-                        customClass: {
-                            popup: 'cyber-swal',
-                            title: 'cyber-swal-title',
-                            htmlContainer: 'cyber-swal-text'
-                        }
-                    });
-                }).catch(() => {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'TAUTAN PRODUK',
-                        text: shareUrl,
-                        customClass: { popup: 'cyber-swal' }
-                    });
-                });
-            }
-        }
+    if (navigator.share) {
+        navigator.share({
+            title: produk.nama,
+            text: `Check out "${produk.nama}" di ArulzXD Store!`,
+            url: shareUrl
+        }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'LINK BERHASIL DISALIN!',
+                text: 'Tautan share produk telah disalin ke papan klip.',
+                timer: 2000,
+                showConfirmButton: false,
+                customClass: { popup: 'cyber-swal' }
+            });
+        }).catch(() => {
+            Swal.fire({
+                icon: 'info',
+                title: 'TAUTAN PRODUK',
+                text: shareUrl,
+                customClass: { popup: 'cyber-swal' }
+            });
+        });
+    }
+}
 
         async function handleFormSubmit(event) {
             event.preventDefault();
@@ -2262,15 +2259,16 @@
         }
 
         async function checkUrlProductShare() {
-            const pathSegments = window.location.pathname.split('/').filter(Boolean);
-            if (pathSegments.length >= 2 && pathSegments[0] === 'store') {
-                const targetId = pathSegments[1];
-                const matchedIdx = DATA_PRODUK.findIndex(p => p.Id === targetId || p._id === targetId);
-                if (matchedIdx !== -1) {
-                    openCheckoutModal(matchedIdx);
-                }
-            }
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareId = urlParams.get('shareId');
+    
+    if (shareId) {
+        const matchedIdx = DATA_PRODUK.findIndex(p => p.Id === shareId || p._id === shareId);
+        if (matchedIdx !== -1) {
+            openCheckoutModal(matchedIdx);
         }
+    }
+}
 
         // FUNGSI INISIALISASI UTAMA
         async function initStorePage() {
