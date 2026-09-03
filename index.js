@@ -1264,121 +1264,6 @@ const chatMessageSchema = new mongoose.Schema({
 
 const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage', chatMessageSchema);
 
-// Konfigurasi Transporter Nodemailer untuk Kirim Notifikasi Email Ke Owner
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-        user: 'supportarulzxd@gmail.com',
-        pass: 'matsgyapivykobdv'
-    },
-    tls: { rejectUnauthorized: false }
-});
-
-const OWNER_EMAIL = 'supportarulzxd@gmail.com'; // Email Owner
-
-// 1. GET: Ambil Riwayat Chat Berdasarkan User Session
-app.get('/api/bantuan/messages', checkAuthSession, async (req, res) => {
-    try {
-        const userEmail = getUserIdentifier(req);
-        if (!userEmail) {
-            return res.status(400).json({ status: false, message: 'Identifier user tidak valid.' });
-        }
-
-        const messages = await ChatMessage.find({ userEmail }).sort({ createdAt: 1 }).lean();
-        return res.json({ status: true, messages });
-    } catch (error) {
-        return res.status(500).json({ status: false, message: 'Gagal mengambil riwayat pesan.' });
-    }
-});
-
-// 2. POST: Kirim Pesan Bantuan dari User ke Owner (+ Kirim Email Notifikasi)
-app.post('/api/bantuan/send-user', checkAuthSession, async (req, res) => {
-    try {
-        const { message } = req.body;
-        if (!message || !message.trim()) {
-            return res.status(400).json({ status: false, message: 'Pesan tidak boleh kosong!' });
-        }
-
-        const userEmail = getUserIdentifier(req);
-        const senderName = req.user ? req.user.username : 'User Guest';
-
-        // Simpan pesan user secara permanen di MongoDB
-        const newMsg = new ChatMessage({
-            userEmail,
-            sender: 'user',
-            senderName,
-            message: message.trim()
-        });
-        await newMsg.save();
-
-        // Buat URL Balasan Instan khusus Owner
-        const host = req.get('host');
-        const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-        const replyUrl = `${protocol}://${host}/bantuan/owner-reply?userEmail=${encodeURIComponent(userEmail)}`;
-
-        // Kirim email notifikasi pesan baru ke Owner
-        const mailOptions = {
-            from: '"Live Chat Customer Service" <supportarulzxd@gmail.com>',
-            to: OWNER_EMAIL,
-            subject: `[LIVE CHAT CS] Pesan Bantuan Baru dari ${senderName} (${userEmail})`,
-            html: `
-                <div style="background-color: #0b0f19; padding: 30px; font-family: sans-serif; color: #e2e8f0;">
-                    <div style="max-width: 600px; margin: 0 auto; background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 24px;">
-                        <h2 style="color: #f95700; margin-top: 0;">Pesan Bantuan Baru</h2>
-                        <p><strong>Pengirim:</strong> ${senderName} (${userEmail})</p>
-                        <p><strong>Waktu:</strong> ${new Date().toLocaleString('id-ID')}</p>
-                        <hr style="border-color: #374151;" />
-                        <div style="background: #030712; padding: 15px; border-radius: 8px; border-left: 4px solid #f95700; margin: 20px 0;">
-                            <p style="margin: 0; white-space: pre-wrap; color: #ffffff;">${message.trim()}</p>
-                        </div>
-                        <a href="${replyUrl}" target="_blank" style="display: inline-block; padding: 12px 24px; background-color: #f95700; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; text-transform: uppercase;">Balas Chat User Ini</a>
-                    </div>
-                </div>
-            `
-        };
-
-        transporter.sendMail(mailOptions).catch(err => console.error("Gagal kirim email owner:", err.message));
-
-        return res.json({ status: true, message: 'Pesan berhasil terkirim!', data: newMsg });
-    } catch (error) {
-        return res.status(500).json({ status: false, message: 'Gagal mengirim pesan.' });
-    }
-});
-
-// 3. POST: Balasan dari Owner ke Session User Spesifik
-// POST: Balasan dari Owner ke Session User
-app.post('/api/bantuan/reply-owner', async (req, res) => {
-    try {
-        const { userEmail, message } = req.body;
-        if (!userEmail || !message || !message.trim()) {
-            return res.status(400).json({ status: false, message: 'Data email user dan pesan wajib diisi!' });
-        }
-
-        const replyMsg = new ChatMessage({
-            userEmail: userEmail.toLowerCase().trim(),
-            sender: 'owner',
-            senderName: 'Owner CS', // Nama sender khusus Owner
-            message: message.trim()
-        });
-        await replyMsg.save();
-
-        return res.json({ status: true, message: 'Balasan Owner berhasil dikirim!', data: replyMsg });
-    } catch (error) {
-        return res.status(500).json({ status: false, message: 'Gagal menyimpan balasan owner.' });
-    }
-});
-
-// 4. ROUTE: Halaman /bantuan & Halaman Balas Bantuan Khusus Owner
-app.get('/bantuan', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'bantuan.html'));
-});
-
-app.get('/bantuan/owner-reply', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'owner-reply.html'));
-});
-
 // MEMERIKSA STATUS ROLE ADMIN/OWNER
 const checkAdminRole = (req, res, next) => {
     if (!req.user) return res.status(401).json({ status: false, message: 'Silakan login terlebih dahulu!' });
@@ -2123,6 +2008,80 @@ app.get('/profile', checkAuthSession, (req, res) => {
         return res.redirect('/login');
     }
     res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
+// ====================================================
+// DYNAMIC OPEN GRAPH META TAGS UNTUK SHARE PRODUK
+// ====================================================
+app.get('/store/:productId', async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        // Cari produk berdasarkan Id atau _id dari Mongoose
+        const product = await ProductV2.findOne({
+            $or: [
+                { Id: productId },
+                { _id: mongoose.Types.ObjectId.isValid(productId) ? productId : null }
+            ]
+        }).lean();
+
+        // Apabila produk tidak ditemukan, arahkan ke halaman toko biasa
+        if (!product) {
+            return res.sendFile(path.join(__dirname, 'public', 'store.html'));
+        }
+
+        // Tentukan gambar utama
+        let imageUrl = 'https://files.catbox.moe/kdowze.png';
+        if (Array.isArray(product.gambar) && product.gambar.length > 0) {
+            imageUrl = product.gambar[0];
+        } else if (typeof product.gambar === 'string') {
+            imageUrl = product.gambar;
+        }
+
+        // Tentukan Judul dan Deskripsi
+        const priceFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.harga_diskon || product.harga);
+        const shareTitle = `${product.nama} (${priceFormatted}) - ArulzXD Store`;
+        const shareDesc = product.deskripsi ? product.deskripsi.slice(0, 160) : 'Beli source code dan layanan digital berkualitas di ArulzXD Store.';
+        const fullUrl = `${req.protocol}://${req.get('host')}/store/${productId}`;
+
+        // Kirim HTML dengan Open Graph Meta Tags dinamis
+        res.send(`
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>${shareTitle}</title>
+
+            <!-- Open Graph / Facebook / WhatsApp / Telegram Meta Tags -->
+            <meta property="og:type" content="website">
+            <meta property="og:url" content="${fullUrl}">
+            <meta property="og:title" content="${shareTitle}">
+            <meta property="og:description" content="${shareDesc}">
+            <meta property="og:image" content="${imageUrl}">
+            <meta property="og:image:width" content="1200">
+            <meta property="og:image:height" content="630">
+
+            <!-- Twitter Card Meta Tags -->
+            <meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:title" content="${shareTitle}">
+            <meta name="twitter:description" content="${shareDesc}">
+            <meta name="twitter:image" content="${imageUrl}">
+
+            <!-- Redirection JS ke Halaman Toko dengan Auto-Open Modal -->
+            <script>
+                window.location.href = "/store?shareId=${productId}";
+            </script>
+        </head>
+        <body style="background-color: #050b14; color: #ffffff; font-family: sans-serif; display: flex; justify-content: center; items-center; height: 100vh;">
+            <p>Mengarahkan ke produk...</p>
+        </body>
+        </html>
+        `);
+    } catch (error) {
+        console.error("Error Open Graph Share:", error);
+        res.redirect('/store');
+    }
 });
 
 app.get('/database/produk', async (req, res) => {
