@@ -2,167 +2,379 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin CS - Live Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Live Chat - ArulzXD Store</title>
+    <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        cyber: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        neoYellow: '#FFDE59',
+                        neoCyan: '#00E5FF',
+                        neoPink: '#FF79C6',
+                        neoGreen: '#00E676',
+                        neoBg: '#F4F0EA',
+                        neoCard: '#FFFFFF'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { background-color: #050b14; font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0; }
-        .font-cyber { font-family: 'Orbitron', sans-serif; }
+        body { background-color: #F4F0EA; color: #000000; overflow-x: hidden; }
+        
+        .neo-box {
+            background-color: #FFFFFF;
+            border: 3px solid #000000;
+            box-shadow: 5px 5px 0px #000000;
+        }
+
+        .neo-btn {
+            border: 3px solid #000000;
+            box-shadow: 4px 4px 0px #000000;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .neo-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+        .neo-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        .swal2-popup.cyber-swal {
+            background: #FFFFFF !important;
+            border: 3px solid #000000 !important;
+            border-radius: 20px !important;
+            color: #000000 !important;
+            box-shadow: 6px 6px 0px #000000 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
+
+        /* FLUID CURVED NOTCH BOTTOM NAVIGATION BAR */
+        .bottom-nav-fixed {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 440px;
+            height: 64px;
+            z-index: 9999;
+        }
+
+        .bottom-nav-bg {
+            position: absolute;
+            inset: 0;
+            background: #FFFFFF;
+            border: 3px solid #000000;
+            border-radius: 32px;
+            box-shadow: 5px 5px 0px #000000;
+        }
+
+        .nav-items-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            height: 100%;
+            width: 100%;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 100%;
+            color: #000000;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: transparent;
+        }
+
+        .nav-item-btn i { font-size: 18px; transition: all 0.3s ease; }
+        .nav-item-btn span {
+            font-size: 10px;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            position: absolute;
+            bottom: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item-btn.active .nav-icon-box {
+            transform: translateY(-22px);
+            background-color: #FFDE59;
+            border: 3px solid #000000;
+            box-shadow: 3px 3px 0px #000000;
+        }
+
+        .nav-item-btn.active i { font-size: 20px; }
+        .nav-item-btn.active span {
+            color: #000000;
+            font-weight: 900;
+            transform: translateY(-2px);
+        }
+
+        .nav-item-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 5px;
+            height: 5px;
+            background-color: #000000;
+            border-radius: 50%;
+        }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="font-sans antialiased text-black min-h-screen pb-32">
 
     <!-- TOP NAVBAR -->
-    <header class="bg-[#0a1628] border-b border-[#162a45] px-4 py-3 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-2">
-            <button id="btnBackToRooms" onclick="backToRoomList()" class="hidden text-slate-300 hover:text-white mr-1 text-sm">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <h1 class="text-xs sm:text-sm font-bold font-cyber text-[#f95700] flex items-center gap-2">
-                <i class="fa-solid fa-headset text-base"></i> Admin CS Live Chat
-            </h1>
+    <nav class="sticky top-0 z-40 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/dashboard" class="text-2xl font-black font-cyber tracking-tight text-black flex items-center gap-2">
+                <i class="fa-solid fa-user-shield text-black text-xl"></i>
+                <span>Admin<span class="bg-black text-white px-2 py-0.5 ml-1 rounded-md">Console</span></span>
+            </a>
+            <span class="text-xs font-cyber font-black bg-neoGreen text-black px-3 py-1 rounded-lg border-2 border-black shadow-[2px_2px_0px_#000] flex items-center gap-1.5 uppercase">
+                <i class="fa-solid fa-lock"></i> CS Manager
+            </span>
         </div>
-        <a href="/dashboard" class="text-[10px] font-cyber font-bold bg-[#162a45] hover:bg-slate-700 px-3 py-1.5 rounded-xl text-slate-200 transition">
-            Kembali ke Web
-        </a>
-    </header>
+    </nav>
 
-    <!-- MAIN DASHBOARD -->
-    <div class="flex-1 flex overflow-hidden relative">
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-1 space-y-6">
 
-        <!-- SIDEBAR DAFTAR ROOM CHAT USER -->
-        <div id="roomSidebar" class="w-full md:w-80 bg-[#0a1628] border-r border-[#162a45] flex flex-col shrink-0">
-            <div class="p-3 border-b border-[#162a45]">
-                <h2 class="text-xs font-bold font-cyber text-slate-300 uppercase tracking-wider">Daftar Chat User</h2>
+        <!-- HEADER BANNER -->
+        <div class="p-6 neo-box rounded-2xl bg-neoPink flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 class="text-xl sm:text-3xl font-black font-cyber text-black flex items-center gap-2">
+                    <i class="fa-solid fa-headset"></i> Panel Balas Chat Pengguna
+                </h1>
+                <p class="text-xs sm:text-sm font-bold text-black mt-1">Pilih pengguna di daftar kiri untuk membaca dan membalas pesan bantuan secara langsung.</p>
             </div>
-            <div id="roomListContainer" class="flex-1 overflow-y-auto divide-y divide-[#162a45]">
-                <div class="p-4 text-center text-xs text-slate-500 font-mono">Memuat daftar chat...</div>
-            </div>
-        </div>
-
-        <!-- AREA CHAT USER -->
-        <div id="chatViewArea" class="hidden md:flex flex-1 flex-col bg-[#050b14] absolute md:relative inset-0 z-10 md:z-auto">
             
-            <!-- HEADER CHAT -->
-            <div id="activeChatHeader" class="bg-[#0a1628] p-3.5 border-b border-[#162a45] flex items-center justify-between">
-                <div>
-                    <h3 id="activeUserTitle" class="text-xs sm:text-sm font-bold font-cyber text-[#00f3ff]">Pilih User untuk Memulai Chat</h3>
-                    <p id="activeUserEmail" class="text-[10px] text-slate-400 font-mono">-</p>
+            <button onclick="loadUserList()" class="neo-btn bg-white text-black font-cyber font-black px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 uppercase tracking-wider shrink-0">
+                <i class="fa-solid fa-rotate-right"></i> Refresh Percakapan
+            </button>
+        </div>
+
+        <!-- GRID DUA KOLOM: DAFTAR USER & WINDOW CHAT -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+
+            <!-- DAFTAR PENGGUNAGAN CHAT (KIRI) -->
+            <div class="md:col-span-4 neo-box rounded-2xl bg-white overflow-hidden flex flex-col h-[580px]">
+                <div class="bg-neoYellow p-3.5 border-b-3 border-black flex items-center justify-between">
+                    <h3 class="text-xs font-black font-cyber uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-users"></i> Daftar Pengguna (<span id="userCountText">0</span>)
+                    </h3>
+                </div>
+
+                <div id="adminUserList" class="flex-1 overflow-y-auto divide-y-2 divide-black bg-neoBg">
+                    <div class="p-4 text-center text-xs font-mono font-bold text-slate-600">Memuat daftar pengguna...</div>
                 </div>
             </div>
 
-            <!-- HISTORY MESSAGES -->
-            <div id="adminChatMessages" class="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3">
-                <div class="text-center text-xs text-slate-500 font-mono my-auto">Pilih salah satu room chat di sebelah kiri.</div>
-            </div>
+            <!-- AREA DETAIL DAN PESAN CHAT (KANAN) -->
+            <div class="md:col-span-8 neo-box rounded-2xl bg-white overflow-hidden flex flex-col h-[580px]">
+                
+                <!-- HEADER ACTIVE USER -->
+                <div class="bg-neoCyan p-3.5 border-b-3 border-black flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-white border-2 border-black flex items-center justify-center font-black text-sm shadow-[2px_2px_0px_#000]">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div>
+                            <h3 id="activeUserTitle" class="text-xs sm:text-sm font-black font-cyber text-black">Pilih Pengguna</h3>
+                            <p id="activeUserSub" class="text-[10px] font-mono font-bold text-black">Klik salah satu pengguna dari daftar di sebelah kiri</p>
+                        </div>
+                    </div>
 
-            <!-- FORM BALAS CHAT -->
-            <form id="adminReplyForm" onsubmit="sendAdminReply(event)" class="p-2.5 bg-[#0a1628] border-t border-[#162a45] flex items-center gap-2">
-                <input type="text" id="adminReplyInput" disabled placeholder="Pilih user terlebih dahulu..." 
-                       class="flex-1 bg-[#050b14] border border-[#162a45] rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#00f3ff] transition">
-                <button type="submit" id="btnAdminSend" disabled class="px-4 py-2 rounded-xl bg-[#f95700] hover:bg-[#e04e00] disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold font-cyber text-xs transition shrink-0">
-                    Kirim
-                </button>
-            </form>
+                    <div id="activeUserBadge" class="hidden">
+                        <span class="text-[10px] font-black font-cyber bg-neoGreen text-black border-2 border-black px-2.5 py-1 rounded-md uppercase">
+                            AKTIF
+                        </span>
+                    </div>
+                </div>
+
+                <!-- MESSAGES CONTAINER -->
+                <div id="adminChatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-neoBg scroll-smooth">
+                    <div class="flex flex-col items-center justify-center h-full text-center space-y-2 text-slate-600">
+                        <i class="fa-solid fa-comments text-4xl"></i>
+                        <p class="text-xs font-bold font-cyber">Belum ada percakapan yang dipilih.</p>
+                    </div>
+                </div>
+
+                <!-- FORM BALAS PESAN -->
+                <form id="adminChatForm" onsubmit="sendAdminReply(event)" class="p-3 bg-white border-t-3 border-black flex items-center gap-3 opacity-50 pointer-events-none">
+                    <input type="text" id="adminChatInput" required placeholder="Tuliskan balasan sebagai Admin/Owner..." 
+                           class="flex-1 bg-neoBg border-2 border-black rounded-xl px-4 py-3 text-xs text-black font-bold placeholder-slate-500 focus:outline-none shadow-[2px_2px_0px_#000]">
+                    <button type="submit" class="neo-btn bg-neoYellow text-black font-cyber font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2 shrink-0">
+                        <i class="fa-solid fa-reply"></i> <span class="hidden sm:inline">Kirim Balasan</span>
+                    </button>
+                </form>
+
+            </div>
 
         </div>
 
+    </main>
+
+    <!-- CURVED ANIMATED BOTTOM NAV BAR -->
+    <div class="bottom-nav-fixed">
+        <div class="bottom-nav-bg"></div>
+        <div class="nav-items-wrapper">
+            <a href="/dashboard" class="nav-item-btn active">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span>Home</span>
+            </a>
+            <a href="/store" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <span>Toko</span>
+            </a>
+            <a href="/deposit" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <span>Deposit</span>
+            </a>
+            <a href="/riwayat" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <span>Riwayat</span>
+            </a>
+            <a href="/profile" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+                <span id="nav-auth-label">Profil</span>
+            </a>
+        </div>
     </div>
 
     <script>
-        let currentSelectedUserEmail = null;
+        let selectedUserId = null;
+        let selectedUsername = '';
+        let adminPollInterval = null;
 
-        async function loadRoomList() {
+        async function loadUserList() {
             try {
-                const res = await fetch('/api/admin/chat-rooms');
+                const res = await fetch('/api/bantuan/admin/users');
                 const data = await res.json();
-                const container = document.getElementById('roomListContainer');
+                const listEl = document.getElementById('adminUserList');
+                document.getElementById('userCountText').innerText = data.users ? data.users.length : 0;
 
-                if (data.status && data.rooms) {
-                    if (data.rooms.length === 0) {
-                        container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500 font-mono">Belum ada chat masuk.</div>`;
-                        return;
-                    }
-
-                    container.innerHTML = data.rooms.map(room => {
-                        const email = room._id;
-                        const activeClass = currentSelectedUserEmail === email ? 'bg-[#162a45]' : 'hover:bg-[#111827]';
-                        const timeStr = new Date(room.updatedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                if (data.status && data.users && data.users.length > 0) {
+                    listEl.innerHTML = data.users.map(u => {
+                        const isActive = u.userId === selectedUserId;
+                        const activeClass = isActive ? 'bg-neoYellow' : 'bg-white hover:bg-neoBg';
+                        const unreadBadge = u.unreadCount > 0 
+                            ? `<span class="bg-neoPink text-black border border-black text-[9px] font-black font-cyber px-2 py-0.5 rounded-full">${u.unreadCount} baru</span>` 
+                            : '';
 
                         return `
-                            <div onclick="selectUserChat('${email}', '${room.senderName || email}')" class="p-3.5 cursor-pointer transition ${activeClass}">
-                                <div class="flex items-center justify-between mb-1">
-                                    <h4 class="text-xs font-bold text-slate-100 truncate">${room.senderName || 'User'}</h4>
-                                    <span class="text-[9px] text-slate-400 font-mono">${timeStr}</span>
+                            <div onclick="selectUserChat('${u.userId}', '${u.username}')" class="p-3.5 cursor-pointer transition flex items-center justify-between ${activeClass}">
+                                <div class="overflow-hidden pr-2">
+                                    <h4 class="text-xs font-black font-cyber text-black truncate">${u.username}</h4>
+                                    <p class="text-[10px] font-bold text-slate-600 truncate mt-0.5">${u.lastMessage || '-'}</p>
                                 </div>
-                                <p class="text-[10px] text-slate-400 truncate">${room.lastMessage}</p>
+                                <div class="text-right shrink-0">
+                                    ${unreadBadge}
+                                </div>
                             </div>
                         `;
                     }).join('');
+                } else {
+                    listEl.innerHTML = `<div class="p-6 text-center text-xs font-mono font-bold text-slate-600">Belum ada percakapan pengguna.</div>`;
                 }
             } catch(e) {}
         }
 
-        async function selectUserChat(email, name) {
-            currentSelectedUserEmail = email;
-            document.getElementById('activeUserTitle').innerText = name || 'User';
-            document.getElementById('activeUserEmail').innerText = email;
+        async function selectUserChat(userId, username) {
+            selectedUserId = userId;
+            selectedUsername = username;
 
-            document.getElementById('adminReplyInput').disabled = false;
-            document.getElementById('btnAdminSend').disabled = false;
-            document.getElementById('adminReplyInput').placeholder = `Balas pesan ke ${name}...`;
+            document.getElementById('activeUserTitle').innerText = username;
+            document.getElementById('activeUserSub').innerText = `ID Pengguna: ${userId}`;
+            document.getElementById('activeUserBadge').classList.remove('hidden');
 
-            const chatViewArea = document.getElementById('chatViewArea');
-            const roomSidebar = document.getElementById('roomSidebar');
-            const btnBack = document.getElementById('btnBackToRooms');
+            const formEl = document.getElementById('adminChatForm');
+            formEl.classList.remove('opacity-50', 'pointer-events-none');
 
-            chatViewArea.classList.remove('hidden');
-            if (window.innerWidth < 768) {
-                roomSidebar.classList.add('hidden');
-                btnBack.classList.remove('hidden');
+            loadUserMessages();
+            loadUserList();
+
+            if (!adminPollInterval) {
+                adminPollInterval = setInterval(() => {
+                    if (selectedUserId) loadUserMessages();
+                    loadUserList();
+                }, 3000);
             }
-
-            loadAdminChatMessages();
-            loadRoomList();
         }
 
-        function backToRoomList() {
-            document.getElementById('chatViewArea').classList.add('hidden');
-            document.getElementById('roomSidebar').classList.remove('hidden');
-            document.getElementById('btnBackToRooms').classList.add('hidden');
-        }
-
-        async function loadAdminChatMessages() {
-            if (!currentSelectedUserEmail) return;
-
+        async function loadUserMessages() {
+            if (!selectedUserId) return;
             try {
-                const res = await fetch(`/api/admin/chat-history?userEmail=${encodeURIComponent(currentSelectedUserEmail)}`);
+                const res = await fetch(`/api/bantuan/admin/messages/${selectedUserId}`);
                 const data = await res.json();
                 const container = document.getElementById('adminChatMessages');
 
                 if (data.status && data.messages) {
+                    if (data.messages.length === 0) {
+                        container.innerHTML = `<div class="text-center text-xs font-mono font-bold text-slate-600 my-4">Belum ada pesan dari pengguna ini.</div>`;
+                        return;
+                    }
+
                     container.innerHTML = data.messages.map(msg => {
-                        const isOwner = msg.sender === 'owner';
-                        const alignClass = isOwner ? 'justify-end' : 'justify-start';
-                        
-                        const bgClass = isOwner 
-                            ? 'bg-[#f95700] text-white rounded-br-none' 
-                            : 'bg-[#0a1628] border border-[#162a45] text-slate-200 rounded-bl-none';
+                        const isAdmin = msg.sender === 'admin' || msg.sender === 'owner';
+                        const alignClass = isAdmin ? 'justify-end' : 'justify-start';
+                        const bgClass = isAdmin 
+                            ? 'bg-neoYellow text-black font-bold rounded-br-none border-2 border-black shadow-[3px_3px_0px_#000]' 
+                            : 'bg-white text-black font-bold rounded-bl-none border-2 border-black shadow-[3px_3px_0px_#000]';
                         
                         const timeStr = new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                        const displayName = isOwner ? 'Owner CS' : (msg.senderName || 'User');
-                        const nameColor = isOwner ? 'text-amber-200' : 'text-[#00f3ff]';
+                        const displayName = isAdmin ? 'Admin / Owner' : selectedUsername;
 
                         return `
                             <div class="flex ${alignClass}">
-                                <div class="max-w-[80%] p-2.5 rounded-2xl text-xs space-y-1 ${bgClass}">
-                                    <div class="flex items-center justify-between gap-2 border-b border-white/10 pb-1">
-                                        <span class="font-bold font-cyber text-[10px] ${nameColor}">${displayName}</span>
-                                        <span class="text-[8px] opacity-75 font-mono">${timeStr}</span>
+                                <div class="max-w-[85%] sm:max-w-[70%] p-3 rounded-2xl text-xs space-y-1 ${bgClass}">
+                                    <div class="flex items-center justify-between gap-3 border-b border-black/20 pb-1">
+                                        <span class="font-black font-cyber text-[10px] text-black">
+                                            ${isAdmin ? '<i class="fa-solid fa-shield-halved"></i>' : '<i class="fa-solid fa-user"></i>'} ${displayName}
+                                        </span>
+                                        <span class="text-[9px] font-mono font-bold opacity-75">${timeStr}</span>
                                     </div>
-                                    <p class="leading-relaxed break-words pt-0.5">${msg.message}</p>
+                                    <p class="leading-relaxed break-words pt-1">${msg.message}</p>
                                 </div>
                             </div>
                         `;
@@ -175,30 +387,42 @@
 
         async function sendAdminReply(e) {
             e.preventDefault();
-            const input = document.getElementById('adminReplyInput');
-            const message = input.value.trim();
+            if (!selectedUserId) return;
 
-            if (!currentSelectedUserEmail || !message) return;
+            const input = document.getElementById('adminChatInput');
+            const message = input.value.trim();
+            if (!message) return;
 
             input.value = '';
 
             try {
-                await fetch('/api/bantuan/reply-owner', {
+                await fetch('/api/bantuan/admin/reply', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userEmail: currentSelectedUserEmail, message })
+                    body: JSON.stringify({ userId: selectedUserId, message })
                 });
-                loadAdminChatMessages();
-                loadRoomList();
-            } catch(e) {}
+                loadUserMessages();
+                loadUserList();
+            } catch(e) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'GAGAL',
+                    text: 'Gagal mengirim balasan admin.',
+                    customClass: { popup: 'cyber-swal' }
+                });
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            loadRoomList();
-            setInterval(() => {
-                loadRoomList();
-                if (currentSelectedUserEmail) loadAdminChatMessages();
-            }, 3000);
+            loadUserList();
+            fetch('/api/user-status')
+                .then(r => r.json())
+                .then(d => {
+                    const authLabel = document.getElementById('nav-auth-label');
+                    if (d.loggedIn && d.user) {
+                        if (authLabel) authLabel.innerText = 'Profil';
+                    }
+                });
         });
     </script>
 </body>

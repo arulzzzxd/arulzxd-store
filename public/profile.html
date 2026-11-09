@@ -1,147 +1,194 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Profil Saya - ArulzXD Store</title>
     <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        cyber: ['Orbitron', 'sans-serif'],
+                        cyber: ['Space Grotesk', 'sans-serif'],
                     },
                     colors: {
-                        cyberCyan: '#00f3ff',
-                        cyberDark: '#050b14',
-                        cyberCard: '#0a1628',
-                        cyberBorder: '#162a45'
-                    },
-                    boxShadow: {
-                        glowCyan: '0 0 15px rgba(0, 243, 255, 0.35)',
-                        glowCyanSm: '0 0 8px rgba(0, 243, 255, 0.25)',
+                        neoYellow: '#FFDE59',
+                        neoCyan: '#00E5FF',
+                        neoPink: '#FF79C6',
+                        neoGreen: '#00E676',
+                        neoBg: '#F4F0EA',
+                        neoCard: '#FFFFFF'
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #050b14; color: #e2e8f0; overflow-x: hidden; }
-        .bg-cyber-grid {
-            background-image: linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
+        body { background-color: #F4F0EA; color: #000000; overflow-x: hidden; }
+        
+        .neo-box {
+            background-color: #FFFFFF;
+            border: 3px solid #000000;
+            box-shadow: 5px 5px 0px #000000;
         }
+
+        .neo-btn {
+            border: 3px solid #000000;
+            box-shadow: 4px 4px 0px #000000;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .neo-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+        .neo-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+
         .swal2-popup.cyber-swal {
-            background: #0a1628 !important;
-            border: 1px solid #162a45 !important;
-            border-radius: 16px !important;
-            color: #e2e8f0 !important;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.25) !important;
+            background: #FFFFFF !important;
+            border: 3px solid #000000 !important;
+            border-radius: 20px !important;
+            color: #000000 !important;
+            box-shadow: 6px 6px 0px #000000 !important;
             font-family: 'Plus Jakarta Sans', sans-serif !important;
         }
-        .bottom-nav-container {
+
+        /* FLUID CURVED NOTCH BOTTOM NAVIGATION BAR */
+        .bottom-nav-fixed {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             width: 92%;
-            max-width: 480px;
-            background: rgba(10, 22, 40, 0.92);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            border-radius: 28px;
+            max-width: 440px;
+            height: 64px;
+            z-index: 9999;
+        }
+
+        .bottom-nav-bg {
+            position: absolute;
+            inset: 0;
+            background: #FFFFFF;
+            border: 3px solid #000000;
+            border-radius: 32px;
+            box-shadow: 5px 5px 0px #000000;
+        }
+
+        .nav-items-wrapper {
+            position: relative;
+            z-index: 10;
             display: flex;
+            height: 100%;
+            width: 100%;
             justify-content: space-around;
             align-items: center;
-            padding: 12px 10px;
-            z-index: 9999;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 243, 255, 0.2);
         }
-        .nav-item {
+
+        .nav-item-btn {
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            color: #64748b;
+            justify-content: center;
+            width: 60px;
+            height: 100%;
+            color: #000000;
             text-decoration: none;
-            font-size: 11px;
-            font-weight: 700;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            padding: 2px 12px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .nav-item i {
-            font-size: 20px;
-            transition: transform 0.2s ease;
+
+        .nav-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: transparent;
         }
-        .nav-item:hover, .nav-item.active {
-            color: #00f3ff;
+
+        .nav-item-btn i { font-size: 18px; transition: all 0.3s ease; }
+        .nav-item-btn span {
+            font-size: 10px;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            position: absolute;
+            bottom: 6px;
+            transition: all 0.3s ease;
         }
-        .nav-item.active i {
+
+        .nav-item-btn.active .nav-icon-box {
+            transform: translateY(-22px);
+            background-color: #FFDE59;
+            border: 3px solid #000000;
+            box-shadow: 3px 3px 0px #000000;
+        }
+
+        .nav-item-btn.active i { font-size: 20px; }
+        .nav-item-btn.active span {
+            color: #000000;
+            font-weight: 900;
             transform: translateY(-2px);
-            filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.8));
         }
-        .nav-item.active::after {
+
+        .nav-item-btn.active::after {
             content: '';
             position: absolute;
-            bottom: -8px;
-            width: 6px;
-            height: 6px;
-            background-color: #00f3ff;
+            bottom: 4px;
+            width: 5px;
+            height: 5px;
+            background-color: #000000;
             border-radius: 50%;
-            box-shadow: 0 0 10px #00f3ff;
         }
-
     </style>
 </head>
-<body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen pb-32">
+<body class="font-sans antialiased text-black min-h-screen pb-32">
 
-<!-- FLOATING LIVE CHAT WIDGET POP-UP CYBERPUNK -->
+<!-- FLOATING LIVE CHAT WIDGET POP-UP -->
 <div id="liveChatWidgetContainer">
-    <!-- BOX WINDOW CHAT POP-UP CYBER STYLE -->
-    <div id="floatingChatWindow" class="fixed bottom-[148px] right-4 sm:right-6 z-[99999] hidden w-[calc(100vw-2rem)] max-w-[360px] h-[480px] bg-[#0a1628]/95 backdrop-blur-xl border border-[#00f3ff]/40 rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(0,243,255,0.2)] overflow-hidden flex flex-col transition-all duration-300">
+    <div id="floatingChatWindow" class="fixed bottom-[100px] right-4 sm:right-6 z-[99999] hidden w-[calc(100vw-2rem)] max-w-[360px] h-[480px] bg-white border-3 border-black rounded-2xl shadow-[6px_6px_0px_#000] overflow-hidden flex flex-col transition-all duration-300">
         
         <!-- HEADER WINDOW -->
-        <div class="bg-[#050b14]/90 p-3.5 border-b border-[#162a45] flex items-center justify-between">
+        <div class="bg-neoYellow p-3.5 border-b-3 border-black flex items-center justify-between">
             <div class="flex items-center gap-2.5">
                 <div class="relative">
-                    <div class="w-9 h-9 rounded-full bg-[#00f3ff] text-[#050b14] flex items-center justify-center font-bold text-sm shadow-[0_0_10px_rgba(0,243,255,0.5)]">
+                    <div class="w-9 h-9 rounded-full bg-white text-black border-2 border-black flex items-center justify-center font-bold text-sm shadow-[2px_2px_0px_#000]">
                         <i class="fa-solid fa-headset"></i>
                     </div>
-                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#0a1628] rounded-full"></span>
+                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-neoGreen border border-black rounded-full"></span>
                 </div>
                 <div>
-                    <h3 class="text-xs font-bold font-cyber text-white">Customer Support</h3>
-                    <p class="text-[9px] text-emerald-400 font-mono font-semibold flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online 24/7
+                    <h3 class="text-xs font-black font-cyber text-black">Customer Support</h3>
+                    <p class="text-[9px] text-black font-mono font-bold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-neoGreen animate-pulse"></span> Online 24/7
                     </p>
                 </div>
             </div>
-            <button onclick="toggleChatWidget()" class="text-slate-400 hover:text-white text-base transition p-1">
+            <button onclick="toggleChatWidget()" class="text-black font-black text-base transition p-1">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
         <!-- AREA CHAT MESSAGES -->
-        <div id="widgetChatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 bg-[#050b14]/80 scroll-smooth">
-            <div class="text-center text-[11px] text-slate-500 font-mono my-2 animate-pulse">Memuat pesan...</div>
+        <div id="widgetChatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 bg-neoBg scroll-smooth">
+            <div class="text-center text-[11px] text-slate-600 font-mono my-2 animate-pulse font-bold">Memuat pesan...</div>
         </div>
 
         <!-- FORM KIRIM PESAN -->
-        <form id="widgetChatForm" onsubmit="sendWidgetMessage(event)" class="p-2.5 bg-[#0a1628] border-t border-[#162a45] flex items-center gap-2">
+        <form id="widgetChatForm" onsubmit="sendWidgetMessage(event)" class="p-2.5 bg-white border-t-3 border-black flex items-center gap-2">
             <input type="text" id="widgetChatInput" required placeholder="Tuliskan pesan Anda..." 
-                   class="flex-1 bg-[#050b14] border border-[#162a45] rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#00f3ff] transition font-sans">
-            <button type="submit" class="w-9 h-9 rounded-xl bg-[#00f3ff] hover:bg-cyan-300 text-[#050b14] flex items-center justify-center transition shadow-[0_0_10px_rgba(0,243,255,0.4)] shrink-0 font-bold">
+                   class="flex-1 bg-neoBg border-2 border-black rounded-xl px-3.5 py-2 text-xs text-black font-bold placeholder-slate-500 focus:outline-none">
+            <button type="submit" class="neo-btn w-9 h-9 rounded-xl bg-neoYellow text-black flex items-center justify-center shrink-0 font-black">
                 <i class="fa-solid fa-paper-plane text-xs"></i>
             </button>
         </form>
@@ -150,12 +197,12 @@
 </div>
 
     <!-- TOP NAVBAR -->
-    <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
+    <nav class="sticky top-0 z-40 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
         <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)]">
-                Arulz<span class="text-white">Store</span>
+            <a href="/store" class="text-2xl font-black font-cyber tracking-tight text-black">
+                Arulz<span class="bg-black text-white px-2 py-0.5 ml-1 rounded-md">Store</span>
             </a>
-            <a href="/auth/logout" class="text-xs bg-red-600/20 border-2 border-red-500/60 text-red-400 hover:bg-red-600 hover:text-white font-cyber font-extrabold px-4 py-2 rounded-xl transition shadow-[0_0_12px_rgba(239,68,68,0.4)] flex items-center gap-2 uppercase tracking-wider">
+            <a href="/auth/logout" class="neo-btn text-xs bg-neoPink text-black font-cyber font-black px-4 py-2 rounded-xl flex items-center gap-2 uppercase tracking-wider">
                 <i class="fa-solid fa-right-from-bracket text-sm"></i> Keluar
             </a>
         </div>
@@ -164,10 +211,10 @@
     <div class="max-w-3xl mx-auto px-4 py-6 space-y-6">
 
         <!-- PROFILE CARD -->
-        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl text-center space-y-4">
+        <div class="neo-box rounded-2xl p-6 bg-white text-center space-y-4">
             <div class="relative w-24 h-24 mx-auto">
-                <img id="profileAvatar" src="https://arulz-xd.my.id/files/X1F0Cn.png" class="w-24 h-24 rounded-full object-cover border-2 border-cyberCyan shadow-glowCyan">
-                <label for="avatarInput" title="Ganti Avatar" class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-cyberCyan text-cyberDark flex items-center justify-center cursor-pointer shadow hover:scale-110 transition">
+                <img id="profileAvatar" src="https://arulz-xd.my.id/files/X1F0Cn.png" class="w-24 h-24 rounded-full object-cover border-3 border-black shadow-[4px_4px_0px_#000]">
+                <label for="avatarInput" title="Ganti Avatar" class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-neoYellow border-2 border-black text-black flex items-center justify-center cursor-pointer shadow-[2px_2px_0px_#000] hover:scale-110 transition">
                     <i class="fa-solid fa-camera text-xs"></i>
                 </label>
                 <input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="uploadAvatar(this)">
@@ -175,24 +222,24 @@
 
             <div class="space-y-1">
                 <div class="flex items-center justify-center gap-1.5">
-                    <h2 id="profileUsername" class="text-xl font-bold font-cyber text-white">Loading...</h2>
-                    <button onclick="editUsernameModal()" title="Edit Username" class="text-cyberCyan hover:text-cyan-300 text-xs ml-1">
+                    <h2 id="profileUsername" class="text-xl font-black font-cyber text-black">Loading...</h2>
+                    <button onclick="editUsernameModal()" title="Edit Username" class="text-black hover:text-slate-700 text-xs ml-1">
                         <i class="fa-solid fa-pen-to-square"></i>
                     </button>
                 </div>
-                <p id="profileEmail" class="text-xs text-slate-400 font-mono mt-0.5">-</p>
-                <p id="profileJoined" class="text-[11px] text-cyberCyan font-semibold font-mono pt-1">Terdaftar sejak: -</p>
+                <p id="profileEmail" class="text-xs text-slate-600 font-mono font-bold mt-0.5">-</p>
+                <p id="profileJoined" class="text-[11px] font-bold font-mono text-black pt-1">Terdaftar sejak: -</p>
             </div>
         </div>
 
         <!-- WIDGET SALDO TERPISAH -->
-        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl relative overflow-hidden">
+        <div class="neo-box rounded-2xl p-6 bg-neoCyan relative overflow-hidden">
             <div class="flex items-center justify-between">
                 <div>
-                    <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-widest block">Saldo Akun Anda</span>
-                    <h3 id="profileSaldo" class="text-2xl sm:text-3xl font-black font-cyber text-cyberCyan drop-shadow-[0_0_10px_rgba(0,243,255,0.6)] mt-0.5">Rp 0</h3>
+                    <span class="text-[10px] font-black font-cyber uppercase tracking-wider block text-black">Saldo Akun Anda</span>
+                    <h3 id="profileSaldo" class="text-2xl sm:text-3xl font-black font-cyber text-black mt-0.5">Rp 0</h3>
                 </div>
-                <a href="/deposit" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-glowCyan flex items-center gap-1.5 uppercase tracking-wider">
+                <a href="/deposit" class="neo-btn bg-neoYellow text-black font-cyber font-black px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 uppercase tracking-wider">
                     <i class="fa-solid fa-plus-circle"></i> Top Up
                 </a>
             </div>
@@ -200,128 +247,116 @@
 
         <!-- WIDGET STATISTIK TOTAL DEPOSIT & TOTAL BELANJA -->
         <div class="grid grid-cols-2 gap-4">
-            <div class="bg-cyberCard p-4 rounded-2xl border border-cyberBorder shadow-lg relative overflow-hidden">
+            <div class="neo-box p-4 rounded-2xl bg-neoGreen relative overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-wider">Total Deposit</span>
-                    <i class="fa-solid fa-circle-arrow-down text-emerald-400 text-sm"></i>
+                    <span class="text-[10px] font-black font-cyber uppercase tracking-wider">Total Deposit</span>
+                    <i class="fa-solid fa-circle-arrow-down text-black text-sm"></i>
                 </div>
-                <h4 id="profileTotalDeposit" class="text-lg font-black font-cyber text-emerald-400">Rp 0</h4>
-                <p class="text-[9px] text-slate-500 font-mono mt-1">Akumulasi Depo Berhasil</p>
+                <h4 id="profileTotalDeposit" class="text-lg font-black font-cyber text-black">Rp 0</h4>
+                <p class="text-[9px] text-slate-800 font-mono font-bold mt-1">Akumulasi Depo Berhasil</p>
             </div>
 
-            <div class="bg-cyberCard p-4 rounded-2xl border border-cyberBorder shadow-lg relative overflow-hidden">
+            <div class="neo-box p-4 rounded-2xl bg-neoPink relative overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-wider">Total Belanja</span>
-                    <i class="fa-solid fa-bag-shopping text-purple-400 text-sm"></i>
+                    <span class="text-[10px] font-black font-cyber uppercase tracking-wider">Total Belanja</span>
+                    <i class="fa-solid fa-bag-shopping text-black text-sm"></i>
                 </div>
-                <h4 id="profileTotalBelanja" class="text-lg font-black font-cyber text-purple-400">Rp 0</h4>
-                <p class="text-[9px] text-slate-500 font-mono mt-1">Akumulasi Belanja Produk</p>
+                <h4 id="profileTotalBelanja" class="text-lg font-black font-cyber text-black">Rp 0</h4>
+                <p class="text-[9px] text-slate-800 font-mono font-bold mt-1">Akumulasi Belanja Produk</p>
             </div>
         </div>
 
         <!-- WIDGET INFORMASI AKUN -->
-        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-5 shadow-xl space-y-4">
-            <div class="flex items-center gap-2 pb-2 border-b border-cyberBorder/60">
-                <i class="fa-regular fa-user text-cyberCyan text-base"></i>
-                <h3 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider">Informasi Akun</h3>
+        <div class="neo-box rounded-2xl p-5 bg-white space-y-4">
+            <div class="flex items-center gap-2 pb-2 border-b-3 border-black">
+                <i class="fa-regular fa-user text-black text-base"></i>
+                <h3 class="text-xs font-black font-cyber text-black uppercase tracking-wider">Informasi Akun</h3>
             </div>
 
-            <div class="space-y-3.5 text-xs">
-                <!-- Nama -->
+            <div class="space-y-3.5 text-xs font-bold">
                 <div class="flex items-center justify-between">
-                    <span class="text-slate-400 font-medium">Nama</span>
-                    <span id="infoNama" class="font-semibold text-white">-</span>
+                    <span class="text-slate-600">Nama</span>
+                    <span id="infoNama" class="font-black text-black">-</span>
                 </div>
-                <div class="border-b border-cyberBorder/30"></div>
+                <div class="border-b-2 border-black/20"></div>
 
-                <!-- Email & Tombol Show/Hide + Verified Blue Tick TikTok Style -->
                 <div class="flex items-center justify-between">
-                    <span class="text-slate-400 font-medium">Email</span>
+                    <span class="text-slate-600">Email</span>
                     <div class="text-right space-y-1">
                         <div class="flex items-center justify-end gap-2">
-                            <span id="infoEmail" class="font-mono text-slate-200">-</span>
-                            <button onclick="toggleEmailVisibility()" title="Tampilkan/Sembunyikan Email" class="text-slate-400 hover:text-cyberCyan transition text-xs">
+                            <span id="infoEmail" class="font-mono text-black">-</span>
+                            <button onclick="toggleEmailVisibility()" title="Tampilkan/Sembunyikan Email" class="text-black transition text-xs">
                                 <i id="toggleEmailIcon" class="fa-solid fa-eye-slash"></i>
                             </button>
                         </div>
 
-                        <!-- BADGE VERIFIED CENTANG BIRU TIKTOK STYLE -->
                         <div id="emailVerifiedBadge" class="hidden flex justify-end">
-                            <span class="inline-flex items-center gap-1.5 text-[11px] bg-[#20d5ec]/10 text-[#20d5ec] border border-[#20d5ec]/30 px-2.5 py-0.5 rounded-full font-bold">
-                                <svg class="w-3.5 h-3.5 text-[#20d5ec] fill-current" viewBox="0 0 24 24">
-                                    <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.79-4-4-4-.495 0-.965.084-1.4.238C14.55 2.475 13.18 1.6 11.6 1.6c-1.58 0-2.95.875-3.6 2.148-.435-.154-.905-.238-1.4-.238-2.21 0-4 1.79-4 4 0 .495.084.965.238 1.4C1.575 9.55.7 10.92.7 12.5c0 1.58.875 2.95 2.148 3.6-.154.435-.238.905-.238 1.4 0 2.21 1.79 4 4 4 .495 0 .965-.084 1.4-.238.65 1.273 2.02 2.148 3.6 2.148 1.58 0 2.95-.875 3.6-2.148.435.154.905.238 1.4.238 2.21 0 4-1.79 4-4 0-.495-.084-.965-.238-1.4 1.273-.65 2.148-2.02 2.148-3.6zm-12.8 4.2l-4.2-4.2 1.4-1.4 2.8 2.8 6.8-6.8 1.4 1.4-8.2 8.2z"/>
-                                </svg>
-                                Terverifikasi
+                            <span class="inline-flex items-center gap-1.5 text-[11px] bg-neoGreen text-black border border-black px-2.5 py-0.5 rounded-full font-black">
+                                <i class="fa-solid fa-circle-check"></i> Terverifikasi
                             </span>
                         </div>
                     </div>
                 </div>
-                <div class="border-b border-cyberBorder/30"></div>
+                <div class="border-b-2 border-black/20"></div>
 
-                <!-- Metode Login -->
                 <div class="flex items-center justify-between">
-                    <span class="text-slate-400 font-medium">Metode Login</span>
-                    <span id="infoLoginMethod" class="font-semibold text-slate-200">Google OAuth</span>
+                    <span class="text-slate-600">Metode Login</span>
+                    <span id="infoLoginMethod" class="font-black text-black">Google OAuth</span>
                 </div>
-                <div class="border-b border-cyberBorder/30"></div>
+                <div class="border-b-2 border-black/20"></div>
 
-                <!-- Status Akun -->
                 <div class="flex items-center justify-between">
-                    <span class="text-slate-400 font-medium">Status Akun</span>
-                    <span id="infoStatusAkun" class="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-md uppercase tracking-wider">
+                    <span class="text-slate-600">Status Akun</span>
+                    <span id="infoStatusAkun" class="text-[10px] font-black bg-neoGreen text-black border border-black px-2.5 py-0.5 rounded-md uppercase tracking-wider">
                         AKTIF
                     </span>
                 </div>
             </div>
         </div>
 
-        <!-- WIDGET UBAH / SETEL KATA SANDI (DIBAWAH INFORMASI AKUN) -->
-        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-5 shadow-xl space-y-4">
-            <div class="flex items-center gap-2 pb-2 border-b border-cyberBorder/60">
-                <i class="fa-solid fa-key text-cyberCyan text-base"></i>
-                <h3 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider">Ubah Kata Sandi</h3>
+        <!-- WIDGET UBAH / SETEL KATA SANDI -->
+        <div class="neo-box rounded-2xl p-5 bg-white space-y-4">
+            <div class="flex items-center gap-2 pb-2 border-b-3 border-black">
+                <i class="fa-solid fa-key text-black text-base"></i>
+                <h3 class="text-xs font-black font-cyber text-black uppercase tracking-wider">Ubah Kata Sandi</h3>
             </div>
 
-            <!-- BANNER INFORMASI DARI OAUTH/GOOGLE LOGGED IN -->
-            <div id="noPasswordAlert" class="hidden bg-amber-500/10 border border-amber-500/30 p-3.5 rounded-xl flex items-start gap-3">
-                <div class="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+            <div id="noPasswordAlert" class="hidden bg-neoYellow border-2 border-black p-3.5 rounded-xl flex items-start gap-3">
+                <div class="w-7 h-7 rounded-full bg-white text-black border border-black flex items-center justify-center shrink-0 mt-0.5 font-black">
                     <i class="fa-solid fa-circle-info text-sm"></i>
                 </div>
-                <p class="text-xs text-amber-200/90 leading-relaxed">
-                    Anda terhubung menggunakan <strong id="oauthProviderName" class="text-amber-400">Google</strong> dan belum memiliki kata sandi lokal. Setel kata sandi di bawah untuk mengaktifkan login email.
+                <p class="text-xs font-bold text-black leading-relaxed">
+                    Anda terhubung menggunakan <strong id="oauthProviderName">Google</strong> dan belum memiliki kata sandi lokal. Setel kata sandi di bawah untuk mengaktifkan login email.
                 </p>
             </div>
 
             <form id="changePasswordForm" onsubmit="submitChangePassword(event)" class="space-y-3.5">
-                <!-- FIELD KATA SANDI SAAT INI -->
                 <div id="currentPasswordContainer" class="hidden">
-                    <label class="block text-[11px] font-bold font-cyber text-slate-300 uppercase tracking-wider mb-1">
+                    <label class="block text-[11px] font-black font-cyber text-black uppercase tracking-wider mb-1">
                         Kata Sandi Saat Ini
                     </label>
                     <input type="password" id="currentPasswordInput" placeholder="Masukkan kata sandi saat ini..." 
-                           class="w-full px-3.5 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-medium transition">
+                           class="w-full px-3.5 py-2.5 text-xs bg-white border-2 border-black rounded-xl text-black font-bold focus:outline-none">
                 </div>
 
-                <!-- FIELD KATA SANDI BARU -->
                 <div>
-                    <label class="block text-[11px] font-bold font-cyber text-slate-300 uppercase tracking-wider mb-1">
+                    <label class="block text-[11px] font-black font-cyber text-black uppercase tracking-wider mb-1">
                         Kata Sandi Baru
                     </label>
                     <input type="password" id="newPasswordInput" required placeholder="Min. 8 karakter" 
-                           class="w-full px-3.5 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-medium transition">
+                           class="w-full px-3.5 py-2.5 text-xs bg-white border-2 border-black rounded-xl text-black font-bold focus:outline-none">
                 </div>
 
-                <!-- FIELD KONFIRMASI KATA SANDI BARU -->
                 <div>
-                    <label class="block text-[11px] font-bold font-cyber text-slate-300 uppercase tracking-wider mb-1">
+                    <label class="block text-[11px] font-black font-cyber text-black uppercase tracking-wider mb-1">
                         Konfirmasi Kata Sandi Baru
                     </label>
                     <input type="password" id="confirmPasswordInput" required placeholder="Ulangi kata sandi baru..." 
-                           class="w-full px-3.5 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-medium transition">
+                           class="w-full px-3.5 py-2.5 text-xs bg-white border-2 border-black rounded-xl text-black font-bold focus:outline-none">
                 </div>
 
                 <div class="flex justify-end pt-1">
-                    <button type="submit" id="btnSubmitPassword" class="bg-blue-600 hover:bg-blue-500 text-white font-cyber font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-lg flex items-center gap-2 uppercase tracking-wider">
+                    <button type="submit" id="btnSubmitPassword" class="neo-btn bg-neoCyan text-black font-cyber font-black px-5 py-2.5 rounded-xl text-xs flex items-center gap-2 uppercase tracking-wider">
                         <i class="fa-solid fa-key"></i> <span id="btnSubmitPasswordText">Setel Kata Sandi</span>
                     </button>
                 </div>
@@ -329,47 +364,46 @@
         </div>
 
         <!-- WIDGET REFERAL UNDANGAN -->
-        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-6 shadow-xl space-y-4">
+        <div class="neo-box rounded-2xl p-6 bg-white space-y-4">
             <div class="flex items-center justify-between">
-                <label class="block text-xs font-bold font-cyber text-slate-300 uppercase tracking-wider">
-                    <i class="fa-solid fa-gift text-cyberCyan"></i> Undang Teman
+                <label class="block text-xs font-black font-cyber text-black uppercase tracking-wider">
+                    <i class="fa-solid fa-gift"></i> Undang Teman
                 </label>
-                <span class="text-[10px] text-emerald-400 font-mono font-bold">+Rp 1.000 / Undangan</span>
+                <span class="text-[10px] bg-neoGreen border border-black font-mono font-black px-2 py-0.5 rounded">+Rp 1.000 / Undangan</span>
             </div>
-            <p class="text-xs text-slate-400 leading-relaxed">
-                Bagikan link undangan Anda! User yang mendaftar via link Anda otomatis mendapatkan saldo <strong class="text-cyberCyan">Rp 500</strong>, dan Anda mendapatkan bonus <strong class="text-emerald-400">Rp 1.000</strong>.
+            <p class="text-xs font-bold text-slate-700 leading-relaxed">
+                Bagikan link undangan Anda! User yang mendaftar via link Anda otomatis mendapatkan saldo <strong>Rp 500</strong>, dan Anda mendapatkan bonus <strong>Rp 1.000</strong>.
             </p>
 
             <div class="flex items-center gap-2 pt-1">
                 <div class="relative flex-1">
                     <input type="text" id="referralLinkInput" readonly value="Memuat link..." 
-                           class="w-full pl-3 pr-3 py-2.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-200 font-mono focus:outline-none select-all">
+                           class="w-full px-3 py-2.5 text-xs bg-neoBg border-2 border-black rounded-xl text-black font-mono font-bold focus:outline-none select-all">
                 </div>
-                <button onclick="copyReferralLink()" class="bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-extrabold px-4 py-2.5 rounded-xl text-xs transition shadow-glowCyan flex items-center gap-1.5 uppercase tracking-wider">
+                <button onclick="copyReferralLink()" class="neo-btn bg-neoYellow text-black font-cyber font-black px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 uppercase tracking-wider">
                     <i class="fa-solid fa-copy"></i> Salin Link
                 </button>
             </div>
 
-            <!-- TABEL USER YANG DIUNDANG -->
-            <div class="pt-4 border-t border-cyberBorder/60 space-y-2.5">
+            <div class="pt-4 border-t-3 border-black space-y-2.5">
                 <div class="flex items-center justify-between">
-                    <h4 class="text-xs font-bold font-cyber text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-users text-cyberCyan"></i> Daftar Teman Diundang (<span id="invitedCount">0</span>)
+                    <h4 class="text-xs font-black font-cyber text-black uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-users"></i> Daftar Teman Diundang (<span id="invitedCount">0</span>)
                     </h4>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-cyberBorder bg-cyberDark/60">
+                <div class="overflow-x-auto rounded-xl border-2 border-black bg-white">
                     <table class="w-full text-left border-collapse text-[11px]">
                         <thead>
-                            <tr class="bg-cyberCard border-b border-cyberBorder text-slate-400 font-cyber">
+                            <tr class="bg-neoYellow border-b-2 border-black font-cyber font-black">
                                 <th class="p-2.5">Username</th>
                                 <th class="p-2.5">Email</th>
                                 <th class="p-2.5 text-right">Tgl Bergabung</th>
                             </tr>
                         </thead>
-                        <tbody id="invitedUsersTableBody" class="divide-y divide-cyberBorder/40 font-mono text-slate-300">
+                        <tbody id="invitedUsersTableBody" class="divide-y-2 divide-black font-mono font-bold text-black">
                             <tr>
-                                <td colspan="3" class="p-4 text-center text-slate-500 italic">Belum ada teman yang diundang.</td>
+                                <td colspan="3" class="p-4 text-center text-slate-600 italic">Belum ada teman yang diundang.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -379,44 +413,48 @@
 
     </div>
 
-<nav class="bottom-nav-container">
-    <!-- Menu 1: Dashboard -->
-    <a href="/dashboard" class="nav-item" id="nav-dashboard">
-        <i class="fa-solid fa-house"></i>
-        <span>Dashboard</span>
-    </a>
+    <!-- CURVED ANIMATED BOTTOM NAV BAR -->
+    <div class="bottom-nav-fixed">
+        <div class="bottom-nav-bg"></div>
+        <div class="nav-items-wrapper">
+            <a href="/dashboard" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span>Home</span>
+            </a>
+            <a href="/store" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <span>Toko</span>
+            </a>
+            <a href="/deposit" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <span>Deposit</span>
+            </a>
+            <a href="/riwayat" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <span>Riwayat</span>
+            </a>
+            <a href="/profile" class="nav-item-btn active">
+                <div class="nav-icon-box">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+                <span id="nav-auth-label">Profil</span>
+            </a>
+        </div>
+    </div>
 
-    <!-- Menu 2: Toko -->
-    <a href="/store" class="nav-item" id="nav-toko">
-        <i class="fa-solid fa-bag-shopping"></i>
-        <span>Toko</span>
-    </a>
-
-    <!-- Menu 3: Deposit -->
-    <a href="/deposit" class="nav-item" id="nav-deposit">
-        <i class="fa-solid fa-wallet"></i>
-        <span>Deposit</span>
-    </a>
-
-    <!-- Menu 4: Riwayat -->
-    <a href="/riwayat" class="nav-item" id="nav-riwayat">
-        <i class="fa-solid fa-clock-rotate-left"></i>
-        <span>Riwayat</span>
-    </a>
-
-    <!-- Menu 5: Profil (AKTIF) -->
-    <a href="/profile" class="nav-item active" id="nav-auth">
-        <i class="fa-regular fa-user"></i>
-        <span id="nav-auth-label">Profil</span>
-    </a>
-    
-    <!-- Tombol Floating Live Chat Pop-Up -->
-    <button id="floatingChatToggleBtn" onclick="toggleChatWidget()" title="Bantuan & Live Chat" class="fixed bottom-24 right-5 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-[#00f3ff] text-[#050b14] shadow-[0_0_20px_rgba(0,243,255,0.6)] hover:scale-110 transition-transform duration-200">
+    <!-- FLOATING LIVE CHAT BUTTON -->
+    <button id="floatingChatToggleBtn" onclick="toggleChatWidget()" title="Bantuan & Live Chat" class="fixed bottom-24 right-5 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-neoYellow border-3 border-black text-black shadow-[4px_4px_0px_#000] hover:scale-110 transition-transform duration-200 font-black">
         <i class="fa-solid fa-comment-dots text-xl"></i>
-        <!-- Badge Indikator Status Online -->
-        <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-950 rounded-full"></span>
+        <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-neoGreen border-2 border-black rounded-full"></span>
     </button>
-</nav>
 
     <script>
         let fullEmail = '';
@@ -424,11 +462,7 @@
         let userHasPassword = false;
 
         function formatRupiah(angka) {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(angka || 0);
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
         }
 
         function maskEmail(email) {
@@ -455,7 +489,6 @@
             try {
                 const res = await fetch('/api/user-status');
                 const data = await res.json();
-                const authBtn = document.getElementById('nav-auth');
                 const authLabel = document.getElementById('nav-auth-label');
 
                 if (data.loggedIn && data.user) {
@@ -463,27 +496,19 @@
                     fullEmail = data.user.email || 'user@gmail.com';
                     userHasPassword = data.user.hasPassword || false;
 
-                    // Update Profile Card Atas
                     document.getElementById('profileUsername').innerText = usernameVal;
                     document.getElementById('profileEmail').innerText = maskEmail(fullEmail);
 
-                    // Update Widget Informasi Akun
                     document.getElementById('infoNama').innerText = usernameVal;
                     document.getElementById('infoEmail').innerText = maskEmail(fullEmail);
                     
                     const providerStr = data.user.provider ? data.user.provider.toUpperCase() : 'LOCAL';
                     document.getElementById('infoLoginMethod').innerText = providerStr === 'LOCAL' ? 'Email & Password' : `${providerStr} OAuth`;
 
-                    // STATUS BADGE EMAIL VERIFIED
                     const isVerified = data.user.isEmailVerified ?? data.user.isVerified ?? true;
                     const badgeElem = document.getElementById('emailVerifiedBadge');
-                    if (isVerified) {
-                        badgeElem.classList.remove('hidden');
-                    } else {
-                        badgeElem.classList.add('hidden');
-                    }
+                    if (isVerified) badgeElem.classList.remove('hidden');
 
-                    // ATUR TAMPILAN FITUR KATA SANDI
                     const noPasswordAlert = document.getElementById('noPasswordAlert');
                     const currentPasswordContainer = document.getElementById('currentPasswordContainer');
                     const btnSubmitPasswordText = document.getElementById('btnSubmitPasswordText');
@@ -520,7 +545,6 @@
                     }
 
                     if (data.user.avatar) document.getElementById('profileAvatar').src = data.user.avatar;
-                    if (authBtn) authBtn.href = '/profile';
                     if (authLabel) authLabel.innerText = 'Profil';
 
                     renderInvitedUsers(data.user.invitedUsers || []);
@@ -532,72 +556,41 @@
 
         async function submitChangePassword(e) {
             e.preventDefault();
-
             const currentPassword = document.getElementById('currentPasswordInput').value;
             const newPassword = document.getElementById('newPasswordInput').value;
             const confirmPassword = document.getElementById('confirmPasswordInput').value;
 
             if (newPassword.length < 8) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'PERINGATAN',
-                    text: 'Kata sandi baru minimal 8 karakter!',
-                    customClass: { popup: 'cyber-swal' }
-                });
+                Swal.fire({ icon: 'warning', title: 'PERINGATAN', text: 'Kata sandi baru minimal 8 karakter!', customClass: { popup: 'cyber-swal' } });
                 return;
             }
 
             if (newPassword !== confirmPassword) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'PERINGATAN',
-                    text: 'Konfirmasi kata sandi tidak cocok!',
-                    customClass: { popup: 'cyber-swal' }
-                });
+                Swal.fire({ icon: 'warning', title: 'PERINGATAN', text: 'Konfirmasi kata sandi tidak cocok!', customClass: { popup: 'cyber-swal' } });
                 return;
             }
 
-            Swal.fire({
-                title: 'MEMPROSES...',
-                text: 'Memperbarui kata sandi Anda',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); },
-                customClass: { popup: 'cyber-swal' }
-            });
+            Swal.fire({ title: 'MEMPROSES...', text: 'Memperbarui kata sandi Anda', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }, customClass: { popup: 'cyber-swal' } });
 
             try {
                 const res = await fetch('/api/user/change-password', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        currentPassword,
-                        newPassword,
-                        confirmPassword
-                    })
+                    body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
                 });
 
                 const result = await res.json();
                 Swal.close();
 
                 if (result.status) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'BERHASIL',
-                        text: result.message,
-                        customClass: { popup: 'cyber-swal' }
-                    });
+                    Swal.fire({ icon: 'success', title: 'BERHASIL', text: result.message, customClass: { popup: 'cyber-swal' } });
                     document.getElementById('changePasswordForm').reset();
                     loadUserProfile();
                 } else {
                     throw new Error(result.message || 'Gagal mengubah kata sandi');
                 }
             } catch(err) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'GAGAL',
-                    text: err.message,
-                    customClass: { popup: 'cyber-swal' }
-                });
+                Swal.fire({ icon: 'error', title: 'GAGAL', text: err.message, customClass: { popup: 'cyber-swal' } });
             }
         }
 
@@ -606,17 +599,17 @@
             document.getElementById('invitedCount').innerText = users.length;
 
             if (!users || users.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-500 italic">Belum ada teman yang diundang.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-600 italic">Belum ada teman yang diundang.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = users.map(u => {
                 const joined = u.createdAt ? new Date(u.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
                 return `
-                    <tr class="hover:bg-cyberCard/80 transition">
-                        <td class="p-2.5 font-bold text-slate-200">${u.username}</td>
-                        <td class="p-2.5 text-slate-400">${maskEmail(u.email)}</td>
-                        <td class="p-2.5 text-right text-cyberCyan">${joined}</td>
+                    <tr class="hover:bg-neoBg transition">
+                        <td class="p-2.5 font-bold text-black">${u.username}</td>
+                        <td class="p-2.5 text-slate-600">${maskEmail(u.email)}</td>
+                        <td class="p-2.5 text-right font-black text-black">${joined}</td>
                     </tr>
                 `;
             }).join('');
@@ -663,14 +656,7 @@
                     if (result.status) {
                         document.getElementById('profileUsername').innerText = result.username;
                         document.getElementById('infoNama').innerText = result.username;
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'BERHASIL',
-                            text: 'Username berhasil diperbarui!',
-                            timer: 1500,
-                            showConfirmButton: false,
-                            customClass: { popup: 'cyber-swal' }
-                        });
+                        Swal.fire({ icon: 'success', title: 'BERHASIL', text: 'Username berhasil diperbarui!', timer: 1500, showConfirmButton: false, customClass: { popup: 'cyber-swal' } });
                     } else {
                         throw new Error(result.message || 'Gagal mengubah username');
                     }
@@ -685,130 +671,104 @@
             const formData = new FormData();
             formData.append('avatar', input.files[0]);
 
-            Swal.fire({
-                title: 'MENGUNGGAH...',
-                text: 'Memperbarui gambar profil Anda',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); },
-                customClass: { popup: 'cyber-swal' }
-            });
+            Swal.fire({ title: 'MENGUNGGAH...', text: 'Memperbarui gambar profil Anda', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }, customClass: { popup: 'cyber-swal' } });
 
             try {
-                const res = await fetch('/api/user/update-avatar', {
-                    method: 'POST',
-                    body: formData
-                });
+                const res = await fetch('/api/user/update-avatar', { method: 'POST', body: formData });
                 const result = await res.json();
                 if (result.status) {
                     document.getElementById('profileAvatar').src = result.avatar;
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'BERHASIL',
-                        text: 'Avatar profil berhasil diperbarui!',
-                        timer: 1500,
-                        showConfirmButton: false,
-                        customClass: { popup: 'cyber-swal' }
-                    });
+                    Swal.fire({ icon: 'success', title: 'BERHASIL', text: 'Avatar profil berhasil diperbarui!', timer: 1500, showConfirmButton: false, customClass: { popup: 'cyber-swal' } });
                 } else {
                     throw new Error(result.message || 'Gagal unggah gambar');
                 }
             } catch(err) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'GAGAL',
-                    text: err.message,
-                    customClass: { popup: 'cyber-swal' }
-                });
+                Swal.fire({ icon: 'error', title: 'GAGAL', text: err.message, customClass: { popup: 'cyber-swal' } });
             }
         }
         
         document.addEventListener('DOMContentLoaded', loadUserProfile);
-let widgetChatInterval = null;
+        let widgetChatInterval = null;
 
-    function toggleChatWidget() {
-        const windowEl = document.getElementById('floatingChatWindow');
-        const isHidden = windowEl.classList.contains('hidden');
+        function toggleChatWidget() {
+            const windowEl = document.getElementById('floatingChatWindow');
+            const isHidden = windowEl.classList.contains('hidden');
 
-        if (isHidden) {
-            windowEl.classList.remove('hidden');
-            loadWidgetMessages();
-            if (!widgetChatInterval) widgetChatInterval = setInterval(loadWidgetMessages, 3000);
-        } else {
-            windowEl.classList.add('hidden');
-            if (widgetChatInterval) {
-                clearInterval(widgetChatInterval);
-                widgetChatInterval = null;
+            if (isHidden) {
+                windowEl.classList.remove('hidden');
+                loadWidgetMessages();
+                if (!widgetChatInterval) widgetChatInterval = setInterval(loadWidgetMessages, 3000);
+            } else {
+                windowEl.classList.add('hidden');
+                if (widgetChatInterval) {
+                    clearInterval(widgetChatInterval);
+                    widgetChatInterval = null;
+                }
             }
         }
-    }
 
-    async function loadWidgetMessages() {
-        try {
-            const res = await fetch('/api/bantuan/messages');
-            const data = await res.json();
-            const container = document.getElementById('widgetChatMessages');
+        async function loadWidgetMessages() {
+            try {
+                const res = await fetch('/api/bantuan/messages');
+                const data = await res.json();
+                const container = document.getElementById('widgetChatMessages');
 
-            if (data.status && data.messages) {
-                if (data.messages.length === 0) {
-                    container.innerHTML = `
-                        <div class="bg-[#0a1628] p-3 rounded-xl border border-[#162a45] text-xs text-slate-300 space-y-1">
-                            <p class="font-bold font-cyber text-[#00f3ff]">Halo! Selamat datang 👋</p>
-                            <p class="text-[10px] text-slate-400">Silakan kirimkan pertanyaan Anda. Customer Service kami siap membantu.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                container.innerHTML = data.messages.map(msg => {
-                    const isUser = msg.sender === 'user';
-                    const alignClass = isUser ? 'justify-end' : 'justify-start';
-                    
-                    // Bubble Chat Style (Cyan Neon Theme)
-                    const bgClass = isUser 
-                        ? 'bg-[#00f3ff] text-[#050b14] font-medium rounded-br-none shadow-[0_0_12px_rgba(0,243,255,0.4)]' 
-                        : 'bg-[#111827] border border-[#00f3ff]/40 text-slate-100 rounded-bl-none shadow-[0_0_10px_rgba(0,243,255,0.15)]';
-                    
-                    const timeStr = new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                    
-                    // Nama Sender
-                    const displayName = isUser ? (msg.senderName || 'Anda') : 'Owner CS';
-                    const nameColor = isUser ? 'text-[#050b14]' : 'text-[#00f3ff]';
-
-                    return `
-                        <div class="flex ${alignClass}">
-                            <div class="max-w-[82%] p-2.5 rounded-2xl text-[11px] space-y-1 ${bgClass}">
-                                <div class="flex items-center justify-between gap-2 border-b border-black/10 pb-1">
-                                    <span class="font-bold font-cyber text-[10px] ${nameColor}">${displayName}</span>
-                                    <span class="text-[8px] opacity-75 font-mono">${timeStr}</span>
-                                </div>
-                                <p class="leading-relaxed break-words pt-0.5">${msg.message}</p>
+                if (data.status && data.messages) {
+                    if (data.messages.length === 0) {
+                        container.innerHTML = `
+                            <div class="neo-box p-3 rounded-xl bg-white text-xs text-black space-y-1">
+                                <p class="font-black font-cyber">Halo! Selamat datang 👋</p>
+                                <p class="text-[10px] font-bold text-slate-600">Silakan kirimkan pertanyaan Anda. Customer Service kami siap membantu.</p>
                             </div>
-                        </div>
-                    `;
-                }).join('');
+                        `;
+                        return;
+                    }
 
-                container.scrollTop = container.scrollHeight;
-            }
-        } catch(e) {}
-    }
+                    container.innerHTML = data.messages.map(msg => {
+                        const isUser = msg.sender === 'user';
+                        const alignClass = isUser ? 'justify-end' : 'justify-start';
+                        const bgClass = isUser 
+                            ? 'bg-neoYellow text-black font-bold rounded-br-none border-2 border-black' 
+                            : 'bg-white text-black font-bold rounded-bl-none border-2 border-black';
+                        
+                        const timeStr = new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                        const displayName = isUser ? (msg.senderName || 'Anda') : 'Owner CS';
 
-    async function sendWidgetMessage(e) {
-        e.preventDefault();
-        const input = document.getElementById('widgetChatInput');
-        const message = input.value.trim();
-        if (!message) return;
+                        return `
+                            <div class="flex ${alignClass}">
+                                <div class="max-w-[82%] p-2.5 rounded-2xl text-[11px] space-y-1 ${bgClass}">
+                                    <div class="flex items-center justify-between gap-2 border-b border-black/20 pb-1">
+                                        <span class="font-black font-cyber text-[10px] text-black">${displayName}</span>
+                                        <span class="text-[8px] opacity-75 font-mono font-bold">${timeStr}</span>
+                                    </div>
+                                    <p class="leading-relaxed break-words pt-0.5">${msg.message}</p>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
 
-        input.value = '';
+                    container.scrollTop = container.scrollHeight;
+                }
+            } catch(e) {}
+        }
 
-        try {
-            await fetch('/api/bantuan/send-user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message })
-            });
-            loadWidgetMessages();
-        } catch(e) {}
-    }
+        async function sendWidgetMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('widgetChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+
+            try {
+                await fetch('/api/bantuan/send-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                loadWidgetMessages();
+            } catch(e) {}
+        }
     </script>
 </body>
 </html>

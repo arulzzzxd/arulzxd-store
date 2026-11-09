@@ -1,163 +1,214 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Riwayat Transaksi - ArulzXD Store</title>
     <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        cyber: ['Orbitron', 'sans-serif'],
+                        cyber: ['Space Grotesk', 'sans-serif'],
                     },
                     colors: {
-                        cyberCyan: '#00f3ff',
-                        cyberDark: '#050b14',
-                        cyberCard: '#0a1628',
-                        cyberBorder: '#162a45'
-                    },
-                    boxShadow: {
-                        glowCyan: '0 0 15px rgba(0, 243, 255, 0.35)',
-                        glowCyanSm: '0 0 8px rgba(0, 243, 255, 0.25)',
+                        neoYellow: '#FFDE59',
+                        neoCyan: '#00E5FF',
+                        neoPink: '#FF79C6',
+                        neoGreen: '#00E676',
+                        neoBg: '#F4F0EA',
+                        neoCard: '#FFFFFF'
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #050b14; color: #e2e8f0; overflow-x: hidden; }
-        .bg-cyber-grid {
-            background-image: linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
+        body { background-color: #F4F0EA; color: #000000; overflow-x: hidden; }
+        
+        .neo-box {
+            background-color: #FFFFFF;
+            border: 3px solid #000000;
+            box-shadow: 5px 5px 0px #000000;
         }
 
-        /* BOTTOM NAVIGATION STYLE */
-        .bottom-nav-container {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 92%;
-        max-width: 480px;
-        background: rgba(10, 22, 40, 0.92);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(0, 243, 255, 0.3);
-        border-radius: 28px;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        padding: 12px 10px;
-        z-index: 9999;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 243, 255, 0.2);
-    }
-    .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        color: #64748b;
-        text-decoration: none;
-        font-size: 11px;
-        font-weight: 700;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        padding: 2px 12px;
-    }
-    .nav-item i {
-        font-size: 20px;
-        transition: transform 0.2s ease;
-    }
-    .nav-item:hover, .nav-item.active {
-        color: #00f3ff;
-    }
-    .nav-item.active i {
-        transform: translateY(-2px);
-        filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.8));
-    }
-    .nav-item.active::after {
-        content: '';
-        position: absolute;
-        bottom: -8px;
-        width: 6px;
-        height: 6px;
-        background-color: #00f3ff;
-        border-radius: 50%;
-        box-shadow: 0 0 10px #00f3ff;
-    }
+        .neo-btn {
+            border: 3px solid #000000;
+            box-shadow: 4px 4px 0px #000000;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .neo-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+        .neo-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        /* FLUID CURVED NOTCH BOTTOM NAVIGATION BAR */
+        .bottom-nav-fixed {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 440px;
+            height: 64px;
+            z-index: 9999;
+        }
+
+        .bottom-nav-bg {
+            position: absolute;
+            inset: 0;
+            background: #FFFFFF;
+            border: 3px solid #000000;
+            border-radius: 32px;
+            box-shadow: 5px 5px 0px #000000;
+        }
+
+        .nav-items-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            height: 100%;
+            width: 100%;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 100%;
+            color: #000000;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: transparent;
+        }
+
+        .nav-item-btn i { font-size: 18px; transition: all 0.3s ease; }
+        .nav-item-btn span {
+            font-size: 10px;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            position: absolute;
+            bottom: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item-btn.active .nav-icon-box {
+            transform: translateY(-22px);
+            background-color: #FFDE59;
+            border: 3px solid #000000;
+            box-shadow: 3px 3px 0px #000000;
+        }
+
+        .nav-item-btn.active i { font-size: 20px; }
+        .nav-item-btn.active span {
+            color: #000000;
+            font-weight: 900;
+            transform: translateY(-2px);
+        }
+
+        .nav-item-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 5px;
+            height: 5px;
+            background-color: #000000;
+            border-radius: 50%;
+        }
     </style>
 </head>
-<body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen pb-32">
+<body class="font-sans antialiased text-black min-h-screen pb-32">
 
     <!-- TOP NAVBAR -->
-    <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
+    <nav class="sticky top-0 z-40 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
         <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)]">
-                Arulz<span class="text-white">Store</span>
+            <a href="/store" class="text-2xl font-black font-cyber tracking-tight text-black">
+                Arulz<span class="bg-black text-white px-2 py-0.5 ml-1 rounded-md">Store</span>
             </a>
-            <button onclick="loadTransactions()" class="text-xs bg-cyberCard border border-cyberBorder hover:border-cyberCyan text-cyberCyan font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+            <button onclick="loadTransactions()" class="neo-btn bg-white text-black font-cyber font-black px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5">
                 <i class="fa-solid fa-rotate-right"></i> Refresh
             </button>
         </div>
     </nav>
 
     <div class="max-w-4xl mx-auto px-4 py-6 space-y-5">
-        <div class="flex items-center justify-between">
+        <div class="p-6 neo-box rounded-2xl bg-neoCyan flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-black text-white font-cyber flex items-center gap-2">
-                    <i class="fa-solid fa-clock-rotate-left text-cyberCyan"></i> Riwayat Transaksi
+                <h1 class="text-xl sm:text-3xl font-black text-black font-cyber flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi
                 </h1>
-                <p class="text-xs text-slate-400 mt-0.5">Seluruh daftar transaksi akun Anda tersimpan permanen di database.</p>
+                <p class="text-xs sm:text-sm font-bold text-black mt-1">Seluruh daftar transaksi akun Anda tersimpan permanen di database.</p>
             </div>
         </div>
 
         <!-- LIST TRANSAKSI -->
         <div id="historyList" class="space-y-3">
-            <div class="bg-cyberCard rounded-xl border border-cyberBorder p-4 text-center text-xs text-slate-400 animate-pulse">
+            <div class="neo-box rounded-xl p-4 text-center text-xs font-cyber font-black bg-white animate-pulse">
                 Memuat riwayat transaksi dari server...
             </div>
         </div>
     </div>
 
-    <nav class="bottom-nav-container">
-    <!-- Menu 1: Dashboard (Icon Rumah) -->
-    <a href="/dashboard" class="nav-item" id="nav-dashboard">
-        <i class="fa-solid fa-house"></i>
-        <span>Dashboard</span>
-    </a>
-
-    <!-- Menu 2: Toko -->
-    <a href="/store" class="nav-item" id="nav-toko">
-        <i class="fa-solid fa-bag-shopping"></i>
-        <span>Toko</span>
-    </a>
-
-    <!-- Menu 3: Deposit -->
-    <a href="/deposit" class="nav-item" id="nav-deposit">
-        <i class="fa-solid fa-wallet"></i>
-        <span>Deposit</span>
-    </a>
-
-    <!-- Menu 4: Riwayat -->
-    <a href="/riwayat" class="nav-item active" id="nav-riwayat">
-        <i class="fa-solid fa-clock-rotate-left"></i>
-        <span>Riwayat</span>
-    </a>
-
-    <!-- Menu 5: Profil -->
-    <a href="/profile" class="nav-item" id="nav-auth">
-        <i class="fa-regular fa-user"></i>
-        <span id="nav-auth-label">Profil</span>
-    </a>
-</nav>
+    <!-- CURVED ANIMATED BOTTOM NAV BAR -->
+    <div class="bottom-nav-fixed">
+        <div class="bottom-nav-bg"></div>
+        <div class="nav-items-wrapper">
+            <a href="/dashboard" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span>Home</span>
+            </a>
+            <a href="/store" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <span>Toko</span>
+            </a>
+            <a href="/deposit" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <span>Deposit</span>
+            </a>
+            <a href="/riwayat" class="nav-item-btn active">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <span>Riwayat</span>
+            </a>
+            <a href="/profile" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+                <span id="nav-auth-label">Profil</span>
+            </a>
+        </div>
+    </div>
 
     <script>
         function formatRupiah(angka) {
@@ -165,7 +216,7 @@
                 style: 'currency',
                 currency: 'IDR',
                 minimumFractionDigits: 0
-            }).format(angka);
+            }).format(angka || 0);
         }
 
         async function loadTransactions() {
@@ -181,11 +232,11 @@
 
                 if (!res.ok || !data.status || !data.transactions || data.transactions.length === 0) {
                     listEl.innerHTML = `
-                        <div class="bg-cyberCard rounded-2xl border border-cyberBorder p-8 text-center space-y-3">
-                            <i class="fa-solid fa-receipt text-5xl text-slate-600"></i>
-                            <h3 class="text-sm font-bold text-slate-300">Belum Ada Riwayat Transaksi</h3>
-                            <p class="text-xs text-slate-500 max-w-sm mx-auto">Anda belum melakukan transaksi. Pesanan atau deposit Anda akan tersimpan secara permanen di database akun Anda.</p>
-                            <a href="/store" class="inline-block bg-cyberCyan hover:bg-cyan-300 text-cyberDark font-cyber font-bold px-4 py-2 rounded-xl text-xs transition shadow-glowCyanSm uppercase">
+                        <div class="neo-box rounded-2xl p-8 text-center space-y-3 bg-white">
+                            <i class="fa-solid fa-receipt text-5xl text-black"></i>
+                            <h3 class="text-sm font-black font-cyber">Belum Ada Riwayat Transaksi</h3>
+                            <p class="text-xs font-bold text-slate-600 max-w-sm mx-auto">Anda belum melakukan transaksi. Pesanan atau deposit Anda akan tersimpan secara permanen di akun Anda.</p>
+                            <a href="/store" class="neo-btn inline-block bg-neoYellow text-black font-cyber font-black px-4 py-2 rounded-xl text-xs uppercase">
                                 Belanja Sekarang
                             </a>
                         </div>
@@ -195,20 +246,20 @@
 
                 listEl.innerHTML = data.transactions.map(trx => {
                     const status = (trx.status || 'pending').toLowerCase();
-                    let badgeClass = 'bg-amber-950/60 text-amber-400 border-amber-800/50';
-                    let statusLabel = 'PENDING / MENUNGGU';
+                    let badgeClass = 'bg-neoYellow text-black border-2 border-black';
+                    let statusLabel = 'PENDING';
 
                     if (['settlement','success','paid','settled'].includes(status)) {
-                        badgeClass = 'bg-emerald-950/60 text-emerald-400 border-emerald-800/50';
+                        badgeClass = 'bg-neoGreen text-black border-2 border-black';
                         statusLabel = 'BERHASIL / LUNAS';
                     } else if (['cancelled','failed','expired'].includes(status)) {
-                        badgeClass = 'bg-red-950/60 text-red-400 border-red-800/50';
-                        statusLabel = 'DIBATALKAN / EXPIRED';
+                        badgeClass = 'bg-neoPink text-black border-2 border-black';
+                        statusLabel = 'DIBATALKAN';
                     }
 
                     const typeTag = trx.type === 'DEPOSIT' 
-                        ? `<span class="text-[10px] bg-cyan-950/80 text-cyberCyan border border-cyberCyan/40 font-bold px-2 py-0.5 rounded mr-2">DEPOSIT</span>` 
-                        : `<span class="text-[10px] bg-purple-950/80 text-purple-400 border border-purple-800/50 font-bold px-2 py-0.5 rounded mr-2">PEMBELIAN</span>`;
+                        ? `<span class="text-[10px] bg-neoCyan text-black border border-black font-black px-2 py-0.5 rounded mr-2 uppercase">DEPOSIT</span>` 
+                        : `<span class="text-[10px] bg-neoYellow text-black border border-black font-black px-2 py-0.5 rounded mr-2 uppercase">PEMBELIAN</span>`;
 
                     const namaProduk = trx.itemDetails?.nama || (trx.type === 'DEPOSIT' ? 'Deposit Saldo' : 'Produk Store');
                     const harga = trx.amount || trx.itemDetails?.harga || 0;
@@ -218,27 +269,27 @@
                     if (trx.type !== 'DEPOSIT' && ['settlement','success','paid','settled'].includes(status) && (trx.productLink || trx.itemDetails?.link)) {
                         const link = trx.productLink || trx.itemDetails?.link;
                         linkBtn = `
-                            <a href="${link}" target="_blank" class="text-xs bg-cyberCyan/10 border border-cyberCyan/40 text-cyberCyan hover:bg-cyberCyan hover:text-cyberDark font-bold px-3 py-1.5 rounded-lg transition inline-flex items-center gap-1 mt-2 shadow-glowCyanSm">
+                            <a href="${link}" target="_blank" class="neo-btn text-xs bg-neoCyan text-black font-black px-3 py-1.5 rounded-lg inline-flex items-center gap-1 mt-2 font-cyber">
                                 <i class="fa-solid fa-cloud-arrow-down"></i> Akses Produk
                             </a>
                         `;
                     }
 
                     return `
-                        <div class="bg-cyberCard rounded-xl border border-cyberBorder p-4 shadow-md space-y-2">
-                            <div class="flex items-center justify-between border-b border-cyberBorder/50 pb-2">
-                                <span class="text-[11px] font-mono text-slate-400">Order ID: <strong class="text-slate-200">${trx.orderId}</strong></span>
-                                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${badgeClass} uppercase">${statusLabel}</span>
+                        <div class="neo-box rounded-xl p-4 bg-white space-y-2">
+                            <div class="flex items-center justify-between border-b-2 border-black pb-2">
+                                <span class="text-[11px] font-mono font-bold">Order ID: <strong class="text-black font-black">${trx.orderId}</strong></span>
+                                <span class="text-[10px] font-black font-cyber px-2.5 py-0.5 rounded-full ${badgeClass} uppercase">${statusLabel}</span>
                             </div>
                             <div class="flex items-start justify-between gap-3 pt-1">
                                 <div>
-                                    <h4 class="text-sm font-bold text-white font-cyber flex items-center">${typeTag}${namaProduk}</h4>
-                                    <p class="text-[11px] text-slate-400 mt-1">Waktu: ${dateStr}</p>
+                                    <h4 class="text-sm font-black font-cyber text-black flex items-center">${typeTag}${namaProduk}</h4>
+                                    <p class="text-[11px] font-bold text-slate-600 mt-1">Waktu: ${dateStr}</p>
                                     ${linkBtn}
                                 </div>
                                 <div class="text-right">
-                                    <span class="text-xs text-slate-400 block">Total Tagihan:</span>
-                                    <span class="text-sm font-bold font-cyber text-cyberCyan">${formatRupiah(harga)}</span>
+                                    <span class="text-xs font-bold text-slate-600 block">Total Tagihan:</span>
+                                    <span class="text-sm font-black font-cyber text-black">${formatRupiah(harga)}</span>
                                 </div>
                             </div>
                         </div>
@@ -246,7 +297,7 @@
                 }).join('');
 
             } catch(err) {
-                listEl.innerHTML = `<div class="text-center text-xs text-red-400 py-4">Gagal memuat data transaksi.</div>`;
+                listEl.innerHTML = `<div class="neo-box p-4 bg-neoPink text-center text-xs font-black font-cyber">Gagal memuat data transaksi.</div>`;
             }
         }
 
@@ -255,13 +306,10 @@
             fetch('/api/user-status')
                 .then(res => res.json())
                 .then(data => {
-                    const authBtn = document.getElementById('nav-auth');
                     const authLabel = document.getElementById('nav-auth-label');
                     if (data.loggedIn && data.user) {
-                        if (authBtn) authBtn.href = '/profile';
                         if (authLabel) authLabel.innerText = 'Profil';
                     } else {
-                        if (authBtn) authBtn.href = '/login';
                         if (authLabel) authLabel.innerText = 'Login';
                     }
                 })

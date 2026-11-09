@@ -1,302 +1,337 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Deposit Saldo - ArulzXD Store</title>
     <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        cyber: ['Orbitron', 'sans-serif'],
+                        cyber: ['Space Grotesk', 'sans-serif'],
                     },
                     colors: {
-                        cyberCyan: '#00f3ff',
-                        cyberDark: '#050b14',
-                        cyberCard: '#0a1628',
-                        cyberBorder: '#162a45'
-                    },
-                    boxShadow: {
-                        glowCyan: '0 0 20px rgba(0, 243, 255, 0.35)',
-                        glowCyanSm: '0 0 10px rgba(0, 243, 255, 0.25)',
+                        neoYellow: '#FFDE59',
+                        neoCyan: '#00E5FF',
+                        neoPink: '#FF79C6',
+                        neoGreen: '#00E676',
+                        neoBg: '#F4F0EA',
+                        neoCard: '#FFFFFF'
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #050b14; color: #e2e8f0; min-height: 100vh; }
-        .bg-cyber-grid {
-            background-image: linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 32px 32px;
+        body { background-color: #F4F0EA; color: #000000; overflow-x: hidden; }
+        
+        .neo-box {
+            background-color: #FFFFFF;
+            border: 3px solid #000000;
+            box-shadow: 5px 5px 0px #000000;
         }
+
+        .neo-btn {
+            border: 3px solid #000000;
+            box-shadow: 4px 4px 0px #000000;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .neo-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+        .neo-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        .preset-btn.active {
+            background-color: #FFDE59 !important;
+            box-shadow: 5px 5px 0px #000000 !important;
+        }
+
+        /* FLUID CURVED NOTCH BOTTOM NAVIGATION BAR */
+        .bottom-nav-fixed {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 440px;
+            height: 64px;
+            z-index: 9999;
+        }
+
+        .bottom-nav-bg {
+            position: absolute;
+            inset: 0;
+            background: #FFFFFF;
+            border: 3px solid #000000;
+            border-radius: 32px;
+            box-shadow: 5px 5px 0px #000000;
+        }
+
+        .nav-items-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            height: 100%;
+            width: 100%;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 100%;
+            color: #000000;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: transparent;
+        }
+
+        .nav-item-btn i { font-size: 18px; transition: all 0.3s ease; }
+        .nav-item-btn span {
+            font-size: 10px;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            position: absolute;
+            bottom: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item-btn.active .nav-icon-box {
+            transform: translateY(-22px);
+            background-color: #FFDE59;
+            border: 3px solid #000000;
+            box-shadow: 3px 3px 0px #000000;
+        }
+
+        .nav-item-btn.active i { font-size: 20px; }
+        .nav-item-btn.active span {
+            color: #000000;
+            font-weight: 900;
+            transform: translateY(-2px);
+        }
+
+        .nav-item-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 5px;
+            height: 5px;
+            background-color: #000000;
+            border-radius: 50%;
+        }
+
         .swal2-popup.cyber-swal {
-            background: #0a1628 !important;
-            border: 1px solid #162a45 !important;
+            background: #FFFFFF !important;
+            border: 3px solid #000000 !important;
             border-radius: 20px !important;
-            color: #e2e8f0 !important;
-            box-shadow: 0 0 25px rgba(0, 243, 255, 0.3) !important;
+            color: #000000 !important;
+            box-shadow: 6px 6px 0px #000000 !important;
             font-family: 'Plus Jakarta Sans', sans-serif !important;
         }
+
         #depQrcodeContainer canvas, #depQrcodeContainer img {
             margin: 0 auto;
             max-width: 100%;
             height: auto !important;
             display: block;
         }
-        .bottom-nav-container {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 92%;
-        max-width: 480px;
-        background: rgba(10, 22, 40, 0.92);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(0, 243, 255, 0.3);
-        border-radius: 28px;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        padding: 12px 10px;
-        z-index: 9999;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 243, 255, 0.2);
-    }
-    .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        color: #64748b;
-        text-decoration: none;
-        font-size: 11px;
-        font-weight: 700;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        padding: 2px 12px;
-    }
-    .nav-item i {
-        font-size: 20px;
-        transition: transform 0.2s ease;
-    }
-    .nav-item:hover, .nav-item.active {
-        color: #00f3ff;
-    }
-    .nav-item.active i {
-        transform: translateY(-2px);
-        filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.8));
-    }
-    .nav-item.active::after {
-        content: '';
-        position: absolute;
-        bottom: -8px;
-        width: 6px;
-        height: 6px;
-        background-color: #00f3ff;
-        border-radius: 50%;
-        box-shadow: 0 0 10px #00f3ff;
-    }
     </style>
 </head>
-<body class="font-sans antialiased bg-cyberDark bg-cyber-grid text-slate-100 min-h-screen flex flex-col justify-between pb-32">
+<body class="font-sans antialiased text-black min-h-screen pb-32">
 
     <!-- TOP NAVBAR -->
-    <nav class="sticky top-0 z-40 bg-cyberDark/90 backdrop-blur-md border-b border-cyberBorder shadow-glowCyanSm">
-        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
-            <a href="/store" class="text-2xl font-black font-cyber tracking-wider text-cyberCyan drop-shadow-[0_0_8px_rgba(0,243,255,0.6)] flex items-center gap-2">
-                <i class="fa-solid fa-bolt text-cyberCyan text-xl"></i>
-                <span>Arulz<span class="text-white">Store</span></span>
+    <nav class="sticky top-0 z-40 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/store" class="text-2xl font-black font-cyber tracking-tight text-black flex items-center gap-2">
+                <i class="fa-solid fa-bolt text-black text-xl"></i>
+                <span>Arulz<span class="bg-black text-white px-2 py-0.5 ml-1 rounded-md">Store</span></span>
             </a>
             <div class="flex items-center gap-2">
-                <span class="text-[10px] font-cyber font-bold bg-cyberCyan/10 border border-cyberCyan/30 text-cyberCyan px-3 py-1 rounded-full uppercase tracking-wider">
-                    <i class="fa-solid fa-shield-halved mr-1"></i> QRIS Ready
+                <span class="text-xs font-cyber font-black bg-white text-black px-3 py-1 rounded-lg border-2 border-black shadow-[2px_2px_0px_#000] flex items-center gap-1.5 uppercase">
+                    <i class="fa-solid fa-shield-halved"></i> QRIS Ready
                 </span>
             </div>
         </div>
     </nav>
 
     <!-- MAIN CONTAINER -->
-    <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-1">
+    <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-1 space-y-6">
         
         <!-- HEADER TITLE PAGE -->
-        <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-cyberCard/60 border border-cyberBorder p-5 rounded-2xl backdrop-blur-md">
+        <div class="p-6 neo-box rounded-2xl bg-neoCyan flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h1 class="text-xl sm:text-2xl font-extrabold font-cyber text-white flex items-center gap-2">
-                    <i class="fa-solid fa-wallet text-cyberCyan"></i> Deposit Saldo Instan
+                <h1 class="text-xl sm:text-3xl font-black font-cyber text-black flex items-center gap-2">
+                    <i class="fa-solid fa-wallet"></i> Deposit Saldo Instan
                 </h1>
-                <p class="text-xs text-slate-400 mt-1">Isi ulang saldo akun Anda secara otomatis 24/7 menggunakan QRIS All Payment.</p>
+                <p class="text-xs sm:text-sm font-bold text-black mt-1">Isi ulang saldo akun Anda secara otomatis 24/7 menggunakan QRIS All Payment.</p>
             </div>
             
             <!-- WIDGET SALDO AKUN -->
-            <div class="bg-cyberDark/80 border border-cyberCyan/30 p-4 rounded-xl flex items-center justify-between md:justify-end gap-4 min-w-[240px]">
+            <div class="bg-white border-3 border-black p-4 rounded-xl flex items-center justify-between md:justify-end gap-4 min-w-[240px] shadow-[4px_4px_0px_#000]">
                 <div class="text-left md:text-right">
-                    <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-widest block">Saldo Saat Ini</span>
-                    <h3 id="depSaldoVal" class="text-xl sm:text-2xl font-black font-cyber text-cyberCyan drop-shadow-[0_0_10px_rgba(0,243,255,0.6)]">Rp 0</h3>
+                    <span class="text-[10px] font-black font-cyber uppercase tracking-wider block">Saldo Saat Ini</span>
+                    <h3 id="depSaldoVal" class="text-xl sm:text-2xl font-black font-cyber text-black">Rp 0</h3>
                 </div>
-                <div class="w-10 h-10 rounded-xl bg-cyberCyan/10 border border-cyberCyan/40 flex items-center justify-center text-cyberCyan text-lg shadow-glowCyanSm shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-neoYellow border-2 border-black flex items-center justify-center text-black text-lg shadow-[2px_2px_0px_#000] shrink-0">
                     <i class="fa-solid fa-coins"></i>
                 </div>
             </div>
         </div>
 
-        <!-- GRID DUA KOLOM UNTUK PC/LAPTOP -->
+        <!-- GRID DUA KOLOM -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-            <!-- KOLOM KIRI: FORM & PRESET NOMINAL (7 SPAN PC) -->
-            <div class="lg:col-span-7 bg-cyberCard rounded-2xl border border-cyberBorder p-5 sm:p-6 shadow-xl space-y-6">
+            <!-- KOLOM KIRI: PRESET NOMINAL & FORM -->
+            <div class="lg:col-span-7 neo-box rounded-2xl p-5 sm:p-6 bg-white space-y-6">
                 
-                <div class="flex items-center justify-between border-b border-cyberBorder/60 pb-3">
-                    <h2 class="text-xs sm:text-sm font-bold font-cyber text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-cubes text-cyberCyan"></i> Pilih Nominal Deposit
+                <div class="flex items-center justify-between border-b-3 border-black pb-3">
+                    <h2 class="text-xs sm:text-sm font-black font-cyber text-black uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-cubes"></i> Pilih Nominal Deposit
                     </h2>
-                    <span class="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-md border border-emerald-500/30">
+                    <span class="text-[10px] font-mono font-black bg-neoGreen border-2 border-black px-2.5 py-0.5 rounded-md">
                         Min. Rp 1.000
                     </span>
                 </div>
 
-                <!-- PRESET NOMINAL GRID 5.000 - 100.000 DENGAN RANK & POPULER -->
+                <!-- PRESET GRID -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    
-                    <!-- 5.000 - POPULER -->
-                    <button onclick="setDepositAmount(5000, this)" class="preset-btn relative bg-cyberDark/90 border-2 border-cyberCyan text-slate-100 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group shadow-[0_0_12px_rgba(0,243,255,0.2)]">
-                        <span class="absolute -top-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-black text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-glowCyanSm">
+                    <button onclick="setDepositAmount(5000, this)" class="preset-btn neo-btn relative bg-white text-black font-cyber font-black py-3.5 px-2 rounded-xl text-xs flex flex-col items-center gap-1">
+                        <span class="absolute -top-2.5 bg-neoPink border border-black text-black font-black text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full">
                             🔥 Populer
                         </span>
-                        <span class="text-cyberCyan font-extrabold text-[10px]">Super Hemat</span>
+                        <span class="text-[10px] font-bold">Super Hemat</span>
                         <span class="text-sm">Rp 5.000</span>
                     </button>
 
-                    <!-- 10.000 -->
-                    <button onclick="setDepositAmount(10000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">Hemat</span>
+                    <button onclick="setDepositAmount(10000, this)" class="preset-btn neo-btn bg-white text-black font-cyber font-black py-3.5 px-2 rounded-xl text-xs flex flex-col items-center gap-1">
+                        <span class="text-slate-600 text-[10px]">Hemat</span>
                         <span class="text-sm">Rp 10.000</span>
                     </button>
 
-                    <!-- 20.000 -->
-                    <button onclick="setDepositAmount(20000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">Reguler</span>
+                    <button onclick="setDepositAmount(20000, this)" class="preset-btn neo-btn bg-white text-black font-cyber font-black py-3.5 px-2 rounded-xl text-xs flex flex-col items-center gap-1">
+                        <span class="text-slate-600 text-[10px]">Reguler</span>
                         <span class="text-sm">Rp 20.000</span>
                     </button>
 
-                    <!-- 30.000 -->
-                    <button onclick="setDepositAmount(30000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">Pro</span>
+                    <button onclick="setDepositAmount(30000, this)" class="preset-btn neo-btn bg-white text-black font-cyber font-black py-3.5 px-2 rounded-xl text-xs flex flex-col items-center gap-1">
+                        <span class="text-slate-600 text-[10px]">Pro</span>
                         <span class="text-sm">Rp 30.000</span>
                     </button>
 
-                    <!-- 50.000 -->
-                    <button onclick="setDepositAmount(50000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">VIP</span>
+                    <button onclick="setDepositAmount(50000, this)" class="preset-btn neo-btn bg-white text-black font-cyber font-black py-3.5 px-2 rounded-xl text-xs flex flex-col items-center gap-1">
+                        <span class="text-slate-600 text-[10px]">VIP</span>
                         <span class="text-sm">Rp 50.000</span>
                     </button>
 
-                    <!-- 75.000 -->
-                    <button onclick="setDepositAmount(75000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">MVP</span>
+                    <button onclick="setDepositAmount(75000, this)" class="preset-btn neo-btn bg-white text-black font-cyber font-black py-3.5 px-2 rounded-xl text-xs flex flex-col items-center gap-1">
+                        <span class="text-slate-600 text-[10px]">MVP</span>
                         <span class="text-sm">Rp 75.000</span>
                     </button>
 
-                    <!-- 90.000 -->
-                    <button onclick="setDepositAmount(90000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-slate-400 text-[10px] group-hover:text-cyberCyan">Sultan</span>
+                    <button onclick="setDepositAmount(90000, this)" class="preset-btn neo-btn bg-white text-black font-cyber font-black py-3.5 px-2 rounded-xl text-xs flex flex-col items-center gap-1">
+                        <span class="text-slate-600 text-[10px]">Sultan</span>
                         <span class="text-sm">Rp 90.000</span>
                     </button>
 
-                    <!-- 100.000 -->
-                    <button onclick="setDepositAmount(100000, this)" class="preset-btn bg-cyberDark/90 border border-cyberBorder hover:border-cyberCyan text-slate-200 font-cyber font-bold py-3.5 px-2 rounded-xl text-xs transition flex flex-col items-center gap-1 group">
-                        <span class="text-amber-400 font-extrabold text-[10px]">Super Sultan</span>
+                    <button onclick="setDepositAmount(100000, this)" class="preset-btn neo-btn bg-white text-black font-cyber font-black py-3.5 px-2 rounded-xl text-xs flex flex-col items-center gap-1">
+                        <span class="text-slate-600 font-extrabold text-[10px]">Super Sultan</span>
                         <span class="text-sm">Rp 100.000</span>
                     </button>
-
                 </div>
 
                 <!-- INPUT MANUAL & TOMBOL -->
                 <div class="space-y-3 pt-2">
-                    <label class="block text-[11px] font-bold font-cyber text-slate-300 uppercase tracking-wider">
+                    <label class="block text-[11px] font-black font-cyber text-black uppercase tracking-wider">
                         Atau Ketik Nominal Custom
                     </label>
                     <div class="flex flex-col sm:flex-row items-stretch gap-3">
                         <div class="relative flex-1">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-xs font-bold text-cyberCyan font-cyber">Rp</span>
-                            <input type="number" id="depositAmountInput" min="1000" placeholder="Ketik nominal sendiri (cth: 25000)..." 
-                                   class="w-full pl-11 pr-4 py-3.5 text-xs bg-cyberDark border border-cyberBorder rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyberCyan font-bold font-cyber transition shadow-inner">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-xs font-black text-black font-cyber">Rp</span>
+                            <input type="number" id="depositAmountInput" min="1000" placeholder="Ketik nominal (cth: 25000)..." 
+                                   class="w-full pl-11 pr-4 py-3.5 text-xs bg-white border-3 border-black rounded-xl text-black font-black font-cyber shadow-[3px_3px_0px_#000]">
                         </div>
-                        <button onclick="processDeposit()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-cyber font-black px-7 py-3.5 rounded-xl text-xs transition shadow-glowCyan flex items-center justify-center gap-2 uppercase tracking-wider">
-                            <i class="fa-solid fa-bolt text-sm"></i> <span>Bayar QRIS</span>
+                        <button onclick="processDeposit()" class="neo-btn bg-neoYellow text-black font-cyber font-black px-7 py-3.5 rounded-xl text-xs flex items-center justify-center gap-2 uppercase tracking-wider">
+                            <i class="fa-solid fa-bolt"></i> <span>Bayar QRIS</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- DUKUNGAN METODE PEMBAYARAN -->
-                <div class="pt-4 border-t border-cyberBorder/60 space-y-2">
-                    <span class="text-[10px] font-cyber text-slate-400 uppercase tracking-wider block">Mendukung Pembayaran QRIS:</span>
-                    <div class="flex flex-wrap items-center gap-2 text-xs font-mono font-semibold text-slate-300">
-                        <span class="bg-cyberDark px-2.5 py-1 rounded-lg border border-cyberBorder/80"><i class="fa-solid fa-wallet text-blue-400 mr-1"></i> DANA</span>
-                        <span class="bg-cyberDark px-2.5 py-1 rounded-lg border border-cyberBorder/80"><i class="fa-solid fa-wallet text-purple-400 mr-1"></i> OVO</span>
-                        <span class="bg-cyberDark px-2.5 py-1 rounded-lg border border-cyberBorder/80"><i class="fa-solid fa-wallet text-emerald-400 mr-1"></i> GoPay</span>
-                        <span class="bg-cyberDark px-2.5 py-1 rounded-lg border border-cyberBorder/80"><i class="fa-solid fa-wallet text-orange-400 mr-1"></i> ShopeePay</span>
-                        <span class="bg-cyberDark px-2.5 py-1 rounded-lg border border-cyberBorder/80"><i class="fa-solid fa-building-columns text-cyan-400 mr-1"></i> M-Banking</span>
+                <!-- METODE SUPPORT -->
+                <div class="pt-4 border-t-3 border-black space-y-2">
+                    <span class="text-[10px] font-black font-cyber text-black uppercase tracking-wider block">Dukungan Pembayaran QRIS:</span>
+                    <div class="flex flex-wrap items-center gap-2 text-xs font-mono font-bold">
+                        <span class="bg-neoBg px-2.5 py-1 rounded-lg border-2 border-black"><i class="fa-solid fa-wallet mr-1"></i> DANA</span>
+                        <span class="bg-neoBg px-2.5 py-1 rounded-lg border-2 border-black"><i class="fa-solid fa-wallet mr-1"></i> OVO</span>
+                        <span class="bg-neoBg px-2.5 py-1 rounded-lg border-2 border-black"><i class="fa-solid fa-wallet mr-1"></i> GoPay</span>
+                        <span class="bg-neoBg px-2.5 py-1 rounded-lg border-2 border-black"><i class="fa-solid fa-wallet mr-1"></i> ShopeePay</span>
+                        <span class="bg-neoBg px-2.5 py-1 rounded-lg border-2 border-black"><i class="fa-solid fa-building-columns mr-1"></i> M-Banking</span>
                     </div>
                 </div>
 
             </div>
 
-            <!-- KOLOM KANAN: PANDUAN & KEBIJAKAN (5 SPAN PC) -->
-            <div class="lg:col-span-5 bg-cyberCard rounded-2xl border border-cyberBorder p-5 sm:p-6 shadow-xl space-y-4">
-                <div class="flex items-center gap-2 pb-3 border-b border-cyberBorder/60">
-                    <i class="fa-solid fa-shield-halved text-cyberCyan text-base"></i>
-                    <h3 class="text-xs sm:text-sm font-bold font-cyber text-slate-200 uppercase tracking-wider">Panduan & Ketentuan</h3>
+            <!-- KOLOM KANAN: PANDUAN -->
+            <div class="lg:col-span-5 neo-box rounded-2xl p-5 sm:p-6 bg-neoPink space-y-4">
+                <div class="flex items-center gap-2 pb-3 border-b-3 border-black">
+                    <i class="fa-solid fa-shield-halved text-black text-base"></i>
+                    <h3 class="text-xs sm:text-sm font-black font-cyber text-black uppercase tracking-wider">Panduan & Ketentuan</h3>
                 </div>
 
-                <div class="space-y-3.5 text-xs text-slate-300 leading-relaxed">
-                    <div class="bg-cyberDark/60 p-3.5 rounded-xl border border-cyberBorder flex items-start gap-3">
-                        <div class="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                <div class="space-y-3.5 text-xs font-bold text-black leading-relaxed">
+                    <div class="bg-white p-3.5 rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] flex items-start gap-3">
+                        <div class="w-7 h-7 rounded-lg bg-neoYellow border border-black flex items-center justify-center shrink-0 mt-0.5 font-black">
                             <i class="fa-solid fa-money-bill-wave text-xs"></i>
                         </div>
                         <div>
-                            <h4 class="font-bold text-white">Nominal Minimal</h4>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Pengisian saldo minimal adalah <strong class="text-cyberCyan">Rp 1.000</strong>.</p>
+                            <h4 class="font-black font-cyber">Nominal Minimal</h4>
+                            <p class="text-[11px] mt-0.5">Pengisian saldo minimal adalah <strong>Rp 1.000</strong>.</p>
                         </div>
                     </div>
 
-                    <div class="bg-cyberDark/60 p-3.5 rounded-xl border border-cyberBorder flex items-start gap-3">
-                        <div class="w-7 h-7 rounded-lg bg-cyberCyan/10 border border-cyberCyan/30 text-cyberCyan flex items-center justify-center shrink-0 mt-0.5">
+                    <div class="bg-white p-3.5 rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] flex items-start gap-3">
+                        <div class="w-7 h-7 rounded-lg bg-neoCyan border border-black flex items-center justify-center shrink-0 mt-0.5 font-black">
                             <i class="fa-solid fa-qrcode text-xs"></i>
                         </div>
                         <div>
-                            <h4 class="font-bold text-white">Sistem QRIS Otomatis</h4>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Cukup scan QRIS menggunakan aplikasi e-wallet atau bank apa saja pilihan Anda.</p>
+                            <h4 class="font-black font-cyber">QRIS Otomatis</h4>
+                            <p class="text-[11px] mt-0.5">Scan QRIS menggunakan aplikasi e-wallet atau mobile banking favorit Anda.</p>
                         </div>
                     </div>
 
-                    <div class="bg-cyberDark/60 p-3.5 rounded-xl border border-cyberBorder flex items-start gap-3">
-                        <div class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <div class="bg-white p-3.5 rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] flex items-start gap-3">
+                        <div class="w-7 h-7 rounded-lg bg-neoGreen border border-black flex items-center justify-center shrink-0 mt-0.5 font-black">
                             <i class="fa-solid fa-clock text-xs"></i>
                         </div>
                         <div>
-                            <h4 class="font-bold text-white">Proses Real-time 24 Jam</h4>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Saldo langsung masuk secara otomatis ke akun Anda dalam hitungan detik setelah transfer sukses.</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-cyberDark/60 p-3.5 rounded-xl border border-cyberBorder flex items-start gap-3">
-                        <div class="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center shrink-0 mt-0.5">
-                            <i class="fa-solid fa-ban text-xs"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-white">Non-Refundable</h4>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Setiap pengisian saldo bersifat final dan tidak dapat ditarik kembali ke rekening/e-wallet.</p>
+                            <h4 class="font-black font-cyber">Proses Real-time 24/7</h4>
+                            <p class="text-[11px] mt-0.5">Saldo bertambah otomatis hitungan detik setelah transaksi berhasil.</p>
                         </div>
                     </div>
                 </div>
@@ -307,92 +342,90 @@
     </main>
 
     <!-- MODAL POPUP QRIS DEPOSIT -->
-    <div id="depositModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-cyberCard w-full max-w-md rounded-2xl border border-cyberCyan/40 p-6 space-y-4 text-center relative shadow-glowCyan">
-            <button onclick="closeDepositModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+    <div id="depositModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="neo-box w-full max-w-md rounded-2xl bg-white p-6 space-y-4 text-center relative">
+            <button onclick="closeDepositModal()" class="absolute top-4 right-4 text-black font-black text-lg">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             
             <div class="space-y-1">
-                <h3 class="text-base font-bold font-cyber text-cyberCyan uppercase">Scan QRIS Pembayaran</h3>
-                <p class="text-xs text-slate-400">Gunakan E-Wallet atau Bank Apps untuk scan</p>
+                <h3 class="text-base font-black font-cyber uppercase">Scan QRIS Pembayaran</h3>
+                <p class="text-xs font-bold text-slate-600">Gunakan E-Wallet atau Bank Apps untuk scan</p>
             </div>
 
-            <div class="bg-cyberDark p-3.5 rounded-xl border border-cyberBorder">
-                <p class="text-[10px] text-slate-400 font-cyber uppercase">Total Pembayaran Deposit</p>
-                <h4 id="depTotalAmountText" class="text-2xl font-black font-cyber text-cyberCyan mt-0.5">Rp 0</h4>
-                <p class="text-[10px] text-slate-500 font-mono mt-1">Order ID: <span id="depOrderIdText" class="text-slate-300">-</span></p>
+            <div class="bg-neoBg p-3.5 rounded-xl border-2 border-black">
+                <p class="text-[10px] font-black font-cyber uppercase">Total Pembayaran Deposit</p>
+                <h4 id="depTotalAmountText" class="text-2xl font-black font-cyber mt-0.5">Rp 0</h4>
+                <p class="text-[10px] font-mono font-bold mt-1">Order ID: <span id="depOrderIdText">-</span></p>
             </div>
 
-            <div class="bg-white p-3.5 rounded-2xl border-2 border-cyberCyan shadow-glowCyan inline-block">
+            <div class="bg-white p-3.5 rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] inline-block">
                 <div id="depQrcodeContainer"></div>
             </div>
 
-            <div class="flex items-center justify-center gap-2 text-xs text-cyberCyan animate-pulse font-mono bg-cyberCyan/10 py-2 rounded-xl border border-cyberCyan/20">
+            <div class="flex items-center justify-center gap-2 text-xs font-black font-cyber bg-neoYellow py-2 rounded-xl border-2 border-black">
                 <i class="fa-solid fa-spinner fa-spin"></i>
                 <span>Menunggu Pembayaran Masuk...</span>
             </div>
 
             <div class="flex items-center gap-2 pt-1">
-                <button onclick="cancelDepositTransaction()" class="w-1/2 bg-red-950/60 hover:bg-red-900/80 border border-red-800/60 text-red-400 text-xs font-bold py-3 rounded-xl transition flex items-center justify-center gap-1.5">
+                <button onclick="cancelDepositTransaction()" class="neo-btn w-1/2 bg-neoPink text-black text-xs font-black py-3 rounded-xl uppercase flex items-center justify-center gap-1.5 font-cyber">
                     <i class="fa-solid fa-trash-can"></i> Batalkan
                 </button>
-                <button onclick="closeDepositModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-3 rounded-xl border border-cyberBorder transition">
+                <button onclick="closeDepositModal()" class="neo-btn w-1/2 bg-white text-black text-xs font-black py-3 rounded-xl uppercase font-cyber">
                     Tutup
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION BAR (MENTAHAN) -->
-<nav class="bottom-nav-container">
-    <!-- Menu 1: Dashboard (Icon Rumah) -->
-    <a href="/dashboard" class="nav-item" id="nav-dashboard">
-        <i class="fa-solid fa-house"></i>
-        <span>Dashboard</span>
-    </a>
-
-    <!-- Menu 2: Toko -->
-    <a href="/store" class="nav-item" id="nav-toko">
-        <i class="fa-solid fa-bag-shopping"></i>
-        <span>Toko</span>
-    </a>
-
-    <!-- Menu 3: Deposit -->
-    <a href="/deposit" class="nav-item active" id="nav-deposit">
-        <i class="fa-solid fa-wallet"></i>
-        <span>Deposit</span>
-    </a>
-
-    <!-- Menu 4: Riwayat -->
-    <a href="/riwayat" class="nav-item" id="nav-riwayat">
-        <i class="fa-solid fa-clock-rotate-left"></i>
-        <span>Riwayat</span>
-    </a>
-
-    <!-- Menu 5: Profil -->
-    <a href="/profile" class="nav-item" id="nav-auth">
-        <i class="fa-regular fa-user"></i>
-        <span id="nav-auth-label">Profil</span>
-    </a>
-</nav>
+    <!-- CURVED ANIMATED BOTTOM NAV BAR -->
+    <div class="bottom-nav-fixed">
+        <div class="bottom-nav-bg"></div>
+        <div class="nav-items-wrapper">
+            <a href="/dashboard" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span>Home</span>
+            </a>
+            <a href="/store" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <span>Toko</span>
+            </a>
+            <a href="/deposit" class="nav-item-btn active">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <span>Deposit</span>
+            </a>
+            <a href="/riwayat" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <span>Riwayat</span>
+            </a>
+            <a href="/profile" class="nav-item-btn">
+                <div class="nav-icon-box">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+                <span id="nav-auth-label">Profil</span>
+            </a>
+        </div>
+    </div>
 
     <script>
         let depPollInterval = null;
         let currentDepOrderId = '';
 
         function formatRupiah(angka) {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(angka || 0);
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
         }
 
         function setDepositAmount(val, btnElem) {
             document.getElementById('depositAmountInput').value = val;
-            
-            // Highlight preset aktif
             document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
             if (btnElem) btnElem.classList.add('active');
         }
@@ -403,6 +436,7 @@
                 const data = await res.json();
                 if (data.loggedIn && data.user) {
                     document.getElementById('depSaldoVal').innerText = formatRupiah(data.user.saldo || 0);
+                    document.getElementById('nav-auth-label').innerText = 'Profil';
                     checkActiveDepositTransaction();
                 } else {
                     window.location.href = '/login';
@@ -425,11 +459,7 @@
 
                     const qContainer = document.getElementById('depQrcodeContainer');
                     qContainer.innerHTML = '';
-                    new QRCode(qContainer, {
-                        text: result.data.paymentNumber,
-                        width: 240,
-                        height: 240
-                    });
+                    new QRCode(qContainer, { text: result.data.paymentNumber, width: 220, height: 220 });
 
                     document.getElementById('depositModal').classList.remove('hidden');
                     startDepositPolling();
@@ -480,11 +510,7 @@
 
                     const qContainer = document.getElementById('depQrcodeContainer');
                     qContainer.innerHTML = '';
-                    new QRCode(qContainer, {
-                        text: result.data.paymentNumber,
-                        width: 240,
-                        height: 240
-                    });
+                    new QRCode(qContainer, { text: result.data.paymentNumber, width: 220, height: 220 });
 
                     document.getElementById('depositModal').classList.remove('hidden');
                     startDepositPolling();
