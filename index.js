@@ -172,6 +172,18 @@ const systemMetricsSchemaV2 = new mongoose.Schema({
 
 const SystemMetricsV2 = mongoose.models.SystemMetricsV2 || mongoose.model('SystemMetricsV2', systemMetricsSchemaV2);
 
+// CHAT MESSAGE SCHEMA & MODEL
+const chatMessageSchema = new mongoose.Schema({
+    userEmail: { type: String, required: true, index: true },
+    sender: { type: String, enum: ['user', 'owner', 'admin'], required: true },
+    senderName: { type: String, default: 'Guest' },
+    message: { type: String, required: true, trim: true },
+    readByAdmin: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage', chatMessageSchema);
+
 // ====================================================
 // MIDDLEWARES & UTILS
 // ====================================================
@@ -237,6 +249,150 @@ function getUserIdentifier(req) {
     }
     return req.ip; 
 }
+
+const checkAdminRole = (req, res, next) => {
+    if (!req.user) return res.status(401).json({ status: false, message: 'Silakan login terlebih dahulu!' });
+    const ownerEmail = 'haqqi.official13@gmail.com';
+    if (req.user.email?.toLowerCase().trim() === ownerEmail) {
+        req.isAdmin = true;
+        return next();
+    }
+    return res.status(403).json({ status: false, message: 'Akses ditolak! Khusus Admin/Owner.' });
+};
+
+// ====================================================
+// ENDPOINT BANTUAN LIVE CHAT CUSTOMER SUPPORT (USER & ADMIN)
+// ====================================================
+
+// 1. GET PESAN USER: Memuat seluruh percakapan milik user yang sedang aktif
+app.get('/api/bantuan/messages', checkAuthSession, async (req, res) => {
+    try {
+        const userIdentifier = getUserIdentifier(req);
+        const messages = await ChatMessage.find({ userEmail: userIdentifier }).sort({ createdAt: 1 }).lean();
+        return res.json({ status: true, messages });
+    } catch (e) {
+        return res.status(500).json({ status: false, message: 'Gagal memuat pesan live chat.' });
+    }
+});
+
+// 2. POST KIRIM PESAN USER: Mengirim pesan dari user ke Customer Support Admin
+app.post('/api/bantuan/send-user', checkAuthSession, async (req, res) => {
+    try {
+        const { message } = req.body;
+        if (!message || !message.trim()) {
+            return res.status(400).json({ status: false, message: 'Pesan tidak boleh kosong!' });
+        }
+
+        const userIdentifier = getUserIdentifier(req);
+        const senderName = req.user ? (req.user.username || req.user.name) : 'Pengguna Guest';
+
+        const newMsg = new ChatMessage({
+            userEmail: userIdentifier,
+            sender: 'user',
+            senderName: senderName,
+            message: message.trim(),
+            readByAdmin: false
+        });
+
+        await newMsg.save();
+        return res.json({ status: true, message: 'Pesan berhasil dikirim!', data: newMsg });
+    } catch (e) {
+        return res.status(500).json({ status: false, message: 'Gagal mengirim pesan.' });
+    }
+});
+
+// 3. ADMIN: Mengambil daftar antrean pengguna yang mengirim pesan chat
+app.get('/api/bantuan/admin/users', checkAuthSession, checkAdminRole, async (req, res) => {
+    try {
+        const rooms = await ChatMessage.aggregate([
+            { $sort: { createdAt: -1 } },
+            { 
+                $group: {
+                    _id: "$userEmail",
+                    lastMessage: { $first: "$message" },
+                    senderName: { $first: "$senderName" },
+                    lastSender: { $first: "$sender" },
+                    updatedAt: { $first: "$createdAt" },
+                    unreadCount: {
+                        $sum: {
+                            $cond: [
+                                { $and: [{ $eq: ["$sender", "user"] }, { $eq: ["$readByAdmin", false] }] },
+                                1,
+                                0
+                            ]
+                        }
+                    }
+                }
+            },
+            { $sort: { updatedAt: -1 } }
+        ]);
+
+        const formattedUsers = rooms.map(r => ({
+            userId: r._id,
+            username: r.senderName || r._id,
+            lastMessage: r.lastMessage,
+            unreadCount: r.unreadCount,
+            updatedAt: r.updatedAt
+        }));
+
+        return res.json({ status: true, users: formattedUsers });
+    } catch (e) {
+        return res.status(500).json({ status: false, message: 'Gagal memuat daftar pengguna chat.' });
+    }
+});
+
+// 4. ADMIN: Mengambil pesan rinci milik satu pengguna tertentu & otomatis tandai terbaca
+app.get('/api/bantuan/admin/messages/:userId', checkAuthSession, checkAdminRole, async (req, res) => {
+    try {
+        const { userId } = req.params;
+        if (!userId) return res.status(400).json({ status: false, message: 'ID/Email pengguna wajib ada!' });
+
+        const cleanId = userId.toLowerCase().trim();
+        const messages = await ChatMessage.find({ userEmail: cleanId }).sort({ createdAt: 1 }).lean();
+
+        // Tandai pesan terbaca oleh admin
+        await ChatMessage.updateMany(
+            { userEmail: cleanId, sender: 'user', readByAdmin: false },
+            { $set: { readByAdmin: true } }
+        );
+
+        return res.json({ status: true, messages });
+    } catch (e) {
+        return res.status(500).json({ status: false, message: 'Gagal memuat riwayat pesan pengguna.' });
+    }
+});
+
+// 5. ADMIN: Mengirim balasan dari Admin/Owner ke user target
+app.post('/api/bantuan/admin/reply', checkAuthSession, checkAdminRole, async (req, res) => {
+    try {
+        const { userId, message } = req.body;
+        if (!userId || !message || !message.trim()) {
+            return res.status(400).json({ status: false, message: 'ID Pengguna dan pesan balasan wajib diisi!' });
+        }
+
+        const replyMsg = new ChatMessage({
+            userEmail: userId.toLowerCase().trim(),
+            sender: 'owner',
+            senderName: 'Admin / Owner',
+            message: message.trim(),
+            readByAdmin: true
+        });
+
+        await replyMsg.save();
+        return res.json({ status: true, message: 'Balasan admin berhasil terkirim!', data: replyMsg });
+    } catch (e) {
+        return res.status(500).json({ status: false, message: 'Gagal mengirim balasan admin.' });
+    }
+});
+
+// ROUTE PANEL ADMIN CHAT
+app.get('/admin/livechat', checkAuthSession, (req, res) => {
+    const ownerEmail = 'haqqi.official13@gmail.com';
+    if (!req.user || req.user.email?.toLowerCase().trim() !== ownerEmail) {
+        return res.redirect('/dashboard');
+    }
+    res.sendFile(path.join(__dirname, 'public', 'admin-chat.html'));
+});
 
 app.post('/api/user/update-username', checkAuthSession, async (req, res) => {
     try {
@@ -1251,72 +1407,6 @@ app.get('/api/user/transactions', checkAuthSession, async (req, res) => {
         console.error("Error fetching transaction history:", err);
         return res.status(500).json({ status: false, message: "Gagal mengambil riwayat transaksi" });
     }
-});
-
-// CHAT MESSAGE SCHEMA & MODEL
-const chatMessageSchema = new mongoose.Schema({
-    userEmail: { type: String, required: true, index: true },
-    sender: { type: String, enum: ['user', 'owner'], required: true },
-    senderName: { type: String, default: 'Guest' },
-    message: { type: String, required: true, trim: true },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage', chatMessageSchema);
-
-// MEMERIKSA STATUS ROLE ADMIN/OWNER
-const checkAdminRole = (req, res, next) => {
-    if (!req.user) return res.status(401).json({ status: false, message: 'Silakan login terlebih dahulu!' });
-    const ownerEmail = 'supportarulzxd@gmail.com'; // Sesuaikan email owner Anda
-    if (req.user.email?.toLowerCase().trim() === ownerEmail) {
-        req.isAdmin = true;
-        return next();
-    }
-    return res.status(403).json({ status: false, message: 'Akses ditolak! Khusus Admin/Owner.' });
-};
-
-// 1. ENDPOINT KHUSUS ADMIN: Mengambil semua daftar sesi room chat dari seluruh user
-app.get('/api/admin/chat-rooms', checkAuthSession, checkAdminRole, async (req, res) => {
-    try {
-        const rooms = await ChatMessage.aggregate([
-            { $sort: { createdAt: -1 } },
-            { 
-                $group: {
-                    _id: "$userEmail",
-                    lastMessage: { $first: "$message" },
-                    senderName: { $first: "$senderName" },
-                    lastSender: { $first: "$sender" },
-                    updatedAt: { $first: "$createdAt" }
-                }
-            },
-            { $sort: { updatedAt: -1 } }
-        ]);
-        return res.json({ status: true, rooms });
-    } catch (e) {
-        return res.status(500).json({ status: false, message: 'Gagal memuat daftar room chat.' });
-    }
-});
-
-// 2. ENDPOINT KHUSUS ADMIN: Mengambil seluruh riwayat pesan dari user tertentu
-app.get('/api/admin/chat-history', checkAuthSession, checkAdminRole, async (req, res) => {
-    try {
-        const { userEmail } = req.query;
-        if (!userEmail) return res.status(400).json({ status: false, message: 'Email user wajib diisi.' });
-
-        const messages = await ChatMessage.find({ userEmail: userEmail.toLowerCase().trim() }).sort({ createdAt: 1 }).lean();
-        return res.json({ status: true, messages });
-    } catch (e) {
-        return res.status(500).json({ status: false, message: 'Gagal memuat pesan.' });
-    }
-});
-
-// 3. ROUTE HALAMAN PANEL ADMIN CS WEBSITE
-app.get('/admin/livechat', checkAuthSession, (req, res) => {
-    const ownerEmail = 'supportarulzxd@gmail.com';
-    if (!req.user || req.user.email?.toLowerCase().trim() !== ownerEmail) {
-        return res.redirect('/dashboard');
-    }
-    res.sendFile(path.join(__dirname, 'public', 'admin-chat.html'));
 });
 
 // AUTHENTICATION & LOGIN/REGISTER HANDLERS
