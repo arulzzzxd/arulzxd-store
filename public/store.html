@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ArulzXD Store - Marketplace</title>
 
+    <!-- META TAGS OPEN GRAPH -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="ArulzXD Store - Marketplace Source Code & Layanan Digital">
     <meta property="og:description" content="Penyedia Source Code, Script, & Layanan Digital Premium Terpercaya dengan Akses Super Cepat & Otomatis.">
@@ -14,10 +15,15 @@
     <meta property="og:url" content="https://arulz-xd.my.id/store">
 
     <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QRCode JS Generator -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -41,7 +47,12 @@
         }
     </script>
     <style>
-        body { background-color: #F4F0EA; color: #000000; overflow-x: hidden; }
+        body { 
+            background-color: #F4F0EA; 
+            color: #000000; 
+            overflow-x: hidden; 
+            touch-action: manipulation;
+        }
         
         .neo-box {
             background-color: #FFFFFF;
@@ -61,6 +72,27 @@
         .neo-btn:active {
             transform: translate(2px, 2px);
             box-shadow: 2px 2px 0px #000000;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #F4F0EA; }
+        ::-webkit-scrollbar-thumb { background: #000000; border-radius: 4px; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        input[type='number']::-webkit-inner-spin-button,
+        input[type='number']::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .swal2-popup.cyber-swal {
+            background: #FFFFFF !important;
+            border: 3px solid #000000 !important;
+            border-radius: 20px !important;
+            color: #000000 !important;
+            box-shadow: 6px 6px 0px #000000 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
         }
 
         /* FLUID CURVED NOTCH BOTTOM NAVIGATION BAR */
@@ -152,15 +184,6 @@
             border-radius: 50%;
         }
 
-        .swal2-popup.cyber-swal {
-            background: #FFFFFF !important;
-            border: 3px solid #000000 !important;
-            border-radius: 20px !important;
-            color: #000000 !important;
-            box-shadow: 6px 6px 0px #000000 !important;
-            font-family: 'Plus Jakarta Sans', sans-serif !important;
-        }
-
         #cyber-loader-overlay {
             position: fixed;
             inset: 0;
@@ -173,7 +196,7 @@
             transition: opacity 0.4s ease, visibility 0.4s ease;
         }
         #cyber-loader-overlay.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
-        
+
         .animated-dots::after {
             content: '';
             display: inline-block;
@@ -184,16 +207,51 @@
         @keyframes dotsAnimation {
             0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
         }
+
+        .cyber-option-card {
+            background: #FFFFFF;
+            border: 2px solid #000000;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        .cyber-option-card.active {
+            background: #FFDE59;
+            border-width: 3px;
+            box-shadow: 3px 3px 0px #000000;
+        }
+        .cyber-radio-dot {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #FFFFFF;
+        }
+        .cyber-radio-inner {
+            width: 8px;
+            height: 8px;
+            background: #000000;
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s ease;
+        }
+        .cyber-option-card.active .cyber-radio-inner {
+            opacity: 1;
+            transform: scale(1);
+        }
     </style>
 </head>
 <body class="font-sans antialiased text-black min-h-screen pb-32">
 
-    <!-- LOADER -->
+    <!-- LOADER OVERLAY -->
     <div id="cyber-loader-overlay">
         <div class="neo-box p-6 rounded-2xl flex flex-col items-center bg-white">
             <img src="https://files.catbox.moe/kdowze.png" alt="Logo" class="w-20 h-20 rounded-full border-3 border-black mb-4 shadow-[4px_4px_0px_#000]">
             <div id="loader-title-text" class="text-base font-black tracking-wider uppercase font-cyber mb-1">
-                Memuat Toko<span class="animated-dots"></span>
+                Memuat Marketplace<span class="animated-dots"></span>
             </div>
             <div class="text-[11px] font-bold font-mono tracking-wider uppercase bg-neoYellow border-2 border-black px-2 py-0.5">
                 SYSTEM INITIALIZING
@@ -252,7 +310,7 @@
                 <h3 class="font-black text-xs font-cyber text-black mb-3 uppercase tracking-wider flex items-center gap-2">
                     <i class="fa-solid fa-layer-group"></i> Kategori Produk
                 </h3>
-                <div class="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0" id="categoryContainer">
+                <div class="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 scrollbar-hide" id="categoryContainer">
                     <button onclick="selectCategory('all')" data-category="all" class="cat-btn neo-btn w-full text-left px-3 py-2 rounded-lg text-xs font-black bg-neoYellow font-cyber whitespace-nowrap">
                         Semua Produk
                     </button>
@@ -288,10 +346,183 @@
         </div>
     </div>
 
-    <!-- MODAL CHECKOUT / ORDER -->
-    <div id="checkoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="neo-box w-full max-w-lg rounded-2xl bg-white p-5 space-y-4 relative max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between border-b-3 border-black pb-3">
+    <!-- MODAL DETAIL PRODUK & PENILAIAN SHOPEE STYLE -->
+    <div id="productDetailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div id="productDetailModalContent" class="neo-box w-full max-w-2xl rounded-2xl bg-white overflow-hidden my-auto max-h-[90vh] flex flex-col relative">
+            
+            <div class="bg-neoYellow p-4 text-black flex justify-between items-center border-b-3 border-black flex-shrink-0">
+                <h3 class="font-black text-sm font-cyber uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-star text-black"></i> Detail & Penilaian Produk
+                </h3>
+                <button onclick="closeProductDetailModal()" class="text-black font-black text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div id="modalDetailScrollable" class="overflow-y-auto p-4 sm:p-5 space-y-5 flex-1 scroll-smooth">
+                <!-- Ringkasan Produk -->
+                <div class="flex flex-col sm:flex-row gap-4 items-start neo-box p-3 rounded-xl bg-neoBg">
+                    
+                    <div class="relative w-full sm:w-36 h-36 rounded-lg overflow-hidden bg-white border-2 border-black flex-shrink-0 group cursor-pointer" id="modalProductCarousel" onclick="zoomCurrentProductImage()">
+                        <div class="flex w-full h-full transition-transform duration-300 ease-out" id="modalCarouselTrack">
+                            <img id="detailImg" src="" class="w-full h-full object-cover flex-shrink-0">
+                        </div>
+                        
+                        <span class="absolute top-1.5 right-1.5 bg-neoYellow border border-black text-black text-[10px] p-1 rounded font-black">
+                            <i class="fa-solid fa-magnifying-glass-plus"></i>
+                        </span>
+
+                        <button onclick="event.stopPropagation(); slideModalCarousel(-1)" class="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white border border-black text-black flex items-center justify-center text-xs font-black">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button onclick="event.stopPropagation(); slideModalCarousel(1)" class="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white border border-black text-black flex items-center justify-center text-xs font-black">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+                        <div class="absolute bottom-1.5 inset-x-0 flex justify-center gap-1 z-10" id="modalCarouselDots"></div>
+                    </div>
+
+                    <div class="space-y-1 overflow-hidden flex-1">
+                        <h2 id="detailTitle" class="text-sm font-black font-cyber text-black truncate"></h2>
+                        <p id="detailPrice" class="text-xs font-black font-mono text-black"></p>
+                        <div id="detailRatingSummary" class="flex items-center gap-2 text-xs text-black pt-1"></div>
+                        <p id="detailDesc" class="text-[11px] font-bold text-slate-700 line-clamp-3 pt-1"></p>
+                    </div>
+                </div>
+
+                <!-- LIST REVIU / PENILAIAN DARI USER -->
+                <div id="ratingSectionHeader" class="space-y-3 pb-24">
+                    <h4 class="text-xs font-black font-cyber text-black uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-comments"></i> Penilaian Pembeli
+                    </h4>
+                    <div id="reviewsListContainer" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <!-- FORM BERI / EDIT PENILAIAN -->
+            <div id="reviewHotbarContainer" class="sticky bottom-0 z-20 p-3 bg-white border-t-3 border-black space-y-2">
+                <form id="reviewForm" onsubmit="submitReview(event)" class="space-y-2">
+                    <input type="hidden" id="reviewProductId">
+                    <input type="hidden" id="selectedRatingValue" required>
+                    <input type="hidden" id="isEditReviewMode" value="false">
+
+                    <div class="neo-box p-2.5 rounded-xl bg-neoBg space-y-2">
+                        <div class="flex items-center justify-between px-1">
+                            <div class="flex items-center gap-1.5">
+                                <span id="reviewModeBadge" class="text-[10px] font-black font-cyber">Rating:</span>
+                                <div class="flex items-center gap-1 text-sm text-black" id="starInputGroup">
+                                    <i class="fa-solid fa-star cursor-pointer transition" onclick="setRating(1)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition" onclick="setRating(2)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition" onclick="setRating(3)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition" onclick="setRating(4)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition" onclick="setRating(5)"></i>
+                                </div>
+                            </div>
+
+                            <button type="button" id="btnCancelEditMode" onclick="resetReviewForm()" class="hidden text-[10px] font-bold text-red-600 underline">
+                                Batal Edit
+                            </button>
+                        </div>
+
+                        <div id="mediaPreviewContainer" class="hidden flex gap-2 overflow-x-auto py-1 border-t-2 border-black/20"></div>
+
+                        <div class="flex items-end gap-2">
+                            <textarea id="reviewComment" rows="1" required placeholder="Tuliskan ulasan produk..."
+                                oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 90) + 'px'"
+                                class="flex-1 bg-white border-2 border-black rounded-lg text-xs font-bold text-black placeholder-slate-500 focus:outline-none resize-none max-h-24 py-1.5 px-2 leading-relaxed"></textarea>
+                            
+                            <div class="flex items-center gap-1.5 flex-shrink-0 pb-0.5">
+                                <label for="reviewMediaFiles" title="Lampirkan Gambar/Video" class="neo-btn w-8 h-8 rounded-lg bg-white text-black flex items-center justify-center cursor-pointer font-black">
+                                    <i class="fa-solid fa-paperclip text-xs"></i>
+                                </label>
+                                <input type="file" id="reviewMediaFiles" multiple accept="image/*,video/*" class="hidden" onchange="handleFileSelection(this)">
+
+                                <button type="submit" id="btnSubmitReview" title="Kirim Ulasan" class="neo-btn w-8 h-8 rounded-lg bg-neoYellow text-black font-black flex items-center justify-center">
+                                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL LIGHTBOX FULLSCREEN UNTUK ZOOM GAMBAR PRODUK & SLIDER -->
+    <div id="productZoomLightbox" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex flex-col justify-between p-3 sm:p-6 select-none" onclick="closeProductZoomLightbox()">
+        <div class="flex items-center justify-between text-white z-20" onclick="event.stopPropagation()">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-box text-neoYellow"></i>
+                <h5 id="zoomProductTitle" class="text-xs sm:text-sm font-black font-cyber text-white truncate max-w-xs sm:max-w-md"></h5>
+            </div>
+            <button onclick="closeProductZoomLightbox()" class="text-white font-black text-2xl p-2">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="relative flex-1 flex items-center justify-center overflow-hidden my-2" id="zoomSwipeArea" onclick="event.stopPropagation()">
+            <button onclick="navigateProductZoom(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 z-30 neo-btn w-10 h-10 rounded-full bg-white text-black flex items-center justify-center">
+                <i class="fa-solid fa-chevron-left text-base"></i>
+            </button>
+            <button onclick="navigateProductZoom(1)" class="absolute right-2 top-1/2 -translate-y-1/2 z-30 neo-btn w-10 h-10 rounded-full bg-white text-black flex items-center justify-center">
+                <i class="fa-solid fa-chevron-right text-base"></i>
+            </button>
+
+            <div class="max-w-4xl max-h-[78vh] w-full flex items-center justify-center p-2">
+                <img id="zoomImageElement" src="" class="max-w-full max-h-[78vh] rounded-xl object-contain border-3 border-black bg-white">
+            </div>
+        </div>
+
+        <div class="neo-box p-3 rounded-xl max-w-xl mx-auto w-full z-20 flex flex-col items-center justify-center space-y-2 bg-white" onclick="event.stopPropagation()">
+            <div id="zoomCounterText" class="text-xs font-mono font-black text-black">Gambar 1 dari 1</div>
+            <div id="zoomDotsContainer" class="flex items-center gap-1.5"></div>
+        </div>
+    </div>
+
+    <!-- MODAL LIGHTBOX SLIDER MEDIA RATING -->
+    <div id="mediaLightboxModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex flex-col justify-between p-3 sm:p-6 select-none" onclick="closeMediaLightbox()">
+        <div class="flex items-center justify-between text-white z-20" onclick="event.stopPropagation()">
+            <div class="flex items-center gap-3">
+                <img id="lightboxUserAvatar" src="" class="w-9 h-9 rounded-full object-cover border-2 border-black">
+                <div>
+                    <h5 id="lightboxUserName" class="text-xs font-black text-white font-cyber"></h5>
+                    <div id="lightboxUserRating" class="flex items-center gap-1"></div>
+                </div>
+            </div>
+            <button onclick="closeMediaLightbox()" class="text-white font-black text-2xl p-2">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="relative flex-1 flex items-center justify-center overflow-hidden my-2" id="lightboxSwipeArea" onclick="event.stopPropagation()">
+            <button onclick="navigateMediaHorizontal(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 z-30 neo-btn w-10 h-10 rounded-full bg-white text-black flex items-center justify-center">
+                <i class="fa-solid fa-chevron-left text-base"></i>
+            </button>
+            <button onclick="navigateMediaHorizontal(1)" class="absolute right-2 top-1/2 -translate-y-1/2 z-30 neo-btn w-10 h-10 rounded-full bg-white text-black flex items-center justify-center">
+                <i class="fa-solid fa-chevron-right text-base"></i>
+            </button>
+
+            <div class="max-w-4xl max-h-[75vh] w-full flex items-center justify-center p-2">
+                <img id="lightboxImage" src="" class="hidden max-w-full max-h-[75vh] rounded-xl object-contain border-3 border-black bg-white">
+                <video id="lightboxVideo" controls autoplay loop class="hidden max-w-full max-h-[75vh] rounded-xl object-contain border-3 border-black bg-black"></video>
+            </div>
+        </div>
+
+        <div class="neo-box p-3 rounded-xl max-w-2xl mx-auto w-full z-20 space-y-1.5 bg-white" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between text-[11px] font-mono font-bold text-black">
+                <span id="lightboxMediaCounter">Media 1 dari 1</span>
+                <span id="lightboxUserCounter" class="text-slate-600">Ulasan 1 dari 1</span>
+            </div>
+            <p id="lightboxUserComment" class="text-xs font-bold text-black leading-relaxed max-h-16 overflow-y-auto"></p>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP CHECKOUT METODE PEMBAYARAN -->
+    <div id="checkoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="neo-box w-full max-w-lg rounded-2xl bg-white overflow-hidden my-auto max-h-[95vh] flex flex-col" id="modalContent">
+
+            <div class="bg-neoYellow p-4 text-black flex justify-between items-center border-b-3 border-black flex-shrink-0">
                 <h3 class="font-black text-sm font-cyber uppercase flex items-center gap-2">
                     <i class="fa-solid fa-cart-shopping"></i> Form Pemesanan
                 </h3>
@@ -300,81 +531,147 @@
                 </button>
             </div>
 
-            <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                <div class="flex items-center justify-between bg-neoBg border-2 border-black p-2.5 rounded-xl text-xs font-mono font-bold">
-                    <span>ID TRX:</span>
-                    <span id="modalOrderId" class="text-black font-black">TRX-000000</span>
-                </div>
-
-                <div class="neo-box p-3 rounded-xl bg-neoCyan flex items-center gap-3">
-                    <img id="modalProductImage" src="" class="w-14 h-14 rounded-lg object-cover border-2 border-black">
-                    <div class="overflow-hidden flex-1">
-                        <p id="modalProductName" class="text-xs font-black font-cyber truncate"></p>
-                        <p id="modalProductPrice" class="text-xs font-bold font-mono mt-0.5"></p>
-                    </div>
-                </div>
-
-                <div class="neo-box p-3 rounded-xl bg-neoYellow flex items-center justify-between">
-                    <div>
-                        <label class="block text-xs font-black font-cyber">Jumlah Beli</label>
-                        <span id="modalStockInfo" class="text-[10px] font-bold">Tersisa: 0</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button type="button" onclick="updateQuantity(-1)" class="neo-btn w-8 h-8 bg-white rounded-lg font-black text-sm">-</button>
-                        <input type="number" id="qtyInput" value="1" min="1" oninput="onQtyInputChange()" class="w-12 text-center bg-white border-2 border-black rounded-lg text-xs font-black font-cyber py-1">
-                        <button type="button" onclick="updateQuantity(1)" class="neo-btn w-8 h-8 bg-white rounded-lg font-black text-sm">+</button>
-                    </div>
-                </div>
-
-                <div class="neo-box p-3.5 rounded-xl bg-white space-y-2">
-                    <div class="flex items-center justify-between text-xs font-bold">
-                        <span>Total Tagihan:</span>
-                        <span id="modalTotalPrice" class="text-sm font-black font-cyber bg-neoGreen border border-black px-2 py-0.5 rounded">Rp 0</span>
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="block text-xs font-black font-cyber uppercase">Pilih Pembayaran</label>
-                    <input type="hidden" id="paymentMethodSelect" value="saldo">
-                    
-                    <div onclick="selectPayment('saldo')" id="opt-saldo" class="neo-box p-3 rounded-xl cursor-pointer bg-neoYellow flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <i class="fa-solid fa-wallet text-base"></i>
-                            <div>
-                                <p class="text-xs font-black font-cyber">Saldo Akun Anda</p>
-                                <p class="text-[10px] font-bold" id="userBalanceOptionLabel">Saldo: Rp 0</p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-circle-check text-base"></i>
+            <div class="overflow-y-auto p-4 sm:p-5 flex-1">
+                <!-- STEP 1: FORM UTAMA PEMILIHAN METODE PEMBAYARAN -->
+                <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                    <div class="flex items-center justify-between bg-neoBg border-2 border-black px-3 py-2 rounded-xl text-xs font-mono font-bold">
+                        <span>ID TRX:</span>
+                        <span id="modalOrderId" class="text-black font-black">TRX-000000</span>
                     </div>
 
-                    <div onclick="selectPayment('manual')" id="opt-manual" class="neo-box p-3 rounded-xl cursor-pointer bg-white flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <i class="fa-brands fa-whatsapp text-base"></i>
-                            <div>
-                                <p class="text-xs font-black font-cyber">Order Manual WhatsApp</p>
-                                <p class="text-[10px] font-bold text-slate-600">Hubungi Admin Langsung</p>
+                    <div class="neo-box p-3 rounded-xl bg-neoCyan flex items-center gap-3">
+                        <img id="modalProductImage" src="" class="w-12 h-12 rounded-lg object-cover border-2 border-black bg-white">
+                        <div class="overflow-hidden flex-1">
+                            <p id="modalProductName" class="text-xs font-black font-cyber truncate"></p>
+                            <div class="flex items-center justify-between mt-1">
+                                <p id="modalProductPrice" class="text-xs font-mono font-bold"></p>
+                                <span id="modalProductSold" class="text-[10px] font-bold"></span>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="manualFieldsGroup" class="hidden space-y-3">
-                    <div>
-                        <label class="block text-xs font-black font-cyber mb-1">Nama / Username</label>
-                        <input type="text" id="usernameInput" placeholder="Masukkan username Anda" class="w-full px-3 py-2 text-xs bg-white border-2 border-black rounded-xl font-bold">
+                    <div class="neo-box p-3 rounded-xl bg-neoYellow flex items-center justify-between">
+                        <div>
+                            <label class="block text-xs font-black font-cyber">Jumlah Beli</label>
+                            <span id="modalStockInfo" class="text-[10px] font-bold">Tersisa: 0</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="updateQuantity(-1)" class="neo-btn w-8 h-8 bg-white rounded-lg font-black text-sm">-</button>
+                            <input type="number" id="qtyInput" value="1" min="1" oninput="onQtyInputChange()" class="w-12 text-center bg-white border-2 border-black rounded-lg text-xs font-black font-cyber py-1">
+                            <button type="button" onclick="updateQuantity(1)" class="neo-btn w-8 h-8 bg-white rounded-lg font-black text-sm">+</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="pt-2">
-                    <button type="button" id="btnPaySaldo" onclick="processSaldoPayment()" class="neo-btn w-full bg-neoGreen text-black font-cyber font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-wallet"></i> Bayar Pakai Saldo
-                    </button>
-                    <button type="submit" id="btnPayManual" class="neo-btn w-full hidden bg-neoYellow text-black font-cyber font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> Order via WhatsApp
+                    <div class="neo-box p-3 rounded-xl bg-white space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-xs font-black font-cyber flex items-center gap-1.5" for="voucherInput">
+                                <i class="fa-solid fa-ticket"></i> Kode Voucher
+                            </label>
+                            <span id="voucherStatusLabel" class="text-[10px] font-bold">Bisa diisi / dikosongkan</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="voucherInput" placeholder="Masukkan kode jika ada..." 
+                                   class="flex-1 bg-white border-2 border-black rounded-xl px-3 py-2 text-xs font-mono font-bold text-black uppercase">
+                            <button type="button" id="btnClaimVoucher" onclick="claimVoucher()" 
+                                    class="neo-btn bg-neoYellow font-cyber font-black px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 uppercase">
+                                <i class="fa-solid fa-check"></i> <span id="btnClaimText">Claim</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="neo-box p-3 rounded-xl bg-white space-y-1.5">
+                        <div class="flex items-center justify-between text-xs font-bold">
+                            <span>Subtotal Harga:</span>
+                            <span id="modalSubtotalPrice" class="font-mono">Rp 0</span>
+                        </div>
+                        <div id="voucherDiscountRow" class="hidden flex items-center justify-between text-xs font-bold text-emerald-600">
+                            <span>Diskon Voucher:</span>
+                            <span id="modalDiscountAmount" class="font-mono">- Rp 0</span>
+                        </div>
+                        <div class="flex items-center justify-between pt-1.5 border-t-2 border-black">
+                            <span class="text-xs font-black font-cyber">Total Tagihan:</span>
+                            <span id="modalTotalPrice" class="text-sm font-black font-cyber bg-neoGreen border border-black px-2 py-0.5 rounded">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-black font-cyber uppercase tracking-wider">
+                            <i class="fa-solid fa-credit-card"></i> Pilih Metode Pembayaran
+                        </label>
+
+                        <input type="hidden" id="paymentMethodSelect" value="saldo">
+
+                        <div class="space-y-2.5" id="customPaymentOptions">
+                            <div onclick="selectCyberPayment('saldo')" id="opt-saldo" class="cyber-option-card active p-3 cursor-pointer flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-wallet text-base"></i>
+                                    <div>
+                                        <p class="text-xs font-black font-cyber">Saldo Akun Anda</p>
+                                        <p class="text-[10px] font-bold" id="userBalanceOptionLabel">Saldo Tersedia: Rp 0</p>
+                                    </div>
+                                </div>
+                                <div class="cyber-radio-dot"><div class="cyber-radio-inner"></div></div>
+                            </div>
+
+                            <div onclick="selectCyberPayment('manual')" id="opt-manual" class="cyber-option-card p-3 cursor-pointer flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-brands fa-whatsapp text-base"></i>
+                                    <div>
+                                        <p class="text-xs font-black font-cyber">Order Manual via WhatsApp</p>
+                                        <p class="text-[10px] font-bold text-slate-600">Hubungi Admin langsung</p>
+                                    </div>
+                                </div>
+                                <div class="cyber-radio-dot"><div class="cyber-radio-inner"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="manualFieldsGroup" class="hidden space-y-3 pt-2">
+                        <div>
+                            <label class="block text-xs font-black font-cyber mb-1" for="usernameInput">Username Pembeli</label>
+                            <input type="text" id="usernameInput" placeholder="Masukkan username Anda" class="w-full px-3 py-2 text-xs bg-white border-2 border-black rounded-xl font-bold">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-black font-cyber mb-1" for="noteInput">Catatan Tambahan</label>
+                            <textarea id="noteInput" rows="2" placeholder="Catatan khusus..." class="w-full p-2 text-xs bg-white border-2 border-black rounded-xl font-bold resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="button" id="btnPaySaldo" onclick="processSaldoPayment()" class="neo-btn w-full bg-neoGreen text-black font-cyber font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-wallet"></i> Bayar Pakai Saldo
+                        </button>
+
+                        <button type="submit" id="btnPayManual" class="neo-btn w-full hidden bg-neoYellow text-black font-cyber font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> Order via WhatsApp
+                        </button>
+                    </div>
+                </form>
+
+                <!-- STEP 2: SUKSES -->
+                <div id="paymentStep3" class="hidden flex flex-col items-center justify-center space-y-4 text-center">
+                    <div class="w-14 h-14 bg-neoGreen border-3 border-black rounded-full flex items-center justify-center text-2xl font-black shadow-[3px_3px_0px_#000]">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-black font-cyber">Pembayaran Berhasil!</h4>
+                        <p class="text-xs font-bold text-slate-600 mt-1">Transaksi Anda telah dikonfirmasi dan diproses secara otomatis.</p>
+                    </div>
+
+                    <div class="w-full neo-box p-4 rounded-xl space-y-2 bg-neoCyan">
+                        <p class="text-[10px] font-black font-cyber uppercase">LINK AKSES PRODUK / SCRIPT:</p>
+                        <a id="productDownloadLink" href="#" target="_blank" class="text-xs font-bold font-mono text-black underline break-all block">
+                            <i class="fa-solid fa-cloud-arrow-down text-sm"></i> <span id="productLinkText">Akses Link Produk</span>
+                        </a>
+                    </div>
+
+                    <button onclick="closeCheckoutModal()" class="neo-btn w-full bg-white text-black text-xs font-black py-2.5 rounded-xl uppercase font-cyber">
+                        Tutup
                     </button>
                 </div>
-            </form>
+            </div>
+
         </div>
     </div>
 
@@ -415,42 +712,712 @@
         </div>
     </div>
 
+    <!-- JAVASCRIPT LOGIC DARI STORE_2.HTML (100% UTUH) -->
     <script>
+        document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+        document.addEventListener('dblclick', function (e) { e.preventDefault(); }, { passive: false });
+
         let DATA_PRODUK = [];
         let KATEGORI_AKTIF = 'all';
         let SELECTED_PRODUCT = null;
         let CURRENT_ORDER_ID = '';
         let CURRENT_QTY = 1;
+        let ACTIVE_VOUCHER = null;
+
+        let currentSelectedRating = 0;
         let CURRENT_LOGGED_USER = null;
 
-        function formatRupiah(angka) {
-            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
-        }
+        let SELECTED_FILE_LIST = []; 
+        let EXISTING_MEDIA_LIST = []; 
+        let REMOVED_MEDIA_URLS = []; 
+        let KEEP_EXISTING_MEDIA = true;
+
+        const REVIEWS_CACHE = {};
+
+        let cardCarouselIndices = {};
+        let currentModalImages = [];
+        let currentModalImageIndex = 0;
+
+        let zoomProductImageList = [];
+        let zoomProductActiveIndex = 0;
+
+        let currentReviewsListWithMedia = [];
+        let activeUserReviewIndex = 0;
+        let activeMediaItemIndex = 0;
 
         async function fetchCurrentUserStatus() {
             try {
                 const res = await fetch('/api/user-status');
-                if (res.ok) {
+                if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
                     const data = await res.json();
+                    const authLabel = document.getElementById('nav-auth-label');
+
                     if (data.loggedIn && data.user) {
                         CURRENT_LOGGED_USER = data.user;
-                        document.getElementById('nav-auth-label').innerText = 'Profil';
+                        if (authLabel) authLabel.innerText = 'Profil';
+
                         const balLabel = document.getElementById('userBalanceOptionLabel');
-                        if (balLabel) balLabel.innerText = `Saldo: ${formatRupiah(data.user.saldo || 0)}`;
+                        if (balLabel) {
+                            balLabel.innerText = `Saldo Tersedia: ${formatRupiah(data.user.saldo || 0)}`;
+                        }
+                    } else {
+                        if (authLabel) authLabel.innerText = 'Profil';
                     }
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error("Gagal mendapatkan user status:", e);
+            }
+        }
+
+        function recordPurchasedProduct(productId) {
+            let purchased = JSON.parse(localStorage.getItem('purchased_products') || '[]');
+            if (!purchased.includes(productId)) {
+                purchased.push(productId);
+                localStorage.setItem('purchased_products', JSON.stringify(purchased));
+            }
+        }
+
+        function renderStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            let starsHtml = '';
+
+            for (let i = 1; i <= 5; i++) {
+                if (i <= fullStars) {
+                    starsHtml += `<i class="fa-solid fa-star text-black"></i>`;
+                } else if (i === fullStars + 1 && hasHalfStar) {
+                    starsHtml += `<i class="fa-solid fa-star-half-stroke text-black"></i>`;
+                } else {
+                    starsHtml += `<i class="fa-regular fa-star text-slate-400"></i>`;
+                }
+            }
+            return `<div class="flex items-center gap-0.5 text-xs">${starsHtml} <span class="font-black font-cyber text-black ml-1">${rating > 0 ? rating : '0.0'}</span></div>`;
+        }
+
+        function setRating(val) {
+            currentSelectedRating = val;
+            document.getElementById('selectedRatingValue').value = val;
+
+            const stars = document.querySelectorAll('#starInputGroup i');
+            stars.forEach((star, idx) => {
+                if (idx < val) {
+                    star.classList.remove('text-slate-400');
+                    star.classList.add('text-black');
+                } else {
+                    star.classList.remove('text-black');
+                    star.classList.add('text-slate-400');
+                }
+            });
+        }
+
+        function handleFileSelection(input) {
+            if (input.files && input.files.length > 0) {
+                for (let i = 0; i < input.files.length; i++) {
+                    SELECTED_FILE_LIST.push(input.files[i]);
+                }
+            }
+            input.value = '';
+            renderMediaPreviews();
+        }
+
+        function removeExistingMedia(index) {
+            if (EXISTING_MEDIA_LIST[index]) {
+                REMOVED_MEDIA_URLS.push(EXISTING_MEDIA_LIST[index].url);
+                EXISTING_MEDIA_LIST.splice(index, 1);
+            }
+            renderMediaPreviews();
+        }
+
+        function removeSelectedFile(index) {
+            SELECTED_FILE_LIST.splice(index, 1);
+            renderMediaPreviews();
+        }
+
+        function renderMediaPreviews() {
+            const container = document.getElementById('mediaPreviewContainer');
+            if (!container) return;
+
+            if (EXISTING_MEDIA_LIST.length === 0 && SELECTED_FILE_LIST.length === 0) {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+                return;
+            }
+
+            container.classList.remove('hidden');
+            
+            let html = EXISTING_MEDIA_LIST.map((media, idx) => {
+                const isVideo = media.type === 'video';
+                return `
+                    <div class="relative w-14 h-14 rounded-lg overflow-hidden bg-white border-2 border-black flex-shrink-0 group">
+                        ${isVideo ? `<video src="${media.url}" class="w-full h-full object-cover"></video>` : `<img src="${media.url}" class="w-full h-full object-cover">`}
+                        <span class="absolute bottom-0 inset-x-0 bg-neoCyan text-[8px] text-black text-center font-black font-cyber border-t border-black">LAMA</span>
+                        <button type="button" onclick="removeExistingMedia(${idx})" class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-neoPink text-black flex items-center justify-center text-[9px] border border-black font-black" title="Hapus berkas ini">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            html += SELECTED_FILE_LIST.map((file, idx) => {
+                const isVideo = file.type.startsWith('video/');
+                const objectUrl = URL.createObjectURL(file);
+                return `
+                    <div class="relative w-14 h-14 rounded-lg overflow-hidden bg-white border-2 border-black flex-shrink-0 group">
+                        ${isVideo ? `<video src="${objectUrl}" class="w-full h-full object-cover"></video>` : `<img src="${objectUrl}" class="w-full h-full object-cover">`}
+                        <span class="absolute bottom-0 inset-x-0 bg-neoGreen text-[8px] text-black text-center font-black font-cyber border-t border-black">BARU</span>
+                        <button type="button" onclick="removeSelectedFile(${idx})" class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-neoPink text-black flex items-center justify-center text-[9px] border border-black font-black" title="Batal unggah">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+        }
+
+        function resetReviewForm() {
+            document.getElementById('reviewForm').reset();
+            document.getElementById('isEditReviewMode').value = 'false';
+            document.getElementById('reviewModeBadge').innerText = 'Rating:';
+            document.getElementById('reviewModeBadge').className = 'text-[10px] font-black font-cyber';
+            document.getElementById('btnCancelEditMode').classList.add('hidden');
+
+            const commentInput = document.getElementById('reviewComment');
+            if (commentInput) commentInput.style.height = 'auto';
+
+            SELECTED_FILE_LIST = [];
+            EXISTING_MEDIA_LIST = [];
+            REMOVED_MEDIA_URLS = [];
+            KEEP_EXISTING_MEDIA = true;
+            renderMediaPreviews();
+            setRating(0);
+        }
+
+        function openProductDetailModal(productId) {
+            const product = DATA_PRODUK.find(p => (p.Id || p._id) === productId);
+            if (!product) return;
+
+            const pIdStr = product.Id || product._id;
+            document.getElementById('reviewProductId').value = pIdStr;
+            document.getElementById('detailTitle').innerText = product.nama;
+            document.getElementById('detailPrice').innerText = formatRupiah(product.harga_diskon || product.harga);
+            document.getElementById('detailDesc').innerText = product.deskripsi || 'Tidak ada deskripsi.';
+
+            let imgList = [];
+            if (Array.isArray(product.gambar)) {
+                imgList = product.gambar;
+            } else if (typeof product.gambar === 'string') {
+                imgList = [product.gambar];
+            } else {
+                imgList = ['https://arulz-xd.my.id/files/X1F0Cn.png'];
+            }
+            currentModalImages = imgList;
+            currentModalImageIndex = 0;
+            renderModalCarousel();
+
+            resetReviewForm();
+            document.getElementById('productDetailModal').classList.remove('hidden');
+
+            setTimeout(() => {
+                const scrollableContainer = document.getElementById('modalDetailScrollable');
+                const ratingSection = document.getElementById('ratingSectionHeader');
+                if (scrollableContainer && ratingSection) {
+                    scrollableContainer.scrollTop = ratingSection.offsetTop - 20;
+                }
+            }, 10);
+
+            loadProductReviews(pIdStr);
+        }
+
+        function renderModalCarousel() {
+            const track = document.getElementById('modalCarouselTrack');
+            const dots = document.getElementById('modalCarouselDots');
+
+            track.innerHTML = currentModalImages.map(img => `<img src="${img}" class="w-full h-full object-cover flex-shrink-0">`).join('');
+            track.style.transform = `translateX(-${currentModalImageIndex * 100}%)`;
+
+            dots.innerHTML = currentModalImages.map((_, i) => `
+                <span class="w-1.5 h-1.5 rounded-full ${i === currentModalImageIndex ? 'bg-black' : 'bg-slate-400'} transition-all"></span>
+            `).join('');
+        }
+
+        function slideModalCarousel(dir) {
+            if (currentModalImages.length <= 1) return;
+            currentModalImageIndex = (currentModalImageIndex + dir + currentModalImages.length) % currentModalImages.length;
+            renderModalCarousel();
+        }
+
+        function slideCardCarousel(prodIndex, dir) {
+            const produk = DATA_PRODUK[prodIndex];
+            if (!produk || !Array.isArray(produk.gambar)) return;
+
+            const total = produk.gambar.length;
+            if (total <= 1) return;
+
+            cardCarouselIndices[prodIndex] = ((cardCarouselIndices[prodIndex] || 0) + dir + total) % total;
+            const track = document.getElementById(`card-track-${prodIndex}`);
+            const dots = document.getElementById(`card-dots-${prodIndex}`);
+
+            if (track) track.style.transform = `translateX(-${cardCarouselIndices[prodIndex] * 100}%)`;
+            if (dots) {
+                dots.innerHTML = produk.gambar.map((_, i) => `
+                    <span class="w-1.5 h-1.5 rounded-full ${i === cardCarouselIndices[prodIndex] ? 'bg-black' : 'bg-slate-400'}"></span>
+                `).join('');
+            }
+        }
+
+        function closeProductDetailModal() {
+            document.getElementById('productDetailModal').classList.add('hidden');
+        }
+
+        function openProductZoomLightbox(prodIndex, initialImgIndex = 0) {
+            const produk = DATA_PRODUK[prodIndex];
+            if (!produk) return;
+
+            let imgList = Array.isArray(produk.gambar) ? produk.gambar : [produk.gambar || 'https://arulz-xd.my.id/files/X1F0Cn.png'];
+
+            zoomProductImageList = imgList;
+            zoomProductActiveIndex = initialImgIndex;
+
+            document.getElementById('zoomProductTitle').innerText = produk.nama;
+            renderProductZoomContent();
+
+            document.getElementById('productZoomLightbox').classList.remove('hidden');
+        }
+
+        function zoomCurrentProductImage() {
+            if (currentModalImages.length === 0) return;
+            zoomProductImageList = currentModalImages;
+            zoomProductActiveIndex = currentModalImageIndex;
+
+            document.getElementById('zoomProductTitle').innerText = document.getElementById('detailTitle').innerText;
+            renderProductZoomContent();
+
+            document.getElementById('productZoomLightbox').classList.remove('hidden');
+        }
+
+        function renderProductZoomContent() {
+            if (zoomProductImageList.length === 0) return;
+
+            const imgEl = document.getElementById('zoomImageElement');
+            imgEl.src = zoomProductImageList[zoomProductActiveIndex];
+
+            document.getElementById('zoomCounterText').innerText = `Gambar ${zoomProductActiveIndex + 1} dari ${zoomProductImageList.length}`;
+
+            const dotsContainer = document.getElementById('zoomDotsContainer');
+            dotsContainer.innerHTML = zoomProductImageList.map((_, i) => `
+                <span class="w-2 h-2 rounded-full ${i === zoomProductActiveIndex ? 'bg-black scale-125' : 'bg-slate-400'} transition-all"></span>
+            `).join('');
+        }
+
+        function navigateProductZoom(dir) {
+            if (zoomProductImageList.length <= 1) return;
+            zoomProductActiveIndex = (zoomProductActiveIndex + dir + zoomProductImageList.length) % zoomProductImageList.length;
+            renderProductZoomContent();
+        }
+
+        function closeProductZoomLightbox() {
+            document.getElementById('productZoomLightbox').classList.add('hidden');
+        }
+
+        let zoomTouchStartX = 0;
+        const zoomSwipeArea = document.getElementById('zoomSwipeArea');
+        if (zoomSwipeArea) {
+            zoomSwipeArea.addEventListener('touchstart', e => {
+                zoomTouchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            zoomSwipeArea.addEventListener('touchend', e => {
+                const diffX = e.changedTouches[0].screenX - zoomTouchStartX;
+                if (Math.abs(diffX) > 40) {
+                    navigateProductZoom(diffX < 0 ? 1 : -1);
+                }
+            }, { passive: true });
+        }
+
+        function openMediaLightboxSlider(reviewIndex, mediaIndex) {
+            activeUserReviewIndex = reviewIndex;
+            activeMediaItemIndex = mediaIndex;
+
+            renderLightboxMediaContent();
+            document.getElementById('mediaLightboxModal').classList.remove('hidden');
+        }
+
+        function renderLightboxMediaContent() {
+            if (!currentReviewsListWithMedia || currentReviewsListWithMedia.length === 0) return;
+
+            const userReview = currentReviewsListWithMedia[activeUserReviewIndex];
+            if (!userReview) return;
+
+            const currentMedia = userReview.media[activeMediaItemIndex];
+
+            document.getElementById('lightboxUserAvatar').src = userReview.userAvatar || 'https://arulz-xd.my.id/files/X1F0Cn.png';
+            document.getElementById('lightboxUserName').innerText = userReview.username || 'Pembeli';
+            document.getElementById('lightboxUserRating').innerHTML = renderStarRating(userReview.rating || 5);
+            document.getElementById('lightboxUserComment').innerText = userReview.comment || '';
+
+            const img = document.getElementById('lightboxImage');
+            const video = document.getElementById('lightboxVideo');
+
+            if (currentMedia.type === 'video') {
+                img.classList.add('hidden');
+                video.src = currentMedia.url;
+                video.classList.remove('hidden');
+                video.play().catch(() => {});
+            } else {
+                video.pause();
+                video.classList.add('hidden');
+                img.src = currentMedia.url;
+                img.classList.remove('hidden');
+            }
+
+            document.getElementById('lightboxMediaCounter').innerText = `Media ${activeMediaItemIndex + 1} dari ${userReview.media.length}`;
+            document.getElementById('lightboxUserCounter').innerText = `Ulasan ${activeUserReviewIndex + 1} dari ${currentReviewsListWithMedia.length}`;
+        }
+
+        function navigateMediaHorizontal(dir) {
+            const userReview = currentReviewsListWithMedia[activeUserReviewIndex];
+            if (!userReview || !userReview.media) return;
+
+            const totalMedia = userReview.media.length;
+            activeMediaItemIndex = (activeMediaItemIndex + dir + totalMedia) % totalMedia;
+            renderLightboxMediaContent();
+        }
+
+        function closeMediaLightbox() {
+            const video = document.getElementById('lightboxVideo');
+            if (video) video.pause();
+            document.getElementById('mediaLightboxModal').classList.add('hidden');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        function editMyReview(rating, comment, mediaJsonStr) {
+            document.getElementById('isEditReviewMode').value = 'true';
+            document.getElementById('reviewModeBadge').innerText = 'Edit Rating:';
+            document.getElementById('reviewModeBadge').className = 'text-[10px] font-black font-cyber text-black';
+            document.getElementById('btnCancelEditMode').classList.remove('hidden');
+
+            setRating(rating);
+            const commentInput = document.getElementById('reviewComment');
+            if (commentInput) {
+                commentInput.value = comment;
+                commentInput.focus();
+                commentInput.style.height = '';
+                commentInput.style.height = Math.min(commentInput.scrollHeight, 90) + 'px';
+            }
+            
+            SELECTED_FILE_LIST = [];
+            REMOVED_MEDIA_URLS = [];
+            KEEP_EXISTING_MEDIA = true;
+
+            try {
+                EXISTING_MEDIA_LIST = mediaJsonStr ? JSON.parse(decodeURIComponent(mediaJsonStr)) : [];
+            } catch (e) {
+                EXISTING_MEDIA_LIST = [];
+            }
+
+            renderMediaPreviews();
+
+            const hotbar = document.getElementById('reviewHotbarContainer');
+            if (hotbar) {
+                hotbar.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        async function deleteMyReview(reviewId) {
+            const confirm = await Swal.fire({
+                title: 'HAPUS ULASAN?',
+                text: 'Ulasan dan bintang rating Anda akan dihapus secara permanen.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'cyber-swal' }
+            });
+
+            if (confirm.isConfirmed) {
+                try {
+                    const res = await fetch(`/api/reviews/${reviewId}`, { method: 'DELETE' });
+                    
+                    const contentType = res.headers.get('content-type') || '';
+                    let result = {};
+
+                    if (contentType.includes('application/json')) {
+                        result = await res.json();
+                    } else {
+                        result = { status: true, message: 'Ulasan berhasil dihapus.' };
+                    }
+
+                    if (res.ok && (result.status || result.success)) {
+                        Swal.fire({ icon: 'success', title: 'TERHAPUS', text: result.message || 'Ulasan berhasil dihapus.', timer: 1500, showConfirmButton: false, customClass: { popup: 'cyber-swal' } });
+                        const productId = document.getElementById('reviewProductId').value;
+                        delete REVIEWS_CACHE[productId];
+                        resetReviewForm();
+                        await loadProductReviews(productId, true);
+                        renderProduk();
+                    } else {
+                        throw new Error(result.message || 'Gagal menghapus ulasan.');
+                    }
+                } catch (err) {
+                    Swal.fire({ icon: 'error', title: 'GAGAL', text: err.message || 'Gagal menghapus ulasan.', customClass: { popup: 'cyber-swal' } });
+                }
+            }
+        }
+
+        async function loadProductReviews(productId, forceRefresh = false) {
+            const container = document.getElementById('reviewsListContainer');
+
+            if (!forceRefresh && REVIEWS_CACHE[productId]) {
+                renderReviewsToDOM(REVIEWS_CACHE[productId]);
+                return;
+            }
+
+            container.innerHTML = `<p class="text-xs font-bold text-slate-500 animate-pulse">Memuat ulasan...</p>`;
+
+            try {
+                const res = await fetch(`/api/reviews/${productId}`);
+                if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
+                    throw new Error('Gagal mengambil data ulasan dari server');
+                }
+                const data = await res.json();
+                REVIEWS_CACHE[productId] = data;
+                renderReviewsToDOM(data);
+            } catch (err) {
+                container.innerHTML = `<p class="text-xs font-bold text-slate-500 italic">Belum ada ulasan untuk produk ini.</p>`;
+            }
+        }
+
+        function renderReviewsToDOM(data) {
+            const container = document.getElementById('reviewsListContainer');
+            
+            document.getElementById('detailRatingSummary').innerHTML = `
+                ${renderStarRating(data.averageRating || 0)}
+                <span class="text-[11px] font-bold text-slate-600">(${data.totalReviews || 0} Penilaian)</span>
+            `;
+
+            if (!data.reviews || data.reviews.length === 0) {
+                currentReviewsListWithMedia = [];
+                container.innerHTML = `<p class="text-xs font-bold text-slate-500 italic">Belum ada ulasan untuk produk ini.</p>`;
+                return;
+            }
+
+            currentReviewsListWithMedia = data.reviews.filter(r => r.media && r.media.length > 0);
+
+            container.innerHTML = data.reviews.map(rev => {
+                let mediaHtml = '';
+                if (rev.media && rev.media.length > 0) {
+                    const revMediaIdx = currentReviewsListWithMedia.findIndex(r => r._id === rev._id);
+                    
+                    mediaHtml = `<div class="flex gap-2 mt-2 overflow-x-auto scrollbar-hide py-1">` + rev.media.map((m, mIdx) => {
+                        if (m.type === 'video') {
+                            return `
+                                <div class="relative w-20 h-20 rounded-lg overflow-hidden bg-white border-2 border-black cursor-pointer flex-shrink-0 group" onclick="openMediaLightboxSlider(${revMediaIdx}, ${mIdx})">
+                                    <video src="${m.url}" class="w-full h-full object-cover pointer-events-none"></video>
+                                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                        <i class="fa-solid fa-play text-white text-xs"></i>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        return `
+                            <img src="${m.url}" onclick="openMediaLightboxSlider(${revMediaIdx}, ${mIdx})" class="w-20 h-20 rounded-lg object-cover bg-white border-2 border-black cursor-pointer flex-shrink-0">
+                        `;
+                    }).join('') + `</div>`;
+                }
+
+                const currentUsername = CURRENT_LOGGED_USER ? CURRENT_LOGGED_USER.username : null;
+                const currentUserId = CURRENT_LOGGED_USER ? CURRENT_LOGGED_USER.id : null;
+                const isMyReview = (currentUsername && rev.username.toLowerCase() === currentUsername.toLowerCase()) ||
+                                   (currentUserId && rev.userId === currentUserId);
+
+                const encodedMedia = encodeURIComponent(JSON.stringify(rev.media || []));
+
+                const actionBtnsHtml = isMyReview ? `
+                    <div class="flex items-center gap-1.5 ml-2">
+                        <button onclick="editMyReview(${rev.rating}, '${escapeHtml(rev.comment)}', '${encodedMedia}')" 
+                                class="text-[10px] font-black font-cyber bg-neoYellow border border-black px-2 py-0.5 rounded">
+                            Edit
+                        </button>
+                        <button onclick="deleteMyReview('${rev._id}')" 
+                                class="text-[10px] font-black font-cyber bg-neoPink border border-black px-1.5 py-0.5 rounded">
+                            Hapus
+                        </button>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="neo-box p-3 rounded-xl bg-white space-y-2">
+                        <div class="flex items-center gap-2.5">
+                            <img src="${rev.userAvatar || 'https://arulz-xd.my.id/files/X1F0Cn.png'}" class="w-7 h-7 rounded-full object-cover border-2 border-black">
+                            <div class="flex-1">
+                                <div class="flex items-center">
+                                    <p class="text-xs font-black font-cyber text-black">${rev.username}</p>
+                                    ${actionBtnsHtml}
+                                </div>
+                                <div class="flex items-center gap-1 mt-0.5">${renderStarRating(rev.rating)}</div>
+                            </div>
+                            <span class="ml-auto text-[9px] font-mono font-bold text-slate-500">${rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('id-ID') : ''}</span>
+                        </div>
+                        <p class="text-xs font-bold text-black leading-relaxed">${rev.comment}</p>
+                        ${mediaHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function submitReview(event) {
+            event.preventDefault();
+            const productId = document.getElementById('reviewProductId').value;
+            const rating = document.getElementById('selectedRatingValue').value;
+            const comment = document.getElementById('reviewComment').value.trim();
+
+            if (!rating) {
+                Swal.fire({ icon: 'warning', title: 'RATING WAJIB', text: 'Silakan beri bintang rating!', customClass: { popup: 'cyber-swal' } });
+                return;
+            }
+
+            if (!comment) {
+                Swal.fire({ icon: 'warning', title: 'ULASAN WAJIB', text: 'Tuliskan ulasan penilaian Anda!', customClass: { popup: 'cyber-swal' } });
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('productId', productId);
+            formData.append('rating', rating);
+            formData.append('comment', comment);
+            formData.append('keepExistingMedia', KEEP_EXISTING_MEDIA ? 'true' : 'false');
+            formData.append('removedMediaUrls', JSON.stringify(REMOVED_MEDIA_URLS));
+
+            if (SELECTED_FILE_LIST.length > 0) {
+                for (let i = 0; i < SELECTED_FILE_LIST.length; i++) {
+                    formData.append('mediaFiles', SELECTED_FILE_LIST[i]);
+                }
+            }
+
+            const btn = document.getElementById('btnSubmitReview');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xs"></i>`;
+
+            try {
+                const res = await fetch('/api/reviews', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                let result = {};
+                if (res.headers.get('content-type')?.includes('application/json')) {
+                    result = await res.json();
+                } else {
+                    result = { status: res.ok, message: 'Penilaian Anda berhasil dikirim.' };
+                }
+
+                if (res.ok && (result.status || result.success)) {
+                    Swal.fire({ icon: 'success', title: 'BERHASIL!', text: result.message || 'Penilaian Anda telah diperbarui.', timer: 2000, showConfirmButton: false, customClass: { popup: 'cyber-swal' } });
+                    
+                    delete REVIEWS_CACHE[productId];
+                    resetReviewForm();
+                    await loadProductReviews(productId, true);
+                    renderProduk();
+                } else {
+                    throw new Error(result.message || 'Gagal mengirim ulasan');
+                }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'GAGAL', text: err.message || 'Gagal mengirim ulasan', customClass: { popup: 'cyber-swal' } });
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-paper-plane text-xs"></i>`;
+            }
+        }
+
+        function selectCyberPayment(method) {
+            document.getElementById('paymentMethodSelect').value = method;
+
+            document.querySelectorAll('.cyber-option-card').forEach(card => card.classList.remove('active'));
+            const activeCard = document.getElementById(`opt-${method}`);
+            if (activeCard) activeCard.classList.add('active');
+
+            const manualFields = document.getElementById('manualFieldsGroup');
+            const btnSaldo = document.getElementById('btnPaySaldo');
+            const btnManual = document.getElementById('btnPayManual');
+            const usernameInput = document.getElementById('usernameInput');
+
+            if (method === 'manual') {
+                manualFields.classList.remove('hidden');
+                btnSaldo.classList.add('hidden');
+                btnManual.classList.remove('hidden');
+                usernameInput.setAttribute('required', 'true');
+            } else {
+                manualFields.classList.add('hidden');
+                btnSaldo.classList.remove('hidden');
+                btnManual.classList.add('hidden');
+                usernameInput.removeAttribute('required');
+                usernameInput.value = '';
+                document.getElementById('noteInput').value = '';
+            }
+        }
+
+        function formatTerjual(jumlah) {
+            if (!jumlah) return '0 terjual';
+            if (jumlah >= 1000) {
+                return (jumlah / 1000).toFixed(1).replace('.0', '') + 'RB+ terjual';
+            }
+            return jumlah + ' terjual';
+        }
+
+        function generateUniqueOrderId() {
+            return `TRX-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
+        }
+
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(angka || 0);
         }
 
         async function fetchProduk() {
+            const statusElem = document.getElementById('serverStatus');
             try {
-                const res = await fetch('/database/produk');
-                if (!res.ok) throw new Error();
-                DATA_PRODUK = await res.json();
+                const response = await fetch('/database/produk');
+                if (!response.ok) throw new Error('Gagal memuat API server');
+
+                DATA_PRODUK = await response.json();
+
+                await Promise.all(DATA_PRODUK.map(async (produk) => {
+                    const pId = produk.Id || produk._id;
+                    try {
+                        const resRev = await fetch(`/api/reviews/${pId}`);
+                        if (resRev.ok && resRev.headers.get('content-type')?.includes('application/json')) {
+                            const revData = await resRev.json();
+                            REVIEWS_CACHE[pId] = revData;
+                        }
+                    } catch (e) {}
+                }));
+
+                if (statusElem) {
+                    statusElem.innerText = '● ONLINE';
+                    statusElem.className = 'bg-neoGreen px-2 py-0.5 border border-black rounded font-bold';
+                }
+
                 generateKategoriButtons();
                 renderProduk();
-            } catch (e) {
-                document.getElementById('productGrid').innerHTML = `<div class="neo-box p-4 bg-neoPink font-cyber font-black text-xs text-center col-span-full">Gagal memuat produk.</div>`;
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                if (statusElem) {
+                    statusElem.innerText = '● OFFLINE';
+                    statusElem.className = 'bg-neoPink px-2 py-0.5 border border-black rounded font-bold';
+                }
+                
+                document.getElementById('productGrid').innerHTML = `
+                    <div class="col-span-full neo-box p-4 bg-neoPink text-center font-cyber font-black text-xs">
+                        Gagal mengambil data produk.
+                    </div>
+                `;
             }
         }
 
@@ -460,10 +1427,11 @@
 
             container.innerHTML = categories.map(cat => {
                 const isAll = cat === 'all';
+                const label = isAll ? 'Semua Produk' : cat;
                 return `
                     <button onclick="selectCategory('${cat}')" data-category="${cat}" 
                             class="cat-btn neo-btn w-full text-left px-3 py-2 rounded-lg text-xs font-black font-cyber whitespace-nowrap ${isAll ? 'bg-neoYellow' : 'bg-white'}">
-                        ${isAll ? 'Semua Produk' : cat}
+                        ${label}
                     </button>
                 `;
             }).join('');
@@ -475,7 +1443,9 @@
                 btn.className = "cat-btn neo-btn w-full text-left px-3 py-2 rounded-lg text-xs font-black font-cyber whitespace-nowrap bg-white";
             });
             const activeBtn = document.querySelector(`.cat-btn[data-category="${category}"]`);
-            if (activeBtn) activeBtn.className = "cat-btn neo-btn w-full text-left px-3 py-2 rounded-lg text-xs font-black font-cyber whitespace-nowrap bg-neoYellow";
+            if (activeBtn) {
+                activeBtn.className = "cat-btn neo-btn w-full text-left px-3 py-2 rounded-lg text-xs font-black font-cyber whitespace-nowrap bg-neoYellow";
+            }
             renderProduk();
         }
 
@@ -487,7 +1457,8 @@
             const filtered = DATA_PRODUK.filter(item => {
                 const matchKategori = KATEGORI_AKTIF === 'all' || item.kategori === KATEGORI_AKTIF;
                 const matchNama = item.nama.toLowerCase().includes(keyword);
-                return matchKategori && matchNama;
+                const matchDeskripsi = item.deskripsi && item.deskripsi.toLowerCase().includes(keyword);
+                return matchKategori && (matchNama || matchDeskripsi);
             });
 
             document.getElementById('productCount').innerText = filtered.length;
@@ -500,56 +1471,176 @@
 
             emptyState.classList.add('hidden');
 
-            grid.innerHTML = filtered.map((produk, idx) => {
+            grid.innerHTML = filtered.map((produk) => {
+                const originalIndex = DATA_PRODUK.findIndex(p => (p.Id || p._id) === (produk.Id || produk._id));
+                const badgeHtml = (produk.badge && produk.badge.trim() !== "") 
+                    ? `<span class="absolute top-2 left-2 bg-neoYellow border-2 border-black font-cyber text-[9px] font-black px-2 py-0.5 rounded shadow-[2px_2px_0px_#000] uppercase tracking-wider">${produk.badge}</span>` 
+                    : '';
+
                 const isOutOfStock = produk.stok !== undefined && produk.stok <= 0;
-                const hargaFinal = produk.harga_diskon || produk.harga;
-                const imgUrl = Array.isArray(produk.gambar) ? produk.gambar[0] : (produk.gambar || 'https://arulz-xd.my.id/files/X1F0Cn.png');
+
+                const stokBadge = isOutOfStock 
+                    ? `<span class="text-[10px] font-black bg-neoPink border border-black px-1.5 py-0.5 rounded">Stok Habis</span>`
+                    : `<span class="text-[10px] font-black bg-neoGreen border border-black px-1.5 py-0.5 rounded">Stok: ${produk.stok}</span>`;
+
+                let hargaHtml = produk.harga_diskon ? `
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-bold text-slate-500 line-through">${formatRupiah(produk.harga)}</span>
+                        <span class="text-sm font-black font-cyber text-black">${formatRupiah(produk.harga_diskon)}</span>
+                    </div>
+                ` : `
+                    <div class="flex flex-col">
+                        <span class="text-sm font-black font-cyber text-black">${formatRupiah(produk.harga)}</span>
+                    </div>
+                `;
+
+                let imageList = Array.isArray(produk.gambar) ? produk.gambar : [produk.gambar || 'https://arulz-xd.my.id/files/X1F0Cn.png'];
+                let imagesHtml = imageList.map((imgUrl, imgIdx) => 
+                    `<img src="${imgUrl}" onclick="event.stopPropagation(); openProductZoomLightbox(${originalIndex}, ${imgIdx})" class="w-full h-full object-cover flex-shrink-0 cursor-pointer ${isOutOfStock ? 'grayscale' : ''}">`
+                ).join('');
+                
+                let cardNavBtns = imageList.length > 1 ? `
+                    <button onclick="event.stopPropagation(); slideCardCarousel(${originalIndex}, -1)" class="absolute left-1 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border border-black text-black flex items-center justify-center text-[10px] font-black z-10">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button onclick="event.stopPropagation(); slideCardCarousel(${originalIndex}, 1)" class="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border border-black text-black flex items-center justify-center text-[10px] font-black z-10">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <div class="absolute bottom-1.5 inset-x-0 flex justify-center gap-1 z-10" id="card-dots-${originalIndex}">
+                        ${imageList.map((_, i) => `<span class="w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-black' : 'bg-slate-400'}"></span>`).join('')}
+                    </div>
+                ` : '';
+
+                const maxChar = 65;
+                const deskripsiTeks = produk.deskripsi || 'Tidak ada deskripsi.';
+                const isLong = deskripsiTeks.length > maxChar;
+
+                const pId = produk.Id || produk._id;
+                const cachedRev = REVIEWS_CACHE[pId] || { averageRating: 5.0, totalReviews: 0 };
 
                 return `
-                    <div class="neo-box rounded-xl p-4 bg-white flex flex-col justify-between space-y-3">
-                        <img src="${imgUrl}" class="w-full h-36 object-cover rounded-lg border-2 border-black">
-                        <div class="space-y-1">
-                            <h4 class="text-xs font-black font-cyber truncate">${produk.nama}</h4>
-                            <p class="text-[11px] font-bold text-slate-600 line-clamp-2">${produk.deskripsi || ''}</p>
-                            <div class="text-sm font-black font-cyber text-black pt-1">${formatRupiah(hargaFinal)}</div>
+                    <div class="neo-box rounded-xl p-4 bg-white flex flex-col justify-between space-y-3 cursor-pointer" onclick="openProductDetailModal('${produk.Id || produk._id}')">
+                        <div class="relative bg-neoBg pt-[100%] overflow-hidden rounded-lg border-2 border-black flex-shrink-0">
+                            <div class="absolute inset-0 flex transition-transform duration-300 ease-out" id="card-track-${originalIndex}">
+                                ${imagesHtml}
+                            </div>
+                            ${badgeHtml}
+                            ${cardNavBtns}
                         </div>
-                        <button onclick="openCheckoutModal(${idx})" ${isOutOfStock ? 'disabled' : ''} class="neo-btn w-full ${isOutOfStock ? 'bg-slate-300 text-slate-600' : 'bg-neoYellow'} font-black text-xs font-cyber py-2 rounded-lg">
-                            ${isOutOfStock ? 'Stok Habis' : 'Beli Sekarang'}
-                        </button>
+                        
+                        <div class="flex flex-col flex-1 justify-between space-y-2">
+                            <div class="space-y-1">
+                                <h4 class="text-xs font-black font-cyber text-black truncate" title="${produk.nama}">
+                                    ${produk.nama}
+                                </h4>
+                                
+                                <div class="text-[11px] font-bold text-slate-600">
+                                    <p id="desc-text-${originalIndex}" class="line-clamp-2">
+                                        ${deskripsiTeks}
+                                    </p>
+                                    ${isLong ? `
+                                        <button onclick="event.stopPropagation(); toggleWaDesc(${originalIndex})" id="desc-btn-${originalIndex}" class="text-black font-black underline mt-0.5 inline-block text-[10px]">
+                                            ... baca selengkapnya
+                                        </button>
+                                    ` : ''}
+                                </div>
+
+                                <div class="flex items-center justify-between text-[10px] font-bold pt-1">
+                                    <span>${stokBadge}</span>
+                                    <span>${formatTerjual(produk.terjual)}</span>
+                                </div>
+
+                                <div class="flex items-center justify-between pt-1 border-t-2 border-black">
+                                    ${renderStarRating(cachedRev.averageRating)}
+                                    <span class="text-[10px] font-bold text-slate-600">(${cachedRev.totalReviews} ulasan)</span>
+                                </div>
+                                
+                                <div class="pt-1">
+                                    ${hargaHtml}
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-1.5 pt-2">
+                                <button onclick="event.stopPropagation(); openCheckoutModal(${originalIndex})" 
+                                        ${isOutOfStock ? 'disabled' : ''}
+                                        class="neo-btn w-full ${isOutOfStock ? 'bg-slate-300 text-slate-600' : 'bg-neoYellow'} font-black text-xs font-cyber py-2 rounded-lg">
+                                    <i class="fa-solid fa-cart-shopping"></i> ${isOutOfStock ? 'Stok Habis' : 'Beli Sekarang'}
+                                </button>
+
+                                <button onclick="event.stopPropagation(); shareProduk(${originalIndex})" 
+                                        class="neo-btn w-full bg-white text-black font-black text-[11px] font-cyber py-1.5 rounded-lg flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-share-nodes"></i> Bagikan
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 `;
             }).join('');
+        }
+
+        function toggleWaDesc(index) {
+            const textElem = document.getElementById(`desc-text-${index}`);
+            const btnElem = document.getElementById(`desc-btn-${index}`);
+
+            if (!textElem || !btnElem) return;
+
+            if (textElem.classList.contains('line-clamp-2')) {
+                textElem.classList.remove('line-clamp-2');
+                btnElem.innerText = 'Sembunyikan';
+            } else {
+                textElem.classList.add('line-clamp-2');
+                btnElem.innerText = '... baca selengkapnya';
+            }
         }
 
         function filterProduk() { renderProduk(); }
 
         function openCheckoutModal(index) {
             SELECTED_PRODUCT = DATA_PRODUK[index];
-            if (!SELECTED_PRODUCT) return;
+            if (!SELECTED_PRODUCT || (SELECTED_PRODUCT.stok !== undefined && SELECTED_PRODUCT.stok <= 0)) return;
 
-            CURRENT_ORDER_ID = `TRX-${Date.now().toString().slice(-6)}`;
+            CURRENT_ORDER_ID = generateUniqueOrderId();
             CURRENT_QTY = 1;
+            ACTIVE_VOUCHER = null;
+
+            const hargaFinal = SELECTED_PRODUCT.harga_diskon || SELECTED_PRODUCT.harga;
 
             document.getElementById('modalOrderId').innerText = CURRENT_ORDER_ID;
             document.getElementById('modalProductName').innerText = SELECTED_PRODUCT.nama;
-            document.getElementById('modalProductPrice').innerText = formatRupiah(SELECTED_PRODUCT.harga_diskon || SELECTED_PRODUCT.harga);
+            document.getElementById('modalProductPrice').innerText = formatRupiah(hargaFinal);
+            document.getElementById('modalProductSold').innerText = formatTerjual(SELECTED_PRODUCT.terjual);
             
-            const imgUrl = Array.isArray(SELECTED_PRODUCT.gambar) ? SELECTED_PRODUCT.gambar[0] : (SELECTED_PRODUCT.gambar || 'https://arulz-xd.my.id/files/X1F0Cn.png');
-            document.getElementById('modalProductImage').src = imgUrl;
-            document.getElementById('modalStockInfo').innerText = `Tersisa: ${SELECTED_PRODUCT.stok || 'Tersedia'}`;
+            let modalImgSrc = Array.isArray(SELECTED_PRODUCT.gambar) ? SELECTED_PRODUCT.gambar[0] : (SELECTED_PRODUCT.gambar || 'https://arulz-xd.my.id/files/X1F0Cn.png');
+            document.getElementById('modalProductImage').src = modalImgSrc;
+            document.getElementById('modalStockInfo').innerText = `Tersisa: ${SELECTED_PRODUCT.stok !== undefined ? SELECTED_PRODUCT.stok : 'Tersedia'}`;
+
+            const vInput = document.getElementById('voucherInput');
+            if (vInput) {
+                vInput.value = '';
+                vInput.disabled = false;
+            }
+            document.getElementById('voucherStatusLabel').innerText = 'Bisa diisi / dikosongkan';
+            
+            const btnClaimText = document.getElementById('btnClaimText');
+            if (btnClaimText) btnClaimText.innerText = 'Claim';
 
             document.getElementById('qtyInput').value = CURRENT_QTY;
             updateTotalPrice();
-            selectPayment('saldo');
+
+            selectCyberPayment('saldo');
+
+            document.getElementById('orderForm').classList.remove('hidden');
+            document.getElementById('paymentStep3').classList.add('hidden');
 
             document.getElementById('checkoutModal').classList.remove('hidden');
         }
 
-        function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
-
         function updateQuantity(change) {
+            if (!SELECTED_PRODUCT) return;
+            const maxStok = SELECTED_PRODUCT.stok !== undefined ? SELECTED_PRODUCT.stok : 999;
+
             let newQty = CURRENT_QTY + change;
-            if (newQty >= 1) {
+            if (newQty >= 1 && newQty <= maxStok) {
                 CURRENT_QTY = newQty;
                 document.getElementById('qtyInput').value = CURRENT_QTY;
                 updateTotalPrice();
@@ -557,75 +1648,318 @@
         }
 
         function onQtyInputChange() {
+            if (!SELECTED_PRODUCT) return;
+            const maxStok = SELECTED_PRODUCT.stok !== undefined ? SELECTED_PRODUCT.stok : 999;
             let val = parseInt(document.getElementById('qtyInput').value) || 1;
-            CURRENT_QTY = Math.max(1, val);
+
+            if (val < 1) val = 1;
+            if (val > maxStok) val = maxStok;
+
+            CURRENT_QTY = val;
+            document.getElementById('qtyInput').value = CURRENT_QTY;
             updateTotalPrice();
+        }
+
+        async function claimVoucher() {
+            const vInput = document.getElementById('voucherInput');
+            const voucherCode = vInput ? vInput.value.trim().toUpperCase() : '';
+            const btnClaim = document.getElementById('btnClaimVoucher');
+            const btnText = document.getElementById('btnClaimText');
+            const statusLabel = document.getElementById('voucherStatusLabel');
+
+            if (ACTIVE_VOUCHER) {
+                ACTIVE_VOUCHER = null;
+                vInput.value = '';
+                vInput.disabled = false;
+                if (btnText) btnText.innerText = 'Claim';
+                statusLabel.innerText = 'Bisa diisi / dikosongkan';
+                updateTotalPrice();
+                return;
+            }
+
+            if (!voucherCode) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'VOUCHER KOSONG',
+                    text: 'Jika tidak memiliki kode voucher, Anda dapat membiarkannya kosong.',
+                    customClass: { popup: 'cyber-swal' }
+                });
+                return;
+            }
+
+            btnClaim.disabled = true;
+            btnClaim.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xs"></i> <span>Cek...</span>`;
+
+            try {
+                const res = await fetch('/api/vouchers/claim', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: voucherCode })
+                });
+
+                const result = await res.json();
+
+                if (!res.ok || !result.status || !result.voucher) {
+                    throw { type: 'not_found', message: result.message || 'Kode voucher tidak valid.' };
+                }
+
+                ACTIVE_VOUCHER = result.voucher;
+                vInput.disabled = true;
+                btnClaim.disabled = false;
+                btnClaim.innerHTML = `<i class="fa-solid fa-xmark"></i> <span>Lepas</span>`;
+                statusLabel.innerText = `● Voucher Valid (${ACTIVE_VOUCHER.code})`;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'VOUCHER BERHASIL!',
+                    text: 'Voucher diskon berhasil dipasang!',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    customClass: { popup: 'cyber-swal' }
+                });
+
+                updateTotalPrice();
+
+            } catch (err) {
+                btnClaim.disabled = false;
+                btnClaim.innerHTML = `<i class="fa-solid fa-check"></i> <span id="btnClaimText">Claim</span>`;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'GAGAL VOUCHER',
+                    text: err.message || 'Kode voucher diskon tidak ditemukan.',
+                    customClass: { popup: 'cyber-swal' }
+                });
+            }
+        }
+
+        function calculateFinalTotal() {
+            if (!SELECTED_PRODUCT) return { subtotal: 0, discount: 0, total: 0 };
+            
+            const hargaUnit = SELECTED_PRODUCT.harga_diskon || SELECTED_PRODUCT.harga;
+            const subtotal = hargaUnit * CURRENT_QTY;
+            let discountAmount = 0;
+
+            if (ACTIVE_VOUCHER) {
+                if (ACTIVE_VOUCHER.type === 'percentage') {
+                    discountAmount = (subtotal * ACTIVE_VOUCHER.discount) / 100;
+                } else if (ACTIVE_VOUCHER.type === 'fixed') {
+                    discountAmount = ACTIVE_VOUCHER.discount;
+                }
+            }
+
+            if (discountAmount > subtotal) discountAmount = subtotal;
+            const finalTotal = subtotal - discountAmount;
+
+            return { subtotal, discount: discountAmount, total: finalTotal };
         }
 
         function updateTotalPrice() {
             if (!SELECTED_PRODUCT) return;
-            const hargaUnit = SELECTED_PRODUCT.harga_diskon || SELECTED_PRODUCT.harga;
-            document.getElementById('modalTotalPrice').innerText = formatRupiah(hargaUnit * CURRENT_QTY);
-        }
+            const calc = calculateFinalTotal();
 
-        function selectPayment(method) {
-            document.getElementById('paymentMethodSelect').value = method;
-            const optSaldo = document.getElementById('opt-saldo');
-            const optManual = document.getElementById('opt-manual');
-            const btnSaldo = document.getElementById('btnPaySaldo');
-            const btnManual = document.getElementById('btnPayManual');
-            const manualFields = document.getElementById('manualFieldsGroup');
+            document.getElementById('modalSubtotalPrice').innerText = formatRupiah(calc.subtotal);
 
-            if (method === 'saldo') {
-                optSaldo.className = "neo-box p-3 rounded-xl cursor-pointer bg-neoYellow flex items-center justify-between";
-                optManual.className = "neo-box p-3 rounded-xl cursor-pointer bg-white flex items-center justify-between";
-                btnSaldo.classList.remove('hidden');
-                btnManual.classList.add('hidden');
-                manualFields.classList.add('hidden');
+            const discountRow = document.getElementById('voucherDiscountRow');
+            if (calc.discount > 0) {
+                discountRow.classList.remove('hidden');
+                document.getElementById('modalDiscountAmount').innerText = `- ${formatRupiah(calc.discount)}`;
             } else {
-                optSaldo.className = "neo-box p-3 rounded-xl cursor-pointer bg-white flex items-center justify-between";
-                optManual.className = "neo-box p-3 rounded-xl cursor-pointer bg-neoYellow flex items-center justify-between";
-                btnSaldo.classList.add('hidden');
-                btnManual.classList.remove('hidden');
-                manualFields.classList.remove('hidden');
+                discountRow.classList.add('hidden');
             }
+
+            document.getElementById('modalTotalPrice').innerText = formatRupiah(calc.total);
         }
+
+        function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
 
         async function processSaldoPayment() {
             if (!CURRENT_LOGGED_USER) {
-                Swal.fire({ icon: 'warning', title: 'Belum Login', text: 'Silakan login terlebih dahulu.', customClass: { popup: 'cyber-swal' } });
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'BELUM LOGIN',
+                    text: 'Silakan login terlebih dahulu untuk membayar menggunakan saldo.',
+                    customClass: { popup: 'cyber-swal' }
+                });
                 return;
             }
-            Swal.fire({ icon: 'info', title: 'Memproses...', text: 'Mohon tunggu...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), customClass: { popup: 'cyber-swal' } });
+
+            const calc = calculateFinalTotal();
+            const userSaldo = CURRENT_LOGGED_USER.saldo || 0;
+
+            if (userSaldo < calc.total || userSaldo === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'SALDO TIDAK TERSEDIA',
+                    text: 'Saldo tidak mencukupi, silakan isi ulang deposit Anda.',
+                    confirmButtonText: 'Deposit Sekarang',
+                    showCancelButton: true,
+                    cancelButtonText: 'Batal',
+                    customClass: { popup: 'cyber-swal' }
+                }).then((res) => {
+                    if (res.isConfirmed) window.location.href = '/deposit';
+                });
+                return;
+            }
+
+            const confirmRes = await Swal.fire({
+                title: 'KONFIRMASI PEMBAYARAN',
+                text: `Bayar ${formatRupiah(calc.total)} dengan saldo akun Anda?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Bayar',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'cyber-swal' }
+            });
+
+            if (!confirmRes.isConfirmed) return;
+
+            Swal.fire({
+                title: 'MEMPROSES...',
+                text: 'Memotong saldo dan mengonfirmasi pesanan...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); },
+                customClass: { popup: 'cyber-swal' }
+            });
+
             try {
                 const res = await fetch('/api/store/pay-with-balance', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ productId: SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id, qty: CURRENT_QTY })
+                    body: JSON.stringify({
+                        productId: SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id,
+                        qty: CURRENT_QTY,
+                        voucherCode: ACTIVE_VOUCHER ? ACTIVE_VOUCHER.code : null
+                    })
                 });
                 const result = await res.json();
-                if (result.status) {
-                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Pembayaran sukses.', customClass: { popup: 'cyber-swal' } });
-                    closeCheckoutModal();
-                    fetchCurrentUserStatus();
+                Swal.close();
+
+                if (result.status && result.data) {
+                    recordPurchasedProduct(SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id);
+                    await fetchCurrentUserStatus();
+                    fetchProduk();
+                    onPaymentSuccess(result.data.productLink || SELECTED_PRODUCT.link || "#");
                 } else {
-                    throw new Error(result.message);
+                    throw new Error(result.message || "Gagal memproses pembayaran saldo.");
                 }
-            } catch (e) {
-                Swal.fire({ icon: 'error', title: 'Gagal', text: e.message || 'Gagal memproses.', customClass: { popup: 'cyber-swal' } });
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'PEMBAYARAN GAGAL',
+                    text: err.message,
+                    customClass: { popup: 'cyber-swal' }
+                });
             }
         }
 
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            const username = document.getElementById('usernameInput').value;
-            const msg = `Halo Arulz, saya pesan manual: ${SELECTED_PRODUCT.nama} (${CURRENT_QTY}x) - TRX: ${CURRENT_ORDER_ID}`;
-            window.open(`https://wa.me/6285122629940?text=${encodeURIComponent(msg)}`, '_blank');
-            closeCheckoutModal();
+        function onPaymentSuccess(productLink) {
+            document.getElementById('orderForm').classList.add('hidden');
+            document.getElementById('paymentStep3').classList.remove('hidden');
+
+            const linkElem = document.getElementById('productDownloadLink');
+            linkElem.href = productLink;
+            document.getElementById('productLinkText').innerText = productLink;
+
+            Swal.fire({
+                icon: 'success',
+                title: 'PEMBAYARAN DITERIMA!',
+                text: 'Transaksi telah terverifikasi.',
+                timer: 2500,
+                showConfirmButton: false,
+                customClass: { popup: 'cyber-swal' }
+            });
         }
 
-        fetchCurrentUserStatus();
-        fetchProduk();
+        function shareProduk(index) {
+            const produk = DATA_PRODUK[index];
+            if (!produk) return;
+
+            const productId = produk.Id || produk._id;
+            const shareUrl = `${window.location.origin}/store/${productId}`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: produk.nama,
+                    text: `Check out "${produk.nama}" di ArulzXD Store!`,
+                    url: shareUrl
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'LINK DISALIN!',
+                        text: 'Tautan share produk telah disalin.',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        customClass: { popup: 'cyber-swal' }
+                    });
+                });
+            }
+        }
+
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            if (!SELECTED_PRODUCT || !CURRENT_ORDER_ID) return;
+
+            const username = document.getElementById('usernameInput').value.trim();
+            const note = document.getElementById('noteInput').value.trim();
+            const hargaUnit = SELECTED_PRODUCT.harga_diskon || SELECTED_PRODUCT.harga;
+            const calc = calculateFinalTotal();
+
+            recordPurchasedProduct(SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id);
+
+            try {
+                await fetch('/api/store/manual-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productName: SELECTED_PRODUCT.nama,
+                        qty: CURRENT_QTY
+                    })
+                });
+                fetchProduk();
+            } catch (err) {}
+
+            let message = `Halo Arulz, saya pesan manual:\n`;
+            message += `ID TRX: ${CURRENT_ORDER_ID}\n`;
+            message += `Username: ${username}\n`;
+            message += `Produk: ${SELECTED_PRODUCT.nama} (${CURRENT_QTY}x)\n`;
+            message += `Total Tagihan: ${formatRupiah(calc.total)}\n`;
+            if (note) message += `Catatan: ${note}\n`;
+
+            const waLink = `https://wa.me/6285122629940?text=${encodeURIComponent(message)}`;
+
+            Swal.fire({
+                icon: 'success',
+                title: 'MENGALIHKAN KE WHATSAPP',
+                text: 'Pesanan Anda disiapkan. Silakan lanjutkan ke WhatsApp admin.',
+                timer: 2000,
+                showConfirmButton: false,
+                customClass: { popup: 'cyber-swal' }
+            }).then(() => {
+                window.open(waLink, '_blank');
+                closeCheckoutModal();
+            });
+        }
+
+        async function checkUrlProductShare() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const shareId = urlParams.get('shareId');
+            if (shareId) {
+                const matchedIdx = DATA_PRODUK.findIndex(p => p.Id === shareId || p._id === shareId);
+                if (matchedIdx !== -1) openCheckoutModal(matchedIdx);
+            }
+        }
+
+        async function initStorePage() {
+            await Promise.allSettled([
+                fetchCurrentUserStatus(),
+                fetchProduk()
+            ]);
+            await checkUrlProductShare();
+        }
+
+        initStorePage();
 
         let currentProgress = 0;
         const progressFill = document.getElementById('loader-progress-fill');
@@ -645,7 +1979,7 @@
         window.addEventListener('load', () => {
             clearInterval(progressInterval);
             updateProgress(100);
-            setTimeout(() => { if (loaderOverlay) loaderOverlay.classList.add('fade-out'); }, 300);
+            setTimeout(() => { if (loaderOverlay) loaderOverlay.classList.add('fade-out'); }, 400);
         });
     </script>
 </body>
