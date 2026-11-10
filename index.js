@@ -57,6 +57,7 @@ const userSchemaV2 = new mongoose.Schema({
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     avatar: { type: String, default: 'https://arulz-xd.my.id/files/X1F0Cn.png' }, 
+    banner: { type: String, default: 'https://cdn.larasxd.my.id/files/Tk4GavOaHEEP2ykm.mp4' },
     saldo: { type: Number, default: 0 },
     referralCode: { type: String, unique: true },
     referredBy: { type: String, default: null },
@@ -582,6 +583,79 @@ app.post('/api/user/update-avatar', checkAuthSession, (req, res) => {
         } catch (error) {
             console.error("Gagal update avatar:", error);
             return res.status(500).json({ status: false, message: 'Terjadi kesalahan pada server saat memperbarui avatar.' });
+        }
+    });
+});
+
+const uploadBannerMulter = multer({ 
+    limits: { fileSize: 4 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('File banner harus berupa gambar (JPG/PNG/GIF) atau video MP4!'));
+        }
+    }
+});
+
+app.post('/api/user/update-banner', checkAuthSession, (req, res) => {
+    uploadBannerMulter.single('bannerFile')(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({ status: false, message: err.message || 'Gagal mengunggah banner.' });
+        }
+
+        try {
+            if (!req.user) {
+                return res.status(401).json({ status: false, message: 'Anda belum login!' });
+            }
+
+            const userIdToUpdate = req.user.id || req.user._id;
+            const bannerUrlInput = req.body.bannerUrl;
+
+            let finalBanner = '';
+
+            // JIKA UPLOAD DENGAN FILE
+            if (req.file) {
+                const fileSize = req.file.size;
+                const minSize = 4 * 1024 * 1024; // Minimal 4 MB (4.194.304 byte)
+
+                if (fileSize < minSize) {
+                    return res.status(400).json({ 
+                        status: false, 
+                        message: `Ukuran file berkas minimal adalah 4MB! (Ukuran file Anda: ${(fileSize / (1024*1024)).toFixed(2)}MB)` 
+                    });
+                }
+
+                const mimeType = req.file.mimetype || mime.lookup(req.file.originalname) || 'image/png';
+                const base64 = req.file.buffer.toString("base64");
+                finalBanner = `data:${mimeType};base64,${base64}`;
+            } 
+            // JIKA MENGGUNAKAN LINK URL
+            else if (bannerUrlInput && bannerUrlInput.trim() !== '') {
+                finalBanner = bannerUrlInput.trim();
+            } else {
+                return res.status(400).json({ status: false, message: 'Silakan pilih berkas upload (Min. 4MB) atau masukkan URL Link banner!' });
+            }
+
+            const updatedUser = await UserV2.findByIdAndUpdate(
+                userIdToUpdate,
+                { $set: { banner: finalBanner } },
+                { new: true, runValidators: true }
+            );
+
+            if (!updatedUser) {
+                return res.status(404).json({ status: false, message: 'User tidak ditemukan.' });
+            }
+
+            return res.json({
+                status: true,
+                message: 'Banner profil berhasil diperbarui!',
+                banner: updatedUser.banner
+            });
+
+        } catch (error) {
+            console.error("Gagal update banner:", error);
+            return res.status(500).json({ status: false, message: 'Terjadi kesalahan pada server saat memperbarui banner.' });
         }
     });
 });
