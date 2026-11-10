@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Autentikasi - ArulzXD STORE</title>
     <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,7 +22,7 @@
                         neoCyan: '#00E5FF',
                         neoPink: '#FF79C6',
                         neoGreen: '#00E676',
-                        neoBg: '#F4F0EA',
+                        neoBg: '#F5F2EB',
                         neoCard: '#FFFFFF'
                     }
                 } 
@@ -31,20 +31,33 @@
     </script>
     <style>
         body { 
-            background-color: #F4F0EA; 
+            background-color: #F5F2EB; 
+            background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1.2px, transparent 1.2px);
+            background-size: 16px 16px;
             color: #000000;
+            overflow-x: hidden;
+            touch-action: manipulation;
         }
         
+        .viewport-outer-border {
+            position: fixed;
+            inset: 8px;
+            border: 4px solid #000000;
+            pointer-events: none;
+            z-index: 40;
+            box-shadow: inset 0 0 0 2px #FFFFFF;
+        }
+
         .neo-box {
             background-color: #FFFFFF;
-            border: 3px solid #000000;
+            border: 4px solid #000000;
             box-shadow: 6px 6px 0px #000000;
         }
 
         .neo-btn {
-            border: 3px solid #000000;
+            border: 3.5px solid #000000;
             box-shadow: 4px 4px 0px #000000;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
         }
         .neo-btn:hover {
             transform: translate(-2px, -2px);
@@ -53,6 +66,23 @@
         .neo-btn:active {
             transform: translate(2px, 2px);
             box-shadow: 2px 2px 0px #000000;
+        }
+
+        /* TOMBOL TAB NAVIGASI TERPISAH (NEOBRUTALISM BOXES) */
+        .tab-nav-btn {
+            background-color: #FFFFFF;
+            border: 3px solid #000000;
+            box-shadow: 3.5px 3.5px 0px #000000;
+            transition: all 0.15s ease;
+        }
+        .tab-nav-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4.5px 4.5px 0px #000000;
+        }
+        .tab-nav-btn.active {
+            background-color: #FFDE59;
+            transform: translate(2px, 2px);
+            box-shadow: 1.5px 1.5px 0px #000000;
         }
 
         .neo-input {
@@ -69,18 +99,75 @@
 
         .swal2-popup.cyber-swal {
             background: #FFFFFF !important;
-            border: 3px solid #000000 !important;
+            border: 3.5px solid #000000 !important;
             border-radius: 20px !important;
             color: #000000 !important;
             box-shadow: 6px 6px 0px #000000 !important;
             font-family: 'Plus Jakarta Sans', sans-serif !important;
         }
 
+        /* EFEK GLITCH NEOBRUTALISM */
+        .brutal-glitch {
+            position: relative;
+            display: inline-block;
+            color: #000000;
+        }
+
+        .brutal-glitch::before,
+        .brutal-glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        .brutal-glitch::before {
+            left: -2px;
+            text-shadow: 2px 0 #00E5FF;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: brutal-glitch-anim-1 3.5s infinite ease-in-out;
+        }
+
+        .brutal-glitch::after {
+            left: 2px;
+            text-shadow: -2px 0 #FF79C6;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: brutal-glitch-anim-2 4.2s infinite ease-in-out;
+        }
+
+        @keyframes brutal-glitch-anim-1 {
+            0% { clip: rect(0, 0, 0, 0); transform: none; }
+            5% { clip: rect(10px, 9999px, 35px, 0); transform: skew(3deg) translateX(-3px); }
+            10% { clip: rect(45px, 9999px, 80px, 0); transform: skew(-2deg) translateX(4px); }
+            15% { clip: rect(0, 0, 0, 0); transform: none; }
+            45% { clip: rect(0, 0, 0, 0); transform: none; }
+            50% { clip: rect(20px, 9999px, 55px, 0); transform: skew(4deg) translateX(-4px); }
+            55% { clip: rect(70px, 9999px, 105px, 0); transform: skew(-3deg) translateX(3px); }
+            60% { clip: rect(0, 0, 0, 0); transform: none; }
+            100% { clip: rect(0, 0, 0, 0); transform: none; }
+        }
+
+        @keyframes brutal-glitch-anim-2 {
+            0% { clip: rect(0, 0, 0, 0); transform: none; }
+            20% { clip: rect(0, 0, 0, 0); transform: none; }
+            25% { clip: rect(55px, 9999px, 85px, 0); transform: skew(-4deg) translateX(4px); }
+            30% { clip: rect(15px, 9999px, 45px, 0); transform: skew(2deg) translateX(-3px); }
+            35% { clip: rect(0, 0, 0, 0); transform: none; }
+            75% { clip: rect(0, 0, 0, 0); transform: none; }
+            80% { clip: rect(35px, 9999px, 70px, 0); transform: skew(-3deg) translateX(3px); }
+            85% { clip: rect(80px, 9999px, 115px, 0); transform: skew(4deg) translateX(-4px); }
+            90% { clip: rect(0, 0, 0, 0); transform: none; }
+            100% { clip: rect(0, 0, 0, 0); transform: none; }
+        }
+
         #cyber-loader-overlay {
             position: fixed;
             inset: 0;
             z-index: 99999;
-            background-color: #F4F0EA;
+            background-color: #F5F2EB;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -101,14 +188,16 @@
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4 antialiased text-black">
+<body class="flex flex-col items-center justify-center min-h-screen p-3 sm:p-4 antialiased text-black">
+
+    <div class="viewport-outer-border"></div>
 
     <!-- LOADER OVERLAY -->
     <div id="cyber-loader-overlay">
         <div class="neo-box p-6 rounded-2xl flex flex-col items-center bg-white">
             <img src="https://files.catbox.moe/kdowze.png" alt="Logo" class="w-20 h-20 rounded-full border-3 border-black mb-4 shadow-[4px_4px_0px_#000]">
             <div id="loader-title-text" class="text-base font-black tracking-wider uppercase font-cyber mb-1">
-                Memuat Halaman Login<span class="animated-dots"></span>
+                Memuat Halaman Portal<span class="animated-dots"></span>
             </div>
             <div class="text-[11px] font-bold font-mono tracking-wider uppercase bg-neoYellow border-2 border-black px-2 py-0.5">
                 SYSTEM INITIALIZING
@@ -125,100 +214,173 @@
         </div>
     </div>
 
-    <!-- MAIN FORM CARD -->
-    <div class="neo-box p-6 sm:p-8 rounded-2xl w-full max-w-md bg-white relative overflow-hidden">
+    <!-- MAIN CARD PORTAL AUTHENTICATION -->
+    <div class="neo-box p-5 sm:p-7 rounded-2xl w-full max-w-md bg-white relative overflow-hidden flex flex-col justify-between my-auto z-10">
         
-        <div class="text-center mb-6 relative z-10">
-            <h1 class="text-3xl font-black font-cyber tracking-tight text-black mb-1">
-                Arulz<span class="bg-neoYellow border-2 border-black px-2 py-0.5 ml-1 rounded-md shadow-[2px_2px_0px_#000]">STORE</span>
+        <!-- HEADER ATAS PORTAL WITH GLITCH EFFECT -->
+        <div class="text-left relative z-10 pt-1 pb-3 border-b-3 border-black">
+            <h1 class="text-2xl sm:text-3xl font-black font-cyber tracking-tight uppercase leading-none">
+                <span class="brutal-glitch" data-text="ArulzXD-STORE">ArulzXD-STORE</span>
             </h1>
-            <p id="form-description" class="text-xs font-bold text-slate-700 mt-2">Masuk untuk mengelola akun Anda.</p>
+            <p class="text-[10px] sm:text-[11px] font-mono font-bold text-slate-700 tracking-wider uppercase mt-1.5 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-neoGreen inline-block border border-black animate-pulse"></span>
+                - AUTHENTICATION PORTAL -
+            </p>
+        </div>
+
+        <!-- TAB NAVIGATION (TOMBOL TERPISAH BOXES ALA NEOBRUTALISM) -->
+        <div class="grid grid-cols-3 gap-2 my-4">
+            <button id="tab-login" onclick="switchTab('signin')" class="tab-nav-btn active py-2 text-xs font-black font-cyber uppercase tracking-wider text-black rounded-xl">
+                LOGIN
+            </button>
+            <button id="tab-register" onclick="switchTab('signup')" class="tab-nav-btn py-2 text-xs font-black font-cyber uppercase tracking-wider text-black rounded-xl">
+                REGISTER
+            </button>
+            <button id="tab-forgot" onclick="switchTab('forgot')" class="tab-nav-btn py-2 text-xs font-black font-cyber uppercase tracking-wider text-black rounded-xl">
+                RESET PW
+            </button>
         </div>
 
         <!-- ================= FORM SIGN IN ================= -->
-        <div id="signin-form" class="space-y-4 relative z-10">
-            <form id="loginForm" action="/auth/login" method="POST" class="space-y-4">
+        <div id="signin-form" class="space-y-3.5 relative z-10 my-1">
+            <form id="loginForm" action="/auth/login" method="POST" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-black uppercase font-cyber text-black mb-1.5">Username / Email</label>
-                    <input type="text" name="username" required placeholder="Masukkan username atau email" class="neo-input w-full bg-white rounded-xl px-4 py-3 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-1">
+                        USERNAME / EMAIL
+                    </label>
+                    <input type="text" name="username" required placeholder="Masukkan username atau email" class="neo-input w-full bg-white rounded-xl px-3.5 py-2.5 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
                 </div>
                 <div>
-                    <div class="flex justify-between items-center mb-1.5">
-                        <label class="block text-xs font-black uppercase font-cyber text-black">Kata Sandi</label>
-                        <button type="button" onclick="switchForm('forgot')" class="text-xs font-black font-cyber text-black underline hover:bg-neoYellow px-1 rounded">Lupa Password?</button>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[11px] font-black uppercase font-cyber text-black">
+                            PASSWORD
+                        </label>
                     </div>
                     <div class="relative">
-                        <input id="login-password" type="password" name="password" required placeholder="••••••••" class="neo-input w-full bg-white rounded-xl pl-4 pr-12 py-3 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
-                        <button type="button" onclick="togglePassword('login-password', 'eye-icon-login')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-black transition">
-                            <i id="eye-icon-login" class="fa-solid fa-eye text-sm"></i>
+                        <input id="login-password" type="password" name="password" required placeholder="Min. 8 karakter" class="neo-input w-full bg-white rounded-xl pl-3.5 pr-12 py-2.5 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                        <button type="button" onclick="togglePassword('login-password', 'eye-svg-login')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-black hover:text-amber-600 transition">
+                            <span id="eye-svg-login">
+                                <!-- SVG MATA TERTUTUP (SHOW) -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </span>
                         </button>
                     </div>
                 </div>
-                <button type="submit" class="neo-btn w-full bg-neoYellow text-black font-black font-cyber py-3 rounded-xl text-xs uppercase tracking-wider">Masuk</button>
+
+                <div class="neo-input p-2.5 bg-amber-50/60 rounded-xl flex items-center gap-2.5">
+                    <input type="checkbox" id="terms-login" required class="w-4 h-4 accent-amber-400 border-2 border-black rounded cursor-pointer shrink-0">
+                    <label for="terms-login" class="text-[11px] font-bold text-slate-800 leading-snug cursor-pointer select-none">
+                        Saya menyetujui <a href="/privacy" target="_blank" class="text-amber-700 font-black underline hover:bg-neoYellow px-0.5 rounded">Syarat & Kebijakan Privasi</a> layanan.
+                    </label>
+                </div>
+
+                <button type="submit" class="neo-btn w-full bg-neoYellow text-black font-black font-cyber py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-1">
+                    <i class="fa-solid fa-right-to-bracket text-xs"></i> MASUK KE AKUN
+                </button>
             </form>
 
-            <div class="relative flex py-2 items-center">
+            <div class="relative flex py-1 items-center">
                 <div class="flex-grow border-t-2 border-black"></div>
-                <span class="flex-shrink mx-3 text-black text-[10px] font-black font-cyber uppercase bg-neoBg px-2 py-0.5 border border-black rounded">Atau masuk dengan</span>
+                <span class="flex-shrink mx-2 text-black text-[9px] font-black font-cyber uppercase bg-neoBg px-2.5 py-0.5 border border-black rounded-md shadow-[1px_1px_0px_#000]">
+                    atau
+                </span>
                 <div class="flex-grow border-t-2 border-black"></div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <a id="btnGoogleAuth" href="/auth/google" class="neo-btn flex items-center justify-center gap-2 bg-white text-black py-2.5 rounded-xl text-xs font-black font-cyber">
-                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-4 h-4" alt="Google"> Google
+            <div class="space-y-2">
+                <a id="btnGithubAuth" href="/auth/github" class="neo-btn flex items-center justify-center gap-2 bg-neoCyan text-black py-2.5 rounded-xl text-xs font-black font-cyber uppercase w-full">
+                    <i class="fa-brands fa-github text-sm"></i> DAFTAR DENGAN GITHUB
                 </a>
-                <a id="btnGithubAuth" href="/auth/github" class="neo-btn flex items-center justify-center gap-2 bg-neoCyan text-black py-2.5 rounded-xl text-xs font-black font-cyber">
-                    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" class="w-4 h-4" alt="GitHub"> GitHub
+                <a id="btnGoogleAuth" href="/auth/google" class="neo-btn flex items-center justify-center gap-2 bg-white text-black py-2.5 rounded-xl text-xs font-black font-cyber uppercase w-full">
+                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-4 h-4 object-contain" alt="Google"> DAFTAR DENGAN GOOGLE
                 </a>
             </div>
-
-            <p class="text-center text-xs font-bold text-slate-700 mt-4">Belum punya akun? <button onclick="switchForm('signup')" class="text-black font-black underline hover:bg-neoGreen px-1 rounded">Daftar sekarang</button></p>
         </div>
 
         <!-- ================= FORM SIGN UP ================= -->
-        <div id="signup-form" class="space-y-4 relative z-10 hidden-form">
-            <form id="registerForm" action="/auth/register" method="POST" class="space-y-4">
+        <div id="signup-form" class="space-y-3 relative z-10 hidden-form my-1">
+            <form id="registerForm" action="/auth/register" method="POST" class="space-y-2.5">
                 <div>
-                    <label class="block text-xs font-black uppercase font-cyber text-black mb-1.5">Username</label>
-                    <input type="text" name="username" required placeholder="pilih username" class="neo-input w-full bg-white rounded-xl px-4 py-3 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5">NAMA LENGKAP / USERNAME</label>
+                    <input type="text" name="username" required placeholder="Nama kamu" class="neo-input w-full bg-white rounded-xl px-3.5 py-2 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
                 </div>
                 <div>
-                    <label class="block text-xs font-black uppercase font-cyber text-black mb-1.5">Alamat Email</label>
-                    <input type="email" name="email" required placeholder="nama@email.com" class="neo-input w-full bg-white rounded-xl px-4 py-3 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5">EMAIL ADDRESS</label>
+                    <input type="email" name="email" required placeholder="emailkamu.com" class="neo-input w-full bg-white rounded-xl px-3.5 py-2 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
                 </div>
                 <div>
-                    <label class="block text-xs font-black uppercase font-cyber text-black mb-1.5">Kata Sandi</label>
+                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5">PASSWORD</label>
                     <div class="relative">
-                        <input id="register-password" type="password" name="password" required placeholder="••••••••" class="neo-input w-full bg-white rounded-xl pl-4 pr-12 py-3 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
-                        <button type="button" onclick="togglePassword('register-password', 'eye-icon-register')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-black transition">
-                            <i id="eye-icon-register" class="fa-solid fa-eye text-sm"></i>
+                        <input id="register-password" type="password" name="password" required placeholder="Min. 8 karakter" class="neo-input w-full bg-white rounded-xl pl-3.5 pr-12 py-2 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                        <button type="button" onclick="togglePassword('register-password', 'eye-svg-register')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-black hover:text-amber-600 transition">
+                            <span id="eye-svg-register">
+                                <!-- SVG MATA TERTUTUP (SHOW) -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </span>
                         </button>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-black uppercase font-cyber text-black mb-1.5 flex items-center justify-between">
-                        <span>Kode Referal / Undangan</span>
-                        <span class="text-[10px] bg-neoGreen text-black border border-black font-bold px-1.5 rounded lowercase">(bonus saldo Rp 500)</span>
+                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5 flex items-center justify-between">
+                        <span>KODE REFERAL</span>
+                        <span class="text-[9px] bg-neoGreen text-black border border-black font-bold px-1 rounded lowercase">(Bonus Rp 500)</span>
                     </label>
-                    <input type="text" id="referralCodeInput" name="referralCode" placeholder="Masukkan kode undangan (opsional)" class="neo-input w-full bg-white rounded-xl px-4 py-3 text-xs font-mono font-black text-black uppercase placeholder-slate-400 focus:outline-none transition">
+                    <input type="text" id="referralCodeInput" name="referralCode" placeholder="Kode undangan (opsional)" class="neo-input w-full bg-white rounded-xl px-3.5 py-2 text-xs font-mono font-black text-black uppercase placeholder-slate-400 focus:outline-none transition">
                 </div>
 
-                <button type="submit" class="neo-btn w-full bg-neoGreen text-black font-black font-cyber py-3 rounded-xl text-xs uppercase tracking-wider">Buat Akun Baru</button>
+                <div class="neo-input p-2 bg-amber-50/60 rounded-xl flex items-center gap-2">
+                    <input type="checkbox" id="terms-register" required class="w-4 h-4 accent-amber-400 border-2 border-black rounded cursor-pointer shrink-0">
+                    <label for="terms-register" class="text-[10px] font-bold text-slate-800 leading-tight cursor-pointer select-none">
+                        Saya menyetujui <a href="/privacy" target="_blank" class="text-amber-700 font-black underline hover:bg-neoYellow px-0.5 rounded">Syarat & Kebijakan Privasi</a> layanan.
+                    </label>
+                </div>
+
+                <button type="submit" class="neo-btn w-full bg-neoGreen text-black font-black font-cyber py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-user-plus text-xs"></i> DAFTAR SEKARANG
+                </button>
             </form>
-            <p class="text-center text-xs font-bold text-slate-700 mt-4">Sudah punya akun? <button onclick="switchForm('signin')" class="text-black font-black underline hover:bg-neoYellow px-1 rounded">Masuk</button></p>
+
+            <div class="relative flex py-0.5 items-center">
+                <div class="flex-grow border-t-2 border-black"></div>
+                <span class="flex-shrink mx-2 text-black text-[9px] font-black font-cyber uppercase bg-neoBg px-2 py-0.5 border border-black rounded-md shadow-[1px_1px_0px_#000]">
+                    atau
+                </span>
+                <div class="flex-grow border-t-2 border-black"></div>
+            </div>
+
+            <div class="space-y-2">
+                <a href="/auth/github" class="neo-btn flex items-center justify-center gap-2 bg-neoCyan text-black py-2.5 rounded-xl text-xs font-black font-cyber uppercase w-full">
+                    <i class="fa-brands fa-github text-sm"></i> DAFTAR DENGAN GITHUB
+                </a>
+                <a href="/auth/google" class="neo-btn flex items-center justify-center gap-2 bg-white text-black py-2.5 rounded-xl text-xs font-black font-cyber uppercase w-full">
+                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-4 h-4 object-contain" alt="Google"> DAFTAR DENGAN GOOGLE
+                </a>
+            </div>
         </div>
 
         <!-- ================= FORM FORGOT PASSWORD ================= -->
-        <div id="forgot-form" class="space-y-4 relative z-10 hidden-form">
-            <form id="forgotForm" action="/auth/forgot-password" method="POST" class="space-y-4">
+        <div id="forgot-form" class="space-y-3.5 relative z-10 hidden-form my-1">
+            <form id="forgotForm" action="/auth/forgot-password" method="POST" class="space-y-3.5">
                 <div>
-                    <label class="block text-xs font-black uppercase font-cyber text-black mb-1.5">Alamat Email Terdaftar</label>
-                    <input type="email" name="email" required placeholder="nama@email.com" class="neo-input w-full bg-white rounded-xl px-4 py-3 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-1">EMAIL ADDRESS TERDAFTAR</label>
+                    <input type="email" name="email" required placeholder="emailkamu.com" class="neo-input w-full bg-white rounded-xl px-3.5 py-2.5 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
                 </div>
-                <button type="submit" class="neo-btn w-full bg-neoPink text-black font-black font-cyber py-3 rounded-xl text-xs uppercase tracking-wider">Kirim Instruksi Reset</button>
+                <button type="submit" class="neo-btn w-full bg-neoPink text-black font-black font-cyber py-3 rounded-xl text-xs uppercase tracking-wider">KIRIM INSTRUKSI RESET</button>
             </form>
-            <p class="text-center text-xs font-bold text-slate-700 mt-4"><button onclick="switchForm('signin')" class="text-black font-black underline hover:bg-neoYellow px-1 rounded">Kembali ke Halaman Login</button></p>
+        </div>
+
+        <!-- FOOTER BADGES -->
+        <div class="pt-3 mt-3 border-t-2 border-black flex items-center justify-around text-[9px] sm:text-[10px] font-black font-cyber text-black">
+            <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-neoGreen"></i> 100% Aman</span>
+            <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-neoYellow"></i> Otomatis</span>
+            <span class="flex items-center gap-1"><i class="fa-solid fa-headset text-neoCyan"></i> Fast Response</span>
         </div>
 
     </div>
@@ -229,38 +391,56 @@
             buttonsStyling: false
         };
 
-        function togglePassword(inputId, iconId) {
+        // KODE SVG SHOW & HIDE MATA
+        const eyeOpenSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>`;
+
+        const eyeClosedSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a8.959 8.959 0 013.682-.783c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m-6.115-3.486a3 3 0 11-4.243-4.243" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18" />
+        </svg>`;
+
+        function togglePassword(inputId, svgContainerId) {
             const passwordInput = document.getElementById(inputId);
-            const eyeIcon = document.getElementById(iconId);
+            const svgContainer = document.getElementById(svgContainerId);
 
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                eyeIcon.className = 'fa-solid fa-eye-slash text-sm';
+                svgContainer.innerHTML = eyeClosedSvg;
             } else {
                 passwordInput.type = 'password';
-                eyeIcon.className = 'fa-solid fa-eye text-sm';
+                svgContainer.innerHTML = eyeOpenSvg;
             }
         }
 
-        function switchForm(formType) {
+        function switchTab(formType) {
             const signinForm = document.getElementById('signin-form');
             const signupForm = document.getElementById('signup-form');
             const forgotForm = document.getElementById('forgot-form');
-            const description = document.getElementById('form-description');
+
+            const tabLogin = document.getElementById('tab-login');
+            const tabRegister = document.getElementById('tab-register');
+            const tabForgot = document.getElementById('tab-forgot');
 
             signinForm.classList.add('hidden-form');
             signupForm.classList.add('hidden-form');
             forgotForm.classList.add('hidden-form');
 
+            tabLogin.classList.remove('active');
+            tabRegister.classList.remove('active');
+            tabForgot.classList.remove('active');
+
             if (formType === 'signin') {
                 signinForm.classList.remove('hidden-form');
-                description.innerText = "Masuk untuk mengelola akses STORE Anda.";
+                tabLogin.classList.add('active');
             } else if (formType === 'signup') {
                 signupForm.classList.remove('hidden-form');
-                description.innerText = "Daftarkan akun baru Anda secara gratis.";
+                tabRegister.classList.add('active');
             } else if (formType === 'forgot') {
                 forgotForm.classList.remove('hidden-form');
-                description.innerText = "Masukkan email Anda untuk memproses penyetelan ulang sandi.";
+                tabForgot.classList.add('active');
             }
         }
 
@@ -272,7 +452,7 @@
                 const cleanRef = refCode.trim().toUpperCase();
                 document.cookie = `pending_ref=${cleanRef}; path=/; max-age=86400`;
 
-                switchForm('signup');
+                switchTab('signup');
 
                 const refInput = document.getElementById('referralCodeInput');
                 if (refInput) {
@@ -290,6 +470,18 @@
         });
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const terms = document.getElementById('terms-login');
+            if (!terms.checked) {
+                e.preventDefault();
+                Swal.fire({
+                    ...swalConfig,
+                    icon: 'warning',
+                    title: 'Persetujuan Diperlukan',
+                    text: 'Anda harus menyetujui Syarat & Kebijakan Privasi terlebih dahulu!'
+                });
+                return;
+            }
+
             e.preventDefault();
             Swal.fire({
                 ...swalConfig,
@@ -304,6 +496,18 @@
         });
 
         document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const terms = document.getElementById('terms-register');
+            if (!terms.checked) {
+                e.preventDefault();
+                Swal.fire({
+                    ...swalConfig,
+                    icon: 'warning',
+                    title: 'Persetujuan Diperlukan',
+                    text: 'Anda harus menyetujui Syarat & Kebijakan Privasi terlebih dahulu!'
+                });
+                return;
+            }
+
             e.preventDefault();
             Swal.fire({
                 ...swalConfig,
