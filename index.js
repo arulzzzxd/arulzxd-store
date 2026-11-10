@@ -65,8 +65,92 @@ const userSchemaV2 = new mongoose.Schema({
 
 const UserV2 = mongoose.models.UserV2 || mongoose.model('UserV2', userSchemaV2);
 
+// SCHEMA VERIFIKASI OTP 6 DIGIT
+const verificationCodeSchema = new mongoose.Schema({
+    email: { type: String, required: true, lowercase: true, trim: true },
+    code: { type: String, required: true },
+    type: { type: String, enum: ['login', 'register', 'forgot'], required: true },
+    expiresAt: { type: Date, required: true },
+    createdAt: { type: Date, default: Date.now, expires: 600 } // Auto hapus 10 menit
+});
+
+const VerificationCode = mongoose.models.VerificationCode || mongoose.model('VerificationCode', verificationCodeSchema);
+
+// SCHEMA PENCATATAN BATAS MAKSIMAL PENGIRIMAN EMAIL (MAKS 5x SEHARI)
+const emailLimitSchema = new mongoose.Schema({
+    email: { type: String, required: true, lowercase: true, trim: true },
+    date: { type: String, required: true },
+    count: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now, expires: 172800 }
+});
+
+const EmailLimit = mongoose.models.EmailLimit || mongoose.model('EmailLimit', emailLimitSchema);
+
 function generateReferralCode() {
     return 'REF' + Math.floor(100000 + Math.random() * 900000);
+}
+
+// HELPER PENGIRIMAN EMAIL OTP MAKSIMAL 5 KALI SEHARI
+async function checkAndIncrementEmailLimit(email) {
+    const today = new Date().toISOString().split('T')[0];
+    const cleanEmail = email.toLowerCase().trim();
+
+    let limitRecord = await EmailLimit.findOne({ email: cleanEmail, date: today });
+    if (!limitRecord) {
+        limitRecord = new EmailLimit({ email: cleanEmail, date: today, count: 0 });
+    }
+
+    if (limitRecord.count >= 5) {
+        return false;
+    }
+
+    limitRecord.count += 1;
+    await limitRecord.save();
+    return true;
+}
+
+// HELPER NODEMAILER OTP EMAIL
+async function sendEmailOTP(email, code, typeTitle) {
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, 
+        auth: {
+            user: 'servicearulzxd@gmail.com',
+            pass: 'cyljwyaxcjvmqxdm'
+        },
+        tls: { rejectUnauthorized: false }
+    });
+
+    const mailOptions = {
+        from: '"Support ArulzXD" <servicearulzxd@gmail.com>',
+        to: email,
+        subject: `Kode Verifikasi ${typeTitle} - ArulzXD Store`,
+        html: `
+<div style="background-color: #F5F2EB; padding: 40px 20px; font-family: 'Plus Jakarta Sans', sans-serif;">
+    <div style="max-width: 500px; margin: 0 auto; background-color: #FFFFFF; border: 4px solid #000000; box-shadow: 6px 6px 0px #000000; padding: 32px; border-radius: 16px;">
+        <h1 style="margin: 0 0 16px 0; color: #000000; font-size: 24px; font-weight: 900; text-transform: uppercase;">
+            Arulz<span style="color: #00E5FF;">XD</span> Store
+        </h1>
+        <hr style="border: none; border-top: 3px solid #000000; margin-bottom: 20px;">
+        <p style="margin: 0 0 12px 0; color: #000000; font-size: 14px; font-weight: 700;">Halo,</p>
+        <p style="margin: 0 0 20px 0; color: #333333; font-size: 13px; line-height: 1.6;">
+            Berikut adalah kode verifikasi 6 digit Anda untuk **${typeTitle}**. Kode ini hanya berlaku selama <strong>10 menit</strong>.
+        </p>
+        
+        <div style="background-color: #FFDE59; border: 3px solid #000000; box-shadow: 4px 4px 0px #000000; padding: 18px; text-align: center; margin-bottom: 24px; border-radius: 12px;">
+            <span style="font-family: monospace; font-size: 32px; font-weight: 900; letter-spacing: 8px; color: #000000;">${code}</span>
+        </div>
+
+        <p style="margin: 0; color: #666666; font-size: 11px; line-height: 1.5;">
+            * Peringatan: Jangan berikan kode ini kepada siapapun demi keamanan akun Anda. Pengiriman kode dibatasi maksimal 5 kali sehari.
+        </p>
+    </div>
+</div>
+`
+    };
+
+    await transporter.sendMail(mailOptions);
 }
 
 // PRODUCT SCHEMA V2
@@ -161,7 +245,7 @@ const transactionSchemaV2 = new mongoose.Schema({
 
 const TransactionV2 = mongoose.models.TransactionV2 || mongoose.model('TransactionV2', transactionSchemaV2);
 
-// ANALYTICS METRICS SCHEMA V2 (Mencatat Latensi & Permintaan secara Permanen)
+// ANALYTICS METRICS SCHEMA V2
 const systemMetricsSchemaV2 = new mongoose.Schema({
     path: { type: String, required: true },
     method: { type: String, default: 'GET' },
@@ -184,11 +268,7 @@ const chatMessageSchema = new mongoose.Schema({
 
 const ChatMessage = mongoose.models.ChatMessage || mongoose.model('ChatMessage', chatMessageSchema);
 
-// ====================================================
 // MIDDLEWARES & UTILS
-// ====================================================
-
-// Middleware Pencatat Latensi & Permintaan ke MongoDB
 app.use((req, res, next) => {
     const start = Date.now();
     res.on('finish', async () => {
@@ -260,11 +340,7 @@ const checkAdminRole = (req, res, next) => {
     return res.status(403).json({ status: false, message: 'Akses ditolak! Khusus Admin/Owner.' });
 };
 
-// ====================================================
-// ENDPOINT BANTUAN LIVE CHAT CUSTOMER SUPPORT (USER & ADMIN)
-// ====================================================
-
-// 1. GET PESAN USER: Memuat seluruh percakapan milik user yang sedang aktif
+// CHAT BANTUAN API
 app.get('/api/bantuan/messages', checkAuthSession, async (req, res) => {
     try {
         const userIdentifier = getUserIdentifier(req);
@@ -275,7 +351,6 @@ app.get('/api/bantuan/messages', checkAuthSession, async (req, res) => {
     }
 });
 
-// 2. POST KIRIM PESAN USER: Mengirim pesan dari user ke Customer Support Admin
 app.post('/api/bantuan/send-user', checkAuthSession, async (req, res) => {
     try {
         const { message } = req.body;
@@ -301,7 +376,6 @@ app.post('/api/bantuan/send-user', checkAuthSession, async (req, res) => {
     }
 });
 
-// 3. ADMIN: Mengambil daftar antrean pengguna yang mengirim pesan chat
 app.get('/api/bantuan/admin/users', checkAuthSession, checkAdminRole, async (req, res) => {
     try {
         const rooms = await ChatMessage.aggregate([
@@ -341,7 +415,6 @@ app.get('/api/bantuan/admin/users', checkAuthSession, checkAdminRole, async (req
     }
 });
 
-// 4. ADMIN: Mengambil pesan rinci milik satu pengguna tertentu & otomatis tandai terbaca
 app.get('/api/bantuan/admin/messages/:userId', checkAuthSession, checkAdminRole, async (req, res) => {
     try {
         const { userId } = req.params;
@@ -350,7 +423,6 @@ app.get('/api/bantuan/admin/messages/:userId', checkAuthSession, checkAdminRole,
         const cleanId = userId.toLowerCase().trim();
         const messages = await ChatMessage.find({ userEmail: cleanId }).sort({ createdAt: 1 }).lean();
 
-        // Tandai pesan terbaca oleh admin
         await ChatMessage.updateMany(
             { userEmail: cleanId, sender: 'user', readByAdmin: false },
             { $set: { readByAdmin: true } }
@@ -362,7 +434,6 @@ app.get('/api/bantuan/admin/messages/:userId', checkAuthSession, checkAdminRole,
     }
 });
 
-// 5. ADMIN: Mengirim balasan dari Admin/Owner ke user target
 app.post('/api/bantuan/admin/reply', checkAuthSession, checkAdminRole, async (req, res) => {
     try {
         const { userId, message } = req.body;
@@ -385,7 +456,6 @@ app.post('/api/bantuan/admin/reply', checkAuthSession, checkAdminRole, async (re
     }
 });
 
-// ROUTE PANEL ADMIN CHAT
 app.get('/admin/livechat', checkAuthSession, (req, res) => {
     const ownerEmail = 'haqqi.official13@gmail.com';
     if (!req.user || req.user.email?.toLowerCase().trim() !== ownerEmail) {
@@ -955,10 +1025,7 @@ function verifyPaywuzSignature(rawBody, receivedSignature, apikey) {
     }
 }
 
-// ====================================================
-// FITUR DEPOSIT & PEMBAYARAN SALDO
-// ====================================================
-
+// DEPOSIT & SALDO
 app.post('/api/deposit', checkAuthSession, async (req, res) => {
     try {
         if (!req.user) {
@@ -1271,7 +1338,6 @@ app.post('/transactions/:orderId/cancel', async (req, res) => {
     }
 });
 
-// WEBHOOK DISAMARKAN & AUTO TOP-UP SALDO
 app.post('/webhook', async (req, res) => {
     try {
         const signature = req.headers['x-paywuz-signature'];
@@ -1379,7 +1445,6 @@ app.post('/api/store/manual-order', checkAuthSession, async (req, res) => {
     }
 });
 
-// RIWAYAT TRANSAKSI DARI DATABASE USER (PERMANEN)
 app.get('/api/user/transactions', checkAuthSession, async (req, res) => {
     try {
         let transactions = [];
@@ -1409,7 +1474,7 @@ app.get('/api/user/transactions', checkAuthSession, async (req, res) => {
     }
 });
 
-// AUTHENTICATION & LOGIN/REGISTER HANDLERS
+// AUTHENTICATION HANDLERS
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -1506,6 +1571,154 @@ function sendSweetAlert(res, icon, title, text, redirectUrl) {
     `);
 }
 
+// ====================================================
+// FITUR API OTP KODE 6 DIGIT & PEMBATASAN MAKSIMAL 5x SEHARI
+// ====================================================
+
+// 1. ENDPOINT MINTA KODE OTP
+app.post('/auth/send-otp', async (req, res) => {
+    try {
+        const { email, type } = req.body;
+        if (!email || !type) {
+            return res.status(400).json({ status: false, message: 'Email/Username dan jenis aksi wajib diisi!' });
+        }
+
+        const inputClean = email.toLowerCase().trim();
+        let targetEmail = inputClean;
+
+        if (type === 'login' || type === 'forgot') {
+            const user = await UserV2.findOne({
+                $or: [{ email: inputClean }, { username: inputClean }]
+            });
+            if (!user) {
+                return res.status(404).json({ status: false, message: 'Username atau Email tidak terdaftar di sistem kami!' });
+            }
+            if (user.provider !== 'local') {
+                return res.status(400).json({ status: false, message: `Akun mendaftar via ${user.provider.toUpperCase()}, tidak membutuhkan OTP.` });
+            }
+            targetEmail = user.email;
+        } else if (type === 'register') {
+            const existingUser = await UserV2.findOne({ email: inputClean });
+            if (existingUser) {
+                return res.status(400).json({ status: false, message: 'Email sudah terdaftar!' });
+            }
+        }
+
+        // Cek Kuota Pengiriman Harian (Maksimal 5x)
+        const canSend = await checkAndIncrementEmailLimit(targetEmail);
+        if (!canSend) {
+            return res.status(429).json({ status: false, message: 'Batas harian pengiriman email OTP tercapai (Maksimal 5 kali sehari).' });
+        }
+
+        // Buat Kode OTP 6 Digit
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // Expire 10 Menit
+
+        await VerificationCode.deleteMany({ email: targetEmail, type });
+
+        const newVerification = new VerificationCode({
+            email: targetEmail,
+            code: otpCode,
+            type,
+            expiresAt
+        });
+        await newVerification.save();
+
+        const typeNames = { login: 'Login Akun', register: 'Pendaftaran Akun', forgot: 'Reset Kata Sandi' };
+        await sendEmailOTP(targetEmail, otpCode, typeNames[type] || 'Verifikasi');
+
+        return res.json({ status: true, message: `Kode verifikasi 6 digit berhasil dikirim ke ${targetEmail}.` });
+
+    } catch (err) {
+        console.error("Gagal kirim OTP:", err);
+        return res.status(500).json({ status: false, message: 'Gagal mengirim kode verifikasi ke email.' });
+    }
+});
+
+// 2. ENDPOINT VERIFIKASI OTP
+app.post('/auth/verify-otp', async (req, res) => {
+    try {
+        const { email, code, type } = req.body;
+        if (!email || !code || !type) {
+            return res.status(400).json({ status: false, message: 'Email, kode OTP, dan jenis aksi wajib diisi!' });
+        }
+
+        const inputClean = email.toLowerCase().trim();
+        const cleanCode = code.toString().trim();
+        let targetEmail = inputClean;
+
+        if (type === 'login' || type === 'forgot') {
+            const user = await UserV2.findOne({
+                $or: [{ email: inputClean }, { username: inputClean }]
+            });
+            if (user) targetEmail = user.email;
+        }
+
+        const record = await VerificationCode.findOne({
+            email: targetEmail,
+            code: cleanCode,
+            type,
+            expiresAt: { $gt: new Date() }
+        });
+
+        if (!record) {
+            return res.status(400).json({ status: false, message: 'Kode OTP tidak valid atau sudah kedaluwarsa!' });
+        }
+
+        await VerificationCode.deleteOne({ _id: record._id });
+
+        return res.json({ status: true, message: 'Verifikasi kode berhasil!' });
+
+    } catch (err) {
+        return res.status(500).json({ status: false, message: 'Gagal memproses verifikasi OTP.' });
+    }
+});
+
+// 3. ENDPOINT RESET PASSWORD VIA OTP
+app.post('/auth/reset-password-otp', async (req, res) => {
+    try {
+        const { email, code, newPassword } = req.body;
+        if (!email || !code || !newPassword) {
+            return res.status(400).json({ status: false, message: 'Email, Kode OTP, dan Kata Sandi Baru wajib diisi!' });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ status: false, message: 'Kata sandi baru minimal 8 karakter!' });
+        }
+
+        const cleanEmail = email.toLowerCase().trim();
+        const cleanCode = code.toString().trim();
+
+        const record = await VerificationCode.findOne({
+            email: cleanEmail,
+            code: cleanCode,
+            type: 'forgot',
+            expiresAt: { $gt: new Date() }
+        });
+
+        if (!record) {
+            return res.status(400).json({ status: false, message: 'Kode OTP tidak valid atau sudah kedaluwarsa!' });
+        }
+
+        const user = await UserV2.findOne({ email: cleanEmail });
+        if (!user) {
+            return res.status(404).json({ status: false, message: 'Pengguna tidak ditemukan.' });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+
+        await VerificationCode.deleteOne({ _id: record._id });
+
+        return res.json({ status: true, message: 'Kata sandi berhasil diperbarui! Silakan masuk kembali.' });
+
+    } catch (err) {
+        console.error("Reset Password OTP Error:", err);
+        return res.status(500).json({ status: false, message: 'Gagal mengatur ulang kata sandi.' });
+    }
+});
+
 // LOGIN ROUTE
 app.post('/auth/login', (req, res, next) => {
     passport.authenticate('local', async (err, user, info) => { 
@@ -1548,7 +1761,7 @@ app.post('/auth/login', (req, res, next) => {
     })(req, res, next);
 });
 
-// REGISTER ROUTE (DENGAN BONUS KODE UNDANGAN: UNDANG = 1000, DIUNDANG = 500)
+// REGISTER ROUTE
 app.post('/auth/register', async (req, res) => {
     try {
         const { username, email, password, referralCode } = req.body;
@@ -1633,158 +1846,6 @@ app.post('/auth/register', async (req, res) => {
     }
 });
 
-app.post('/auth/forgot-password', async (req, res) => {
-    try {
-        const email = req.body.email;
-        if (!email) {
-            return sendSweetAlert(res, 'error', 'Wajib Diisi', 'Email wajib diisi!', '/login');
-        }
-
-        const user = await UserV2.findOne({ email: email.toLowerCase().trim() });
-        if (!user) {
-            return sendSweetAlert(res, 'error', 'Tidak Ditemukan', 'Email tersebut tidak terdaftar di sistem kami.', '/login');
-        }
-
-        if (user.provider !== 'local') {
-            return sendSweetAlert(res, 'error', 'Metode Login OAuth', `Akun ini mendaftar via ${user.provider.toUpperCase()}, tidak memerlukan reset password.`, '/login');
-        }
-
-        const resetToken = crypto.randomBytes(20).toString('hex');
-
-        user.resetPasswordToken = resetToken;
-        user.resetPasswordExpires = Date.now() + 3600000; 
-        await user.save();
-
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, 
-            auth: {
-                user: 'supportarulzxd@gmail.com',
-                pass: 'matsgyapivykobdv'
-            },
-            tls: { rejectUnauthorized: false }
-        });
-
-        const host = req.get('host');
-        const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-        const resetUrl = `${protocol}://${host}/reset-password/${resetToken}`;
-
-        const mailOptions = {
-            from: '"Support ArulzXD" <supportarulzxd@gmail.com>',
-            to: user.email,
-            subject: 'Permintaan Reset Kata Sandi',
-            html: `
-<div style="background-color: #0b0f19; padding: 40px 20px; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; min-height: 100%;">
-    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 550px; background-color: #111827; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);">
-        <tr>
-            <td style="padding: 32px 32px 24px 32px; text-align: center;">
-                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; tracking-tight: -0.025em;">
-                    Arulz<span style="color: #22d3ee;">XD</span> Store
-                </h1>
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 0 32px 24px 32px;">
-                <div style="height: 1px; background: linear-gradient(to right, transparent, rgba(6, 182, 212, 0.2), transparent);"></div>
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 0 32px 32px 32px; color: #9ca3af; font-size: 14px; line-height: 24px;">
-                <p style="margin: 0 0 16px 0; color: #ffffff; font-size: 16px; font-weight: 600;">Halo ${user.username},</p>
-                <p style="margin: 0 0 16px 0;">Kami menerima permintaan untuk mengatur ulang kata sandi akun ArulzXD Store Anda.</p>
-                <p style="margin: 0 0 24px 0;">Silakan klik tombol di bawah ini untuk membuat kata sandi baru:</p>
-                
-                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-                    <tr>
-                        <td align="center" bgcolor="#06b6d4" style="border-radius: 12px;">
-                            <a href="${resetUrl}" target="_blank" style="display: inline-block; padding: 14px 28px; font-size: 14px; font-weight: 700; color: #0f172a; text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em;">Reset Kata Sandi</a>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 0 32px 32px 32px; color: #6b7280; font-size: 12px; line-height: 20px;">
-                <p style="margin: 0 0 12px 0; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
-                    <strong style="color: #ef4444;">Penting:</strong> Link ini hanya berlaku selama <span style="color: #9ca3af; font-weight: 600;">1 jam</span> demi keamanan akun Anda.
-                </p>
-                <p style="margin: 0;">Jika Anda tidak merasa meminta reset password ini, Anda dapat mengabaikan email ini dengan aman.</p>
-            </td>
-        </tr>
-    </table>
-</div>
-`
-        };
-
-        await transporter.sendMail(mailOptions);
-        return sendSweetAlert(res, 'success', 'Sukses!', 'Link reset password telah dikirim ke email Anda.', '/login');
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Gagal memproses lupa password.');
-    }
-});
-
-app.get('/reset-password/:token', async (req, res) => {
-    try {
-        const user = await UserV2.findOne({ 
-            resetPasswordToken: req.params.token, 
-            resetPasswordExpires: { $gt: Date.now() } 
-        });
-
-        if (!user) {
-            return sendSweetAlert(res, 'error', 'Link Kadaluwarsa', 'Link reset password tidak valid atau sudah kedaluwarsa. Silakan minta link baru.', '/login');
-        }
-
-        res.send(`
-    <!DOCTYPE html>
-    <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Buat Password Baru - ArulzXD Store</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <style>
-            body { background-color: #0b0f19; }
-            .solid-card { background: #111827; border: 1px solid rgba(255, 255, 255, 0.08); }
-        </style>
-    </head>
-    <body class="flex flex-col items-center justify-center min-h-screen p-4 antialiased text-gray-200">
-        <div class="solid-card p-8 rounded-2xl shadow-lg w-full max-w-md relative overflow-hidden">
-            <div class="text-center mb-6 relative z-10">
-                <h1 class="text-xl font-extrabold tracking-tight text-white mb-1">
-                    Atur Ulang <span class="text-cyan-400">Kata Sandi</span>
-                </h1>
-                <p class="text-xs text-gray-400">Silakan masukkan kata sandi baru Anda yang aman.</p>
-            </div>
-
-            <form action="/reset-password/${req.params.token}" method="POST" class="space-y-4 relative z-10">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">Password Baru</label>
-                    <input id="new-password" type="password" name="password" required placeholder="••••••••" 
-                        class="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 font-medium transition">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">Konfirmasi Password Baru</label>
-                    <input id="confirm-password" type="password" name="confirmPassword" required placeholder="••••••••" 
-                        class="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 font-medium transition">
-                </div>
-
-                <button type="submit" class="w-full mt-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-slate-950 font-bold py-3 rounded-xl text-sm tracking-wide uppercase">Simpan Password Baru</button>
-            </form>
-        </div>
-    </body>
-    </html>
-`);
-
-    } catch (err) {
-        res.status(500).send("Error server.");
-    }
-});
-
 // ENDPOINT SETEL / UBAH KATA SANDI USER
 app.post('/api/user/change-password', checkAuthSession, async (req, res) => {
     try {
@@ -1808,7 +1869,6 @@ app.post('/api/user/change-password', checkAuthSession, async (req, res) => {
             return res.status(400).json({ status: false, message: 'Konfirmasi kata sandi tidak cocok!' });
         }
 
-        // Jika user sudah memiliki kata sandi lokal, verifikasi kata sandi lama
         if (user.password) {
             if (!currentPassword) {
                 return res.status(400).json({ status: false, message: 'Kata sandi saat ini wajib diisi!' });
@@ -1819,7 +1879,6 @@ app.post('/api/user/change-password', checkAuthSession, async (req, res) => {
             }
         }
 
-        // Hash kata sandi baru dan update
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
         await user.save();
@@ -2101,14 +2160,10 @@ app.get('/profile', checkAuthSession, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
 
-// ====================================================
-// DYNAMIC OPEN GRAPH META TAGS UNTUK SHARE PRODUK
-// ====================================================
 app.get('/store/:productId', async (req, res) => {
     try {
         const { productId } = req.params;
 
-        // Cari produk berdasarkan Id atau _id dari Mongoose
         const product = await ProductV2.findOne({
             $or: [
                 { Id: productId },
@@ -2116,12 +2171,10 @@ app.get('/store/:productId', async (req, res) => {
             ]
         }).lean();
 
-        // Apabila produk tidak ditemukan, arahkan ke halaman toko biasa
         if (!product) {
             return res.sendFile(path.join(__dirname, 'public', 'store.html'));
         }
 
-        // Tentukan gambar utama
         let imageUrl = 'https://files.catbox.moe/kdowze.png';
         if (Array.isArray(product.gambar) && product.gambar.length > 0) {
             imageUrl = product.gambar[0];
@@ -2129,13 +2182,11 @@ app.get('/store/:productId', async (req, res) => {
             imageUrl = product.gambar;
         }
 
-        // Tentukan Judul dan Deskripsi
         const priceFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.harga_diskon || product.harga);
         const shareTitle = `${product.nama} (${priceFormatted}) - ArulzXD Store`;
         const shareDesc = product.deskripsi ? product.deskripsi.slice(0, 160) : 'Beli source code dan layanan digital berkualitas di ArulzXD Store.';
         const fullUrl = `${req.protocol}://${req.get('host')}/store/${productId}`;
 
-        // Kirim HTML dengan Open Graph Meta Tags dinamis
         res.send(`
         <!DOCTYPE html>
         <html lang="id">
@@ -2144,7 +2195,6 @@ app.get('/store/:productId', async (req, res) => {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${shareTitle}</title>
 
-            <!-- Open Graph / Facebook / WhatsApp / Telegram Meta Tags -->
             <meta property="og:type" content="website">
             <meta property="og:url" content="${fullUrl}">
             <meta property="og:title" content="${shareTitle}">
@@ -2153,13 +2203,11 @@ app.get('/store/:productId', async (req, res) => {
             <meta property="og:image:width" content="1200">
             <meta property="og:image:height" content="630">
 
-            <!-- Twitter Card Meta Tags -->
             <meta name="twitter:card" content="summary_large_image">
             <meta name="twitter:title" content="${shareTitle}">
             <meta name="twitter:description" content="${shareDesc}">
             <meta name="twitter:image" content="${imageUrl}">
 
-            <!-- Redirection JS ke Halaman Toko dengan Auto-Open Modal -->
             <script>
                 window.location.href = "/store?shareId=${productId}";
             </script>
@@ -2193,7 +2241,6 @@ app.get('/auth/logout', (req, res, next) => {
     });
 });
 
-// GET USER STATUS LENGKAP TERMASUK AKUMULASI DEPOSIT DARI MONGODB
 app.get('/api/user-status', async (req, res) => {
     if (req.user) {
         try {
@@ -2248,25 +2295,24 @@ app.get('/api/user-status', async (req, res) => {
             const totalDeposit = deposits.length > 0 ? deposits[0].total : 0;
             const totalBelanja = purchases.length > 0 ? purchases[0].total : 0;
 
-            // Di dalam endpoint /api/user-status pada bagian response user:
-res.json({
-    loggedIn: true,
-    user: {
-        id: activeUser._id,
-        name: activeUser.username,
-        username: activeUser.username,
-        email: activeUser.email,
-        avatar: activeUser.avatar,
-        saldo: activeUser.saldo || 0,
-        provider: activeUser.provider || 'local',
-        hasPassword: Boolean(activeUser.password), // Flag untuk cek ketersediaan password lokal
-        referralCode: activeUser.referralCode,
-        totalDeposit: totalDeposit,
-        totalBelanja: totalBelanja,
-        invitedUsers: invitedUsers,
-        createdAt: activeUser.createdAt
-    }
-});
+            res.json({
+                loggedIn: true,
+                user: {
+                    id: activeUser._id,
+                    name: activeUser.username,
+                    username: activeUser.username,
+                    email: activeUser.email,
+                    avatar: activeUser.avatar,
+                    saldo: activeUser.saldo || 0,
+                    provider: activeUser.provider || 'local',
+                    hasPassword: Boolean(activeUser.password),
+                    referralCode: activeUser.referralCode,
+                    totalDeposit: totalDeposit,
+                    totalBelanja: totalBelanja,
+                    invitedUsers: invitedUsers,
+                    createdAt: activeUser.createdAt
+                }
+            });
         } catch (err) {
             res.json({ loggedIn: true, user: req.user });
         }
@@ -2275,7 +2321,6 @@ res.json({
     }
 });
 
-// ENDPOINT STATISTIK DASHBOARD PERMANEN TERMASUK REAL-TIME TRANSACTION, LATENSI & DIAGRAM BATANG
 app.get('/api/dashboard-stats', async (req, res) => {
     try {
         const startOfToday = new Date();
