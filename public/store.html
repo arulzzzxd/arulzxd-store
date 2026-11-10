@@ -229,17 +229,6 @@
             opacity: 0;
             transform: scale(0.8);
         }
-
-        /* CARD SLIDER KATEGORI STYLING */
-        .product-card-horizontal {
-            width: 280px;
-            flex-shrink: 0;
-        }
-        @media (min-width: 640px) {
-            .product-card-horizontal {
-                width: 310px;
-            }
-        }
     </style>
 </head>
 <body class="font-sans antialiased text-black min-h-screen pb-32">
@@ -266,7 +255,7 @@
         </div>
     </div>
 
-    <!-- TOP NAVBAR (PENCARIAN PRESISI ICON DITERAPKAN) -->
+    <!-- TOP NAVBAR -->
     <nav class="sticky top-0 z-30 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
         <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
             <a href="/store" class="text-xl sm:text-2xl font-black font-cyber tracking-tight text-black flex-shrink-0">
@@ -304,8 +293,8 @@
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
 
-            <!-- SIDEBAR KATEGORI -->
-            <div class="neo-box p-4 rounded-xl bg-white sticky top-20 z-20">
+            <!-- SIDEBAR KATEGORI (GESER HORIZONTAL JIKA BANYAK) -->
+            <div class="neo-box p-4 rounded-xl bg-white sticky top-20 z-20 overflow-hidden">
                 <h3 class="font-black text-xs font-cyber text-black mb-3 uppercase tracking-wider flex items-center gap-2">
                     <i class="fa-solid fa-layer-group"></i> Kategori Produk
                 </h3>
@@ -316,8 +305,8 @@
                 </div>
             </div>
 
-            <!-- CONTAINER CONTAINER LIST & SLIDER PRODUK -->
-            <div class="md:col-span-3 space-y-6">
+            <!-- TABEL LIST PRODUK GRID -->
+            <div class="md:col-span-3 space-y-4">
                 <div class="flex items-center justify-between neo-box p-3.5 rounded-xl bg-white">
                     <p class="text-xs font-bold font-cyber uppercase">
                         Menampilkan <span id="productCount" class="font-black underline">0</span> produk
@@ -325,7 +314,7 @@
                     <div class="text-xs font-cyber font-black">Status: <span id="serverStatus" class="bg-neoGreen px-2 py-0.5 border border-black rounded font-bold">● ONLINE</span></div>
                 </div>
 
-                <div id="productGrid" class="space-y-6">
+                <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-start">
                     <!-- SKELETON PLACEHOLDER -->
                     <div class="neo-box rounded-2xl p-4 space-y-3 bg-white animate-pulse">
                         <div class="bg-slate-200 h-44 rounded-xl border-3 border-black"></div>
@@ -345,7 +334,7 @@
         </div>
     </div>
 
-    <!-- MODAL DETAIL PRODUK & PENILAIAN SHOPEE STYLE -->
+    <!-- MODAL DETAIL PRODUK & PENILAIAN -->
     <div id="productDetailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div id="productDetailModalContent" class="neo-box w-full max-w-2xl rounded-2xl bg-white overflow-hidden my-auto max-h-[92vh] flex flex-col relative">
             
@@ -441,7 +430,7 @@
         </div>
     </div>
 
-    <!-- MODAL LIGHTBOX FULLSCREEN SLIDER DENGAN VIDEO AUTOPLAY DITERAPKAN -->
+    <!-- MODAL LIGHTBOX FULLSCREEN SLIDER DENGAN VIDEO BERSUARA (UNMUTED) -->
     <div id="mediaLightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex flex-col justify-between p-3 sm:p-6 select-none" onclick="closeMediaLightbox()">
         
         <div class="flex items-center justify-between text-white z-20" onclick="event.stopPropagation()">
@@ -463,7 +452,7 @@
                 <img id="lightboxImage" src="" class="hidden max-w-full max-h-[80vh] rounded-2xl object-contain border-3 border-black bg-white">
                 
                 <div id="videoWrapper" class="video-container hidden max-w-full max-h-[80vh] rounded-2xl overflow-hidden border-3 border-black bg-black" onclick="toggleVideoPlayPause()">
-                    <video id="lightboxVideo" loop playsinline autoplay muted class="w-full h-full max-h-[80vh] object-contain"></video>
+                    <video id="lightboxVideo" loop playsinline class="w-full h-full max-h-[80vh] object-contain"></video>
                     <div id="videoPlayOverlayBtn" class="play-overlay-btn">
                         <i class="fa-solid fa-play"></i>
                     </div>
@@ -984,7 +973,7 @@
             }, { passive: true });
         }
 
-        // LIGHTBOX MEDIA FULLSCREEN AUTOPLAY DITERAPKAN
+        // LIGHTBOX MEDIA FULLSCREEN DENGAN AUDIO
         function openMediaLightboxSlider(reviewIndex, mediaIndex) {
             activeUserReviewIndex = reviewIndex;
             activeMediaItemIndex = mediaIndex;
@@ -1014,19 +1003,14 @@
                 img.classList.add('hidden');
                 videoWrapper.classList.remove('hidden');
                 video.src = currentMedia.url;
+                video.muted = false; // Mengaktifkan suara video
                 
-                // AUTOPLAY OTOMATIS SAAT DIBUKA
                 videoWrapper.classList.add('playing');
                 video.currentTime = 0;
                 
-                const playPromise = video.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        // Jika diproteksi browser, fallback ke muted & play
-                        video.muted = true;
-                        video.play().catch(() => {});
-                    });
-                }
+                video.play().catch(error => {
+                    console.log("Autoplay dengan suara memerlukan interaksi atau diizinkan browser");
+                });
             } else {
                 video.pause();
                 videoWrapper.classList.add('hidden');
@@ -1406,7 +1390,7 @@
             renderProduk();
         }
 
-        // RENDER PRODUK DENGAN PENGELOMPOKAN KATEGORI & SLIDER GESER KIRI/KANAN
+        // RENDER PRODUK DENGAN GRID TABEL PERSIS
         function renderProduk() {
             const grid = document.getElementById('productGrid');
             const emptyState = document.getElementById('emptyState');
@@ -1429,103 +1413,75 @@
 
             emptyState.classList.add('hidden');
 
-            // Pengelompokan produk berdasarkan nama Kategori
-            const categoriesGroup = {};
-            filtered.forEach(item => {
-                const catName = item.kategori || 'Umum';
-                if (!categoriesGroup[catName]) categoriesGroup[catName] = [];
-                categoriesGroup[catName].push(item);
-            });
+            grid.innerHTML = filtered.map((produk) => {
+                const originalIndex = DATA_PRODUK.findIndex(p => (p.Id || p._id) === (produk.Id || produk._id));
+                const pId = produk.Id || produk._id;
+                const cachedRev = REVIEWS_CACHE[pId] || { averageRating: 5.0, totalReviews: 0 };
 
-            grid.innerHTML = Object.keys(categoriesGroup).map(catName => {
-                const itemsList = categoriesGroup[catName];
-                
-                const cardItemsHtml = itemsList.map(produk => {
-                    const originalIndex = DATA_PRODUK.findIndex(p => (p.Id || p._id) === (produk.Id || produk._id));
-                    const pId = produk.Id || produk._id;
-                    const cachedRev = REVIEWS_CACHE[pId] || { averageRating: 5.0, totalReviews: 0 };
+                let mainImg = Array.isArray(produk.gambar) ? produk.gambar[0] : (produk.gambar || 'https://arulz-xd.my.id/files/X1F0Cn.png');
+                const deskripsiTeks = produk.deskripsi || 'Tidak ada deskripsi.';
+                const isLong = deskripsiTeks.length > 70;
 
-                    let mainImg = Array.isArray(produk.gambar) ? produk.gambar[0] : (produk.gambar || 'https://arulz-xd.my.id/files/X1F0Cn.png');
-                    const deskripsiTeks = produk.deskripsi || 'Tidak ada deskripsi.';
-                    const isLong = deskripsiTeks.length > 60;
-
-                    let hargaCorethtml = produk.harga_diskon ? `
-                        <div class="text-[11px] font-bold text-slate-400 line-through">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga)}</div>
-                        <div class="text-base font-black font-cyber text-neoYellow">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga_diskon)}</div>
-                    ` : `
-                        <div class="text-base font-black font-cyber text-neoYellow">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga)}</div>
-                    `;
-
-                    return `
-                        <div class="neo-box product-card-horizontal rounded-2xl p-4 bg-white flex flex-col justify-between space-y-3 cursor-pointer" onclick="openProductDetailModal('${pId}')">
-                            
-                            <!-- Gambar Card Produk -->
-                            <div class="relative bg-neoBg pt-[70%] overflow-hidden rounded-2xl border-3 border-black flex-shrink-0">
-                                <img src="${mainImg}" onclick="event.stopPropagation(); openProductZoomLightbox(${originalIndex}, 0)" class="absolute inset-0 w-full h-full object-cover">
-                            </div>
-
-                            <!-- Info Detail Card -->
-                            <div class="flex flex-col flex-1 justify-between space-y-2">
-                                <div class="space-y-1.5">
-                                    <h3 class="text-base font-black font-cyber text-black leading-tight truncate">${produk.nama}</h3>
-                                    
-                                    <div class="text-xs font-bold text-slate-600">
-                                        <p id="desc-text-${originalIndex}" class="line-clamp-2 leading-relaxed">
-                                            ${deskripsiTeks}
-                                        </p>
-                                        ${isLong ? `
-                                            <button onclick="event.stopPropagation(); toggleWaDesc(${originalIndex})" id="desc-btn-${originalIndex}" class="text-neoYellow font-black underline mt-0.5 inline-block text-xs">
-                                                ... baca selengkapnya
-                                            </button>
-                                        ` : ''}
-                                    </div>
-
-                                    <div class="flex items-center justify-between text-xs font-black pt-2">
-                                        <span class="text-neoGreen">Stok: ${produk.stok !== undefined ? produk.stok : 99}</span>
-                                        <span class="text-black">${formatTerjual(produk.terjual)}</span>
-                                    </div>
-
-                                    <div class="flex items-center justify-between pt-1">
-                                        <div class="flex items-center gap-1">${renderStarRating(cachedRev.averageRating)}</div>
-                                        <span class="text-xs font-bold text-slate-500">(${cachedRev.totalReviews} ulasan)</span>
-                                    </div>
-
-                                    <div class="pt-1">
-                                        ${hargaCorethtml}
-                                    </div>
-                                </div>
-
-                                <!-- Tombol Aksi Beli & Share Simetris -->
-                                <div class="space-y-2 pt-2">
-                                    <button onclick="event.stopPropagation(); openCheckoutModal(${originalIndex})" 
-                                            class="neo-btn w-full bg-neoYellow text-black font-black text-xs font-cyber py-2.5 rounded-2xl flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-cart-shopping"></i> Beli Sekarang
-                                    </button>
-
-                                    <button onclick="event.stopPropagation(); shareProduk(${originalIndex})" 
-                                            class="neo-btn w-full bg-white text-black font-black text-xs font-cyber py-2 rounded-2xl flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-share-nodes"></i> Bagikan
-                                    </button>
-                                </div>
-                            </div>
-
-                        </div>
-                    `;
-                }).join('');
+                let hargaCorethtml = produk.harga_diskon ? `
+                    <div class="text-[11px] font-bold text-slate-400 line-through">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga)}</div>
+                    <div class="text-base font-black font-cyber text-neoYellow">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga_diskon)}</div>
+                ` : `
+                    <div class="text-base font-black font-cyber text-neoYellow">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga)}</div>
+                `;
 
                 return `
-                    <div class="neo-box p-4 rounded-2xl bg-white space-y-3">
-                        <div class="flex items-center justify-between border-b-2 border-black pb-2">
-                            <h3 class="text-sm font-black font-cyber uppercase tracking-wider flex items-center gap-2 text-black">
-                                <i class="fa-solid fa-folder-open text-neoYellow bg-black px-1.5 py-0.5 rounded"></i> ${catName}
-                            </h3>
-                            <span class="text-[11px] font-bold font-cyber text-slate-500">${itemsList.length} Produk</span>
-                        </div>
+                    <div class="neo-box rounded-2xl p-4 bg-white flex flex-col justify-between space-y-3 cursor-pointer" onclick="openProductDetailModal('${pId}')">
                         
-                        <!-- Horizontal Scroll Container -->
-                        <div class="flex gap-4 overflow-x-auto pb-3 pt-1 scrollbar-hide scroll-smooth">
-                            ${cardItemsHtml}
+                        <!-- Gambar Card Produk -->
+                        <div class="relative bg-neoBg pt-[70%] overflow-hidden rounded-2xl border-3 border-black flex-shrink-0">
+                            <img src="${mainImg}" onclick="event.stopPropagation(); openProductZoomLightbox(${originalIndex}, 0)" class="absolute inset-0 w-full h-full object-cover">
                         </div>
+
+                        <!-- Info Detail Card -->
+                        <div class="flex flex-col flex-1 justify-between space-y-2">
+                            <div class="space-y-1.5">
+                                <h3 class="text-base font-black font-cyber text-black leading-tight">${produk.nama}</h3>
+                                
+                                <div class="text-xs font-bold text-slate-600">
+                                    <p id="desc-text-${originalIndex}" class="line-clamp-2 leading-relaxed">
+                                        ${deskripsiTeks}
+                                    </p>
+                                    ${isLong ? `
+                                        <button onclick="event.stopPropagation(); toggleWaDesc(${originalIndex})" id="desc-btn-${originalIndex}" class="text-neoYellow font-black underline mt-0.5 inline-block text-xs">
+                                            ... baca selengkapnya
+                                        </button>
+                                    ` : ''}
+                                </div>
+
+                                <div class="flex items-center justify-between text-xs font-black pt-2">
+                                    <span class="text-neoGreen">Stok: ${produk.stok !== undefined ? produk.stok : 99}</span>
+                                    <span class="text-black">${formatTerjual(produk.terjual)}</span>
+                                </div>
+
+                                <div class="flex items-center justify-between pt-1">
+                                    <div class="flex items-center gap-1">${renderStarRating(cachedRev.averageRating)}</div>
+                                    <span class="text-xs font-bold text-slate-500">(${cachedRev.totalReviews} ulasan)</span>
+                                </div>
+
+                                <div class="pt-1">
+                                    ${hargaCorethtml}
+                                </div>
+                            </div>
+
+                            <!-- Tombol Aksi Beli & Share Simetris -->
+                            <div class="space-y-2 pt-2">
+                                <button onclick="event.stopPropagation(); openCheckoutModal(${originalIndex})" 
+                                        class="neo-btn w-full bg-neoYellow text-black font-black text-xs font-cyber py-2.5 rounded-2xl flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-cart-shopping"></i> Beli Sekarang
+                                </button>
+
+                                <button onclick="event.stopPropagation(); shareProduk(${originalIndex})" 
+                                        class="neo-btn w-full bg-white text-black font-black text-xs font-cyber py-2 rounded-2xl flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-share-nodes"></i> Bagikan
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 `;
             }).join('');
