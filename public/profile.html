@@ -536,7 +536,7 @@
                         <div>
                             <label class="block mb-1 font-cyber uppercase font-black text-black">1. Upload File (GIF / MP4 / Image)</label>
                             <input type="file" id="swalBannerFile" accept="image/*,video/mp4" class="w-full text-xs p-2 bg-neoBg border-2 border-black rounded-xl">
-                            <p class="text-[10px] text-red-600 font-bold mt-1">* Minimal ukuran file berkas: <strong>4 MB</strong></p>
+                            <p class="text-[10px] text-black font-bold mt-1">* Maksimal ukuran file berkas: <strong>4 MB</strong></p>
                         </div>
                         <div class="text-center font-black font-cyber uppercase tracking-wider text-slate-500 text-[10px]">--- ATAU ---</div>
                         <div>
@@ -557,12 +557,12 @@
                     const url = urlInput.value.trim();
 
                     if (!file && !url) {
-                        Swal.showValidationMessage('Pilih berkas upload (Min. 4MB) atau tempel URL link!');
+                        Swal.showValidationMessage('Pilih berkas upload (Maks. 4MB) atau tempel URL link!');
                         return false;
                     }
 
-                    if (file && file.size < (4 * 1024 * 1024)) {
-                        Swal.showValidationMessage(`Ukuran berkas upload minimal 4MB! (File Anda: ${(file.size / (1024*1024)).toFixed(2)}MB)`);
+                    if (file && file.size > (4 * 1024 * 1024)) {
+                        Swal.showValidationMessage(`Ukuran berkas upload maksimal 4MB! (File Anda: ${(file.size / (1024*1024)).toFixed(2)}MB)`);
                         return false;
                     }
 
