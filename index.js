@@ -588,7 +588,7 @@ app.post('/api/user/update-avatar', checkAuthSession, (req, res) => {
 });
 
 const uploadBannerMulter = multer({ 
-    limits: { fileSize: 4 * 1024 * 1024 },
+    limits: { fileSize: 4 * 1024 * 1024 }, // Batas maksimal upload 4MB
     fileFilter: (req, file, cb) => {
         if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
             cb(null, true);
@@ -601,6 +601,9 @@ const uploadBannerMulter = multer({
 app.post('/api/user/update-banner', checkAuthSession, (req, res) => {
     uploadBannerMulter.single('bannerFile')(req, res, async (err) => {
         if (err) {
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({ status: false, message: 'Ukuran berkas melebihi batas maksimal 4MB!' });
+            }
             return res.status(400).json({ status: false, message: err.message || 'Gagal mengunggah banner.' });
         }
 
@@ -617,15 +620,16 @@ app.post('/api/user/update-banner', checkAuthSession, (req, res) => {
             // JIKA UPLOAD DENGAN FILE
             if (req.file) {
                 const fileSize = req.file.size;
-                const minSize = 4 * 1024 * 1024; // Minimal 4 MB (4.194.304 byte)
+                const maxSize = 4 * 1024 * 1024; // Maksimal 4 MB
 
-                if (fileSize < minSize) {
+                if (fileSize > maxSize) {
                     return res.status(400).json({ 
                         status: false, 
-                        message: `Ukuran file berkas minimal adalah 4MB! (Ukuran file Anda: ${(fileSize / (1024*1024)).toFixed(2)}MB)` 
+                        message: `Ukuran file berkas maksimal adalah 4MB! (Ukuran file Anda: ${(fileSize / (1024*1024)).toFixed(2)}MB)` 
                     });
                 }
 
+                // Konversi berkas ke Base64
                 const mimeType = req.file.mimetype || mime.lookup(req.file.originalname) || 'image/png';
                 const base64 = req.file.buffer.toString("base64");
                 finalBanner = `data:${mimeType};base64,${base64}`;
@@ -634,7 +638,7 @@ app.post('/api/user/update-banner', checkAuthSession, (req, res) => {
             else if (bannerUrlInput && bannerUrlInput.trim() !== '') {
                 finalBanner = bannerUrlInput.trim();
             } else {
-                return res.status(400).json({ status: false, message: 'Silakan pilih berkas upload (Min. 4MB) atau masukkan URL Link banner!' });
+                return res.status(400).json({ status: false, message: 'Silakan pilih berkas upload (Maks. 4MB) atau masukkan URL Link banner!' });
             }
 
             const updatedUser = await UserV2.findByIdAndUpdate(
@@ -659,6 +663,7 @@ app.post('/api/user/update-banner', checkAuthSession, (req, res) => {
         }
     });
 });
+
 
 const uploadReviewMedia = multer({
     limits: { fileSize: 10 * 1024 * 1024 }, 
