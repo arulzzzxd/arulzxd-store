@@ -2377,6 +2377,7 @@ app.get('/api/user-status', async (req, res) => {
                     username: activeUser.username,
                     email: activeUser.email,
                     avatar: activeUser.avatar,
+                    banner: activeUser.banner || '',
                     saldo: activeUser.saldo || 0,
                     provider: activeUser.provider || 'local',
                     hasPassword: Boolean(activeUser.password),
