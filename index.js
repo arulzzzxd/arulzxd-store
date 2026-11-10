@@ -2093,6 +2093,7 @@ app.get('/deposit', checkAuthSession, (req, res) => {
     }
     res.sendFile(path.join(__dirname, 'public', 'deposit.html'));
 });
+app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'public', 'privacy.html')));
 app.get('/profile', checkAuthSession, (req, res) => {
     if (!req.user) {
         return res.redirect('/login');
