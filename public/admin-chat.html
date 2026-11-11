@@ -35,7 +35,7 @@
         
         .neo-box {
             background-color: #FFFFFF;
-            border: 3px solid #000000;
+            border: 3.5px solid #000000;
             box-shadow: 5px 5px 0px #000000;
         }
 
@@ -53,9 +53,24 @@
             box-shadow: 2px 2px 0px #000000;
         }
 
+        /* CAROUSEL HORIZONTAL SCROLL HIDE SCROLLBAR */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .user-pill {
+            border: 3px solid #000000;
+            box-shadow: 3px 3px 0px #000000;
+            transition: all 0.2s ease;
+        }
+        .user-pill.active {
+            background-color: #FFDE59 !important;
+            transform: translate(-1px, -1px);
+            box-shadow: 4.5px 4.5px 0px #000000;
+        }
+
         .swal2-popup.cyber-swal {
             background: #FFFFFF !important;
-            border: 3px solid #000000 !important;
+            border: 3.5px solid #000000 !important;
             border-radius: 20px !important;
             color: #000000 !important;
             box-shadow: 6px 6px 0px #000000 !important;
@@ -78,7 +93,7 @@
             position: absolute;
             inset: 0;
             background: #FFFFFF;
-            border: 3px solid #000000;
+            border: 3.5px solid #000000;
             border-radius: 32px;
             box-shadow: 5px 5px 0px #000000;
         }
@@ -130,7 +145,7 @@
         .nav-item-btn.active .nav-icon-box {
             transform: translateY(-22px);
             background-color: #FFDE59;
-            border: 3px solid #000000;
+            border: 3.5px solid #000000;
             box-shadow: 3px 3px 0px #000000;
         }
 
@@ -168,15 +183,15 @@
     </nav>
 
     <!-- MAIN CONTAINER -->
-    <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-1 space-y-6">
+    <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-1 space-y-5">
 
         <!-- HEADER BANNER -->
-        <div class="p-6 neo-box rounded-2xl bg-neoPink flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="p-5 neo-box rounded-2xl bg-neoPink flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h1 class="text-xl sm:text-3xl font-black font-cyber text-black flex items-center gap-2">
+                <h1 class="text-xl sm:text-2xl font-black font-cyber text-black flex items-center gap-2">
                     <i class="fa-solid fa-headset"></i> Panel Balas Chat Pengguna
                 </h1>
-                <p class="text-xs sm:text-sm font-bold text-black mt-1">Pilih pengguna di daftar kiri untuk membaca dan membalas pesan bantuan secara langsung.</p>
+                <p class="text-xs font-bold text-black mt-1">Geser kanan/kiri pada daftar pilihan pengguna di bawah untuk membaca dan membalas pesan.</p>
             </div>
             
             <button onclick="loadUserList()" class="neo-btn bg-white text-black font-cyber font-black px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 uppercase tracking-wider shrink-0">
@@ -184,62 +199,47 @@
             </button>
         </div>
 
-        <!-- GRID DUA KOLOM: DAFTAR USER & WINDOW CHAT -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-
-            <!-- DAFTAR PENGGUNAGAN CHAT (KIRI) -->
-            <div class="md:col-span-4 neo-box rounded-2xl bg-white overflow-hidden flex flex-col h-[580px]">
-                <div class="bg-neoYellow p-3.5 border-b-3 border-black flex items-center justify-between">
+        <!-- MAIN WINDOW CHAT WITH INTEGRATED USER SELECTOR CAROUSEL -->
+        <div class="neo-box rounded-2xl bg-white overflow-hidden flex flex-col h-[620px]">
+            
+            <!-- SELECTOR & DAFTAR PENGGUNA INTEGRATED (GESER KANAN KIRI) -->
+            <div class="bg-neoCyan p-3.5 border-b-3 border-black space-y-2">
+                <div class="flex items-center justify-between">
                     <h3 class="text-xs font-black font-cyber uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-users"></i> Daftar Pengguna (<span id="userCountText">0</span>)
+                        <i class="fa-solid fa-users"></i> Pilih Pengguna (<span id="userCountText">0</span>)
                     </h3>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="scrollUserCarousel('left')" class="w-7 h-7 rounded-lg bg-white border-2 border-black font-black text-xs shadow-[1.5px_1.5px_0px_#000] hover:bg-neoYellow flex items-center justify-center">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button onclick="scrollUserCarousel('right')" class="w-7 h-7 rounded-lg bg-white border-2 border-black font-black text-xs shadow-[1.5px_1.5px_0px_#000] hover:bg-neoYellow flex items-center justify-center">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <div id="adminUserList" class="flex-1 overflow-y-auto divide-y-2 divide-black bg-neoBg">
-                    <div class="p-4 text-center text-xs font-mono font-bold text-slate-600">Memuat daftar pengguna...</div>
+                <!-- CAROUSEL SCROLL CONTAINER -->
+                <div id="adminUserList" class="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1 scroll-smooth">
+                    <div class="text-xs font-mono font-bold text-slate-700 py-2">Memuat daftar pengguna...</div>
                 </div>
             </div>
 
-            <!-- AREA DETAIL DAN PESAN CHAT (KANAN) -->
-            <div class="md:col-span-8 neo-box rounded-2xl bg-white overflow-hidden flex flex-col h-[580px]">
-                
-                <!-- HEADER ACTIVE USER -->
-                <div class="bg-neoCyan p-3.5 border-b-3 border-black flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-white border-2 border-black flex items-center justify-center font-black text-sm shadow-[2px_2px_0px_#000]">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        <div>
-                            <h3 id="activeUserTitle" class="text-xs sm:text-sm font-black font-cyber text-black">Pilih Pengguna</h3>
-                            <p id="activeUserSub" class="text-[10px] font-mono font-bold text-black">Klik salah satu pengguna dari daftar di sebelah kiri</p>
-                        </div>
-                    </div>
-
-                    <div id="activeUserBadge" class="hidden">
-                        <span class="text-[10px] font-black font-cyber bg-neoGreen text-black border-2 border-black px-2.5 py-1 rounded-md uppercase">
-                            AKTIF
-                        </span>
-                    </div>
+            <!-- MESSAGES CONTAINER -->
+            <div id="adminChatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-neoBg scroll-smooth">
+                <div class="flex flex-col items-center justify-center h-full text-center space-y-2 text-slate-600">
+                    <i class="fa-solid fa-comments text-4xl"></i>
+                    <p class="text-xs font-bold font-cyber">Pilih salah satu pengguna di atas untuk melihat isi pesan.</p>
                 </div>
-
-                <!-- MESSAGES CONTAINER -->
-                <div id="adminChatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-neoBg scroll-smooth">
-                    <div class="flex flex-col items-center justify-center h-full text-center space-y-2 text-slate-600">
-                        <i class="fa-solid fa-comments text-4xl"></i>
-                        <p class="text-xs font-bold font-cyber">Belum ada percakapan yang dipilih.</p>
-                    </div>
-                </div>
-
-                <!-- FORM BALAS PESAN -->
-                <form id="adminChatForm" onsubmit="sendAdminReply(event)" class="p-3 bg-white border-t-3 border-black flex items-center gap-3 opacity-50 pointer-events-none">
-                    <input type="text" id="adminChatInput" required placeholder="Tuliskan balasan sebagai Admin/Owner..." 
-                           class="flex-1 bg-neoBg border-2 border-black rounded-xl px-4 py-3 text-xs text-black font-bold placeholder-slate-500 focus:outline-none shadow-[2px_2px_0px_#000]">
-                    <button type="submit" class="neo-btn bg-neoYellow text-black font-cyber font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2 shrink-0">
-                        <i class="fa-solid fa-reply"></i> <span class="hidden sm:inline">Kirim Balasan</span>
-                    </button>
-                </form>
-
             </div>
+
+            <!-- FORM BALAS PESAN -->
+            <form id="adminChatForm" onsubmit="sendAdminReply(event)" class="p-3 bg-white border-t-3 border-black flex items-center gap-3 opacity-50 pointer-events-none">
+                <input type="text" id="adminChatInput" required placeholder="Tuliskan balasan sebagai Admin/Owner..." 
+                       class="flex-1 bg-neoBg border-2 border-black rounded-xl px-4 py-3 text-xs text-black font-bold placeholder-slate-500 focus:outline-none shadow-[2px_2px_0px_#000]">
+                <button type="submit" class="neo-btn bg-neoYellow text-black font-cyber font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2 shrink-0">
+                    <i class="fa-solid fa-reply"></i> <span class="hidden sm:inline">Kirim Balasan</span>
+                </button>
+            </form>
 
         </div>
 
@@ -287,6 +287,16 @@
         let selectedUsername = '';
         let adminPollInterval = null;
 
+        function scrollUserCarousel(direction) {
+            const container = document.getElementById('adminUserList');
+            const scrollAmount = 240;
+            if (direction === 'left') {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
         async function loadUserList() {
             try {
                 const res = await fetch('/api/bantuan/admin/users');
@@ -297,25 +307,30 @@
                 if (data.status && data.users && data.users.length > 0) {
                     listEl.innerHTML = data.users.map(u => {
                         const isActive = u.userId === selectedUserId;
-                        const activeClass = isActive ? 'bg-neoYellow' : 'bg-white hover:bg-neoBg';
+                        const activeClass = isActive ? 'active' : 'bg-white hover:bg-amber-50';
+                        const displayEmail = u.username.includes('@') ? u.username : `${u.username}@gmail.com`;
                         const unreadBadge = u.unreadCount > 0 
-                            ? `<span class="bg-neoPink text-black border border-black text-[9px] font-black font-cyber px-2 py-0.5 rounded-full">${u.unreadCount} baru</span>` 
+                            ? `<span class="bg-neoPink text-black border border-black text-[9px] font-black font-cyber px-1.5 py-0.2 rounded-full ml-1 animate-pulse">${u.unreadCount}</span>` 
                             : '';
 
                         return `
-                            <div onclick="selectUserChat('${u.userId}', '${u.username}')" class="p-3.5 cursor-pointer transition flex items-center justify-between ${activeClass}">
-                                <div class="overflow-hidden pr-2">
-                                    <h4 class="text-xs font-black font-cyber text-black truncate">${u.username}</h4>
-                                    <p class="text-[10px] font-bold text-slate-600 truncate mt-0.5">${u.lastMessage || '-'}</p>
+                            <button onclick="selectUserChat('${u.userId}', '${u.username}')" 
+                                    class="user-pill shrink-0 px-3 py-2 rounded-xl text-left flex items-center gap-2 cursor-pointer ${activeClass}">
+                                <div class="w-7 h-7 rounded-full bg-neoCyan border-2 border-black flex items-center justify-center font-black text-xs shrink-0">
+                                    <i class="fa-solid fa-user"></i>
                                 </div>
-                                <div class="text-right shrink-0">
-                                    ${unreadBadge}
+                                <div class="whitespace-nowrap">
+                                    <div class="text-xs font-black font-cyber text-black flex items-center">
+                                        <span>${displayEmail}</span>
+                                        ${unreadBadge}
+                                    </div>
+                                    <div class="text-[9px] font-bold text-slate-700 truncate max-w-[150px]">${u.lastMessage || 'Tidak ada pesan'}</div>
                                 </div>
-                            </div>
+                            </button>
                         `;
                     }).join('');
                 } else {
-                    listEl.innerHTML = `<div class="p-6 text-center text-xs font-mono font-bold text-slate-600">Belum ada percakapan pengguna.</div>`;
+                    listEl.innerHTML = `<div class="p-2 text-center text-xs font-mono font-bold text-slate-700">Belum ada percakapan pengguna.</div>`;
                 }
             } catch(e) {}
         }
@@ -323,10 +338,6 @@
         async function selectUserChat(userId, username) {
             selectedUserId = userId;
             selectedUsername = username;
-
-            document.getElementById('activeUserTitle').innerText = username;
-            document.getElementById('activeUserSub').innerText = `ID Pengguna: ${userId}`;
-            document.getElementById('activeUserBadge').classList.remove('hidden');
 
             const formEl = document.getElementById('adminChatForm');
             formEl.classList.remove('opacity-50', 'pointer-events-none');

@@ -164,7 +164,49 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased text-black min-h-screen pb-32">
+<body class="font-sans antialiased text-black min-h-screen pb-36">
+
+    <!-- FLOATING LIVE CHAT WIDGET POP-UP -->
+    <div id="liveChatWidgetContainer">
+        <div id="floatingChatWindow" class="fixed bottom-20 right-4 sm:right-6 z-[99999] hidden w-[calc(100vw-2rem)] max-w-[360px] h-[420px] max-h-[calc(100vh-100px)] bg-white border-3 border-black rounded-2xl shadow-[6px_6px_0px_#000] overflow-hidden flex flex-col transition-all duration-300">
+            
+            <!-- HEADER WINDOW -->
+            <div class="bg-neoYellow p-3 border-b-3 border-black flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="relative">
+                        <div class="w-8 h-8 rounded-full bg-white text-black border-2 border-black flex items-center justify-center font-bold text-xs shadow-[2px_2px_0px_#000]">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-neoGreen border border-black rounded-full"></span>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-black font-cyber text-black">Customer Support</h3>
+                        <p class="text-[9px] text-black font-mono font-bold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-neoGreen animate-pulse"></span> Online 24/7
+                        </p>
+                    </div>
+                </div>
+                <button onclick="toggleChatWidget()" class="text-black font-black text-base transition p-1 hover:scale-110">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- AREA CHAT MESSAGES -->
+            <div id="widgetChatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 bg-neoBg scroll-smooth">
+                <div class="text-center text-[11px] text-slate-600 font-mono my-2 animate-pulse font-bold">Memuat pesan...</div>
+            </div>
+
+            <!-- FORM KIRIM PESAN -->
+            <form id="widgetChatForm" onsubmit="sendWidgetMessage(event)" class="p-2.5 bg-white border-t-3 border-black flex items-center gap-2 shrink-0">
+                <input type="text" id="widgetChatInput" required placeholder="Tuliskan pesan Anda..." 
+                       class="flex-1 bg-neoBg border-2 border-black rounded-xl px-3 py-2 text-xs text-black font-bold placeholder-slate-500 focus:outline-none">
+                <button type="submit" class="neo-btn w-9 h-9 rounded-xl bg-neoYellow text-black flex items-center justify-center shrink-0 font-black">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+
+        </div>
+    </div>
 
     <!-- TOP NAVBAR -->
     <nav class="sticky top-0 z-40 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
@@ -416,9 +458,16 @@
         </div>
     </div>
 
+    <!-- FLOATING LIVE CHAT BUTTON -->
+    <button id="floatingChatToggleBtn" onclick="toggleChatWidget()" title="Bantuan & Live Chat" class="fixed bottom-24 right-5 z-[99990] flex items-center justify-center w-12 h-12 rounded-full bg-neoYellow border-3 border-black text-black shadow-[4px_4px_0px_#000] hover:scale-110 transition-transform duration-200 font-black">
+        <i class="fa-solid fa-comment-dots text-xl"></i>
+        <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-neoGreen border-2 border-black rounded-full"></span>
+    </button>
+
     <script>
         let depPollInterval = null;
         let currentDepOrderId = '';
+        let widgetChatInterval = null;
 
         function formatRupiah(angka) {
             return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
@@ -598,6 +647,87 @@
         function closeDepositModal() {
             if (depPollInterval) clearInterval(depPollInterval);
             document.getElementById('depositModal').classList.add('hidden');
+        }
+
+        /* LOGIKA FLOATING LIVE CHAT WIDGET */
+        function toggleChatWidget() {
+            const windowEl = document.getElementById('floatingChatWindow');
+            const isHidden = windowEl.classList.contains('hidden');
+
+            if (isHidden) {
+                windowEl.classList.remove('hidden');
+                loadWidgetMessages();
+                if (!widgetChatInterval) widgetChatInterval = setInterval(loadWidgetMessages, 3000);
+            } else {
+                windowEl.classList.add('hidden');
+                if (widgetChatInterval) {
+                    clearInterval(widgetChatInterval);
+                    widgetChatInterval = null;
+                }
+            }
+        }
+
+        async function loadWidgetMessages() {
+            try {
+                const res = await fetch('/api/bantuan/messages');
+                const data = await res.json();
+                const container = document.getElementById('widgetChatMessages');
+
+                if (data.status && data.messages) {
+                    if (data.messages.length === 0) {
+                        container.innerHTML = `
+                            <div class="neo-box p-3 rounded-xl bg-white text-xs text-black space-y-1">
+                                <p class="font-black font-cyber">Halo! Selamat datang 👋</p>
+                                <p class="text-[10px] font-bold text-slate-600">Silakan kirimkan pertanyaan Anda. Customer Service kami siap membantu.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = data.messages.map(msg => {
+                        const isUser = msg.sender === 'user';
+                        const alignClass = isUser ? 'justify-end' : 'justify-start';
+                        const bgClass = isUser 
+                            ? 'bg-neoYellow text-black font-bold rounded-br-none border-2 border-black' 
+                            : 'bg-white text-black font-bold rounded-bl-none border-2 border-black';
+                        
+                        const timeStr = new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                        const displayName = isUser ? (msg.senderName || 'Anda') : 'Owner CS';
+
+                        return `
+                            <div class="flex ${alignClass}">
+                                <div class="max-w-[82%] p-2.5 rounded-2xl text-[11px] space-y-1 ${bgClass}">
+                                    <div class="flex items-center justify-between gap-2 border-b border-black/20 pb-1">
+                                        <span class="font-black font-cyber text-[10px] text-black">${displayName}</span>
+                                        <span class="text-[8px] opacity-75 font-mono font-bold">${timeStr}</span>
+                                    </div>
+                                    <p class="leading-relaxed break-words pt-0.5">${msg.message}</p>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    container.scrollTop = container.scrollHeight;
+                }
+            } catch(e) {}
+        }
+
+        async function sendWidgetMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('widgetChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+
+            try {
+                await fetch('/api/bantuan/send-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                loadWidgetMessages();
+            } catch(e) {}
         }
 
         document.addEventListener('DOMContentLoaded', loadDepositPageData);
