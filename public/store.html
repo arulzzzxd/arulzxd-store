@@ -56,7 +56,7 @@
         
         .neo-box {
             background-color: #FFFFFF;
-            border: 3.5px solid #000000;
+            border: 3px solid #000000;
             box-shadow: 5px 5px 0px #000000;
         }
 
@@ -88,7 +88,7 @@
 
         .swal2-popup.cyber-swal {
             background: #FFFFFF !important;
-            border: 3.5px solid #000000 !important;
+            border: 3px solid #000000 !important;
             border-radius: 20px !important;
             color: #000000 !important;
             box-shadow: 6px 6px 0px #000000 !important;
@@ -111,7 +111,7 @@
             position: absolute;
             inset: 0;
             background: #FFFFFF;
-            border: 3.5px solid #000000;
+            border: 3px solid #000000;
             border-radius: 32px;
             box-shadow: 5px 5px 0px #000000;
         }
@@ -163,7 +163,7 @@
         .nav-item-btn.active .nav-icon-box {
             transform: translateY(-22px);
             background-color: #FFDE59;
-            border: 3.5px solid #000000;
+            border: 3px solid #000000;
             box-shadow: 3px 3px 0px #000000;
         }
 
@@ -198,7 +198,7 @@
             0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
         }
 
-        /* CUSTOM VIDEO OVERLAY PLAY/PAUSE */
+        /* CUSTOM VIDEO OVERLAY PLAY BUTTON */
         .video-container {
             position: relative;
             cursor: pointer;
@@ -210,17 +210,17 @@
         }
         .play-overlay-btn {
             position: absolute;
-            width: 64px;
-            height: 64px;
+            width: 56px;
+            height: 56px;
             background: rgba(255, 255, 255, 0.9);
-            border: 3.5px solid #000000;
+            border: 3px solid #000000;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #000000;
-            font-size: 22px;
-            box-shadow: 4px 4px 0px #000;
+            font-size: 20px;
+            box-shadow: 3px 3px 0px #000;
             transition: opacity 0.2s ease, transform 0.2s ease;
             pointer-events: none;
             z-index: 20;
@@ -230,10 +230,7 @@
             transform: scale(0.8);
         }
 
-        /* HIDE DEFAULT VIDEO CONTROLS */
-        video::-webkit-media-controls { display: none !important; }
-        video::-webkit-media-controls-enclosure { display: none !important; }
-
+        /* CARD SLIDER KATEGORI STYLING */
         .product-card-horizontal {
             width: 280px;
             flex-shrink: 0;
@@ -361,7 +358,7 @@
                 </div>
             </div>
 
-            <!-- CONTAINER LIST & SLIDER PRODUK -->
+            <!-- CONTAINER CONTAINER LIST & SLIDER PRODUK -->
             <div class="md:col-span-3 space-y-6">
                 <div class="flex items-center justify-between neo-box p-3.5 rounded-xl bg-white">
                     <p class="text-xs font-bold font-cyber uppercase">
@@ -407,16 +404,16 @@
                 <!-- Ringkasan Produk -->
                 <div class="flex flex-col sm:flex-row gap-4 items-start neo-box p-3.5 rounded-2xl bg-neoBg">
                     
-                    <div class="relative w-full sm:w-36 h-36 rounded-xl overflow-hidden bg-white border-2 border-black flex-shrink-0 group cursor-pointer" id="modalProductCarousel">
-                        <div class="flex w-full h-full transition-transform duration-300 ease-out" id="modalCarouselTrack" onclick="zoomCurrentProductImage()">
+                    <div class="relative w-full sm:w-36 h-36 rounded-xl overflow-hidden bg-white border-2 border-black flex-shrink-0 group cursor-pointer" id="modalProductCarousel" onclick="zoomCurrentProductImage()">
+                        <div class="flex w-full h-full transition-transform duration-300 ease-out" id="modalCarouselTrack">
                             <img id="detailImg" src="" class="w-full h-full object-cover flex-shrink-0">
                         </div>
                         
-                        <span class="absolute top-1.5 right-1.5 bg-neoYellow border border-black text-black text-[10px] p-1 rounded font-black pointer-events-none">
+                        <span class="absolute top-1.5 right-1.5 bg-neoYellow border border-black text-black text-[10px] p-1 rounded font-black">
                             <i class="fa-solid fa-magnifying-glass-plus"></i>
                         </span>
 
-                        <div class="absolute bottom-1.5 inset-x-0 flex justify-center gap-1 z-10 pointer-events-none" id="modalCarouselDots"></div>
+                        <div class="absolute bottom-1.5 inset-x-0 flex justify-center gap-1 z-10" id="modalCarouselDots"></div>
                     </div>
 
                     <div class="space-y-1.5 overflow-hidden flex-1">
@@ -447,12 +444,12 @@
                         <div class="flex items-center justify-between px-1">
                             <div class="flex items-center gap-1.5">
                                 <span id="reviewModeBadge" class="text-[10px] font-black font-cyber">Rating:</span>
-                                <div class="flex items-center gap-1 text-sm text-amber-400" id="starInputGroup">
-                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-300" onclick="setRating(1)"></i>
-                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-300" onclick="setRating(2)"></i>
-                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-300" onclick="setRating(3)"></i>
-                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-300" onclick="setRating(4)"></i>
-                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-300" onclick="setRating(5)"></i>
+                                <div class="flex items-center gap-1 text-sm text-yellow-500" id="starInputGroup">
+                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-400" onclick="setRating(1)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-400" onclick="setRating(2)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-400" onclick="setRating(3)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-400" onclick="setRating(4)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-400" onclick="setRating(5)"></i>
                                 </div>
                             </div>
 
@@ -486,7 +483,7 @@
         </div>
     </div>
 
-    <!-- MODAL LIGHTBOX FULLSCREEN DENGAN SWIPE & AUTO PLAY VIDEO -->
+    <!-- MODAL LIGHTBOX FULLSCREEN SLIDER -->
     <div id="mediaLightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex flex-col justify-between p-3 sm:p-6 select-none" onclick="closeMediaLightbox()">
         
         <div class="flex items-center justify-between text-white z-20" onclick="event.stopPropagation()">
@@ -494,7 +491,7 @@
                 <img id="lightboxUserAvatar" src="" class="w-10 h-10 rounded-full object-cover border-2 border-black">
                 <div>
                     <h5 id="lightboxUserName" class="text-xs font-black text-white font-cyber"></h5>
-                    <div id="lightboxUserRating" class="flex items-center gap-1"></div>
+                    <div id="lightboxUserRating" class="flex items-center gap-1 text-yellow-400"></div>
                 </div>
             </div>
             <button onclick="closeMediaLightbox()" class="text-white font-black text-2xl p-2">
@@ -507,8 +504,7 @@
                 <img id="lightboxImage" src="" class="hidden max-w-full max-h-[80vh] rounded-2xl object-contain border-3 border-black bg-white">
                 
                 <div id="videoWrapper" class="video-container hidden max-w-full max-h-[80vh] rounded-2xl overflow-hidden border-3 border-black bg-black" onclick="toggleVideoPlayPause()">
-                    <!-- VIDEO DENGAN AUTO-PLAY SAAT BERPINDAH -->
-                    <video id="lightboxVideo" loop playsinline class="w-full h-full max-h-[80vh] object-contain"></video>
+                    <video id="lightboxVideo" loop playsinline autoplay class="w-full h-full max-h-[80vh] object-contain"></video>
                     <div id="videoPlayOverlayBtn" class="play-overlay-btn">
                         <i class="fa-solid fa-play"></i>
                     </div>
@@ -739,6 +735,12 @@
         </div>
     </div>
 
+    <!-- FLOATING LIVE CHAT BUTTON -->
+    <button id="floatingChatToggleBtn" onclick="toggleChatWidget()" title="Bantuan & Live Chat" class="fixed bottom-24 right-5 z-[99990] flex items-center justify-center w-12 h-12 rounded-full bg-neoYellow border-3 border-black text-black shadow-[4px_4px_0px_#000] hover:scale-110 transition-transform duration-200 font-black">
+        <i class="fa-solid fa-comment-dots text-xl"></i>
+        <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-neoGreen border-2 border-black rounded-full"></span>
+    </button>
+
     <!-- JAVASCRIPT LOGIC FULL INTEGRATED -->
     <script>
         document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
@@ -761,6 +763,7 @@
 
         const REVIEWS_CACHE = {};
 
+        let cardCarouselIndices = {};
         let currentModalImages = [];
         let currentModalImageIndex = 0;
 
@@ -770,6 +773,8 @@
         let currentReviewsListWithMedia = [];
         let activeUserReviewIndex = 0;
         let activeMediaItemIndex = 0;
+
+        let widgetChatInterval = null;
 
         async function fetchCurrentUserStatus() {
             try {
@@ -795,6 +800,14 @@
             }
         }
 
+        function recordPurchasedProduct(productId) {
+            let purchased = JSON.parse(localStorage.getItem('purchased_products') || '[]');
+            if (!purchased.includes(productId)) {
+                purchased.push(productId);
+                localStorage.setItem('purchased_products', JSON.stringify(purchased));
+            }
+        }
+
         function renderStarRating(rating) {
             const fullStars = Math.floor(rating);
             const hasHalfStar = rating % 1 >= 0.5;
@@ -802,14 +815,14 @@
 
             for (let i = 1; i <= 5; i++) {
                 if (i <= fullStars) {
-                    starsHtml += `<i class="fa-solid fa-star text-amber-400"></i>`;
+                    starsHtml += `<i class="fa-solid fa-star text-yellow-400"></i>`;
                 } else if (i === fullStars + 1 && hasHalfStar) {
-                    starsHtml += `<i class="fa-solid fa-star-half-stroke text-amber-400"></i>`;
+                    starsHtml += `<i class="fa-solid fa-star-half-stroke text-yellow-400"></i>`;
                 } else {
-                    starsHtml += `<i class="fa-regular fa-star text-slate-300"></i>`;
+                    starsHtml += `<i class="fa-regular fa-star text-slate-400"></i>`;
                 }
             }
-            return `<div class="flex items-center gap-0.5 text-xs">${starsHtml} <span class="font-black font-cyber text-black ml-1">${rating > 0 ? rating.toFixed(1) : '0.0'}</span></div>`;
+            return `<div class="flex items-center gap-0.5 text-xs">${starsHtml} <span class="font-black font-cyber text-black ml-1">${rating > 0 ? rating : '0.0'}</span></div>`;
         }
 
         function setRating(val) {
@@ -819,11 +832,11 @@
             const stars = document.querySelectorAll('#starInputGroup i');
             stars.forEach((star, idx) => {
                 if (idx < val) {
-                    star.classList.remove('text-slate-300');
-                    star.classList.add('text-amber-400');
+                    star.classList.remove('text-slate-400');
+                    star.classList.add('text-yellow-400');
                 } else {
-                    star.classList.remove('text-amber-400');
-                    star.classList.add('text-slate-300');
+                    star.classList.remove('text-yellow-400');
+                    star.classList.add('text-slate-400');
                 }
             });
         }
@@ -915,6 +928,12 @@
             const product = DATA_PRODUK.find(p => (p.Id || p._id) === productId);
             if (!product) return;
 
+            // Sembunyikan widget live chat saat modal review/detail produk terbuka
+            const chatWidget = document.getElementById('floatingChatWindow');
+            const chatToggleBtn = document.getElementById('floatingChatToggleBtn');
+            if (chatWidget) chatWidget.classList.add('hidden');
+            if (chatToggleBtn) chatToggleBtn.classList.add('hidden');
+
             const pIdStr = product.Id || product._id;
             document.getElementById('reviewProductId').value = pIdStr;
             document.getElementById('detailTitle').innerText = product.nama;
@@ -951,30 +970,11 @@
             `).join('');
         }
 
-        function navigateModalCarousel(dir) {
-            if (currentModalImages.length <= 1) return;
-            currentModalImageIndex = (currentModalImageIndex + dir + currentModalImages.length) % currentModalImages.length;
-            renderModalCarousel();
-        }
-
         function closeProductDetailModal() {
             document.getElementById('productDetailModal').classList.add('hidden');
-        }
-
-        /* SWIPE / GESER FOTO PRODUK PADA MODAL DETAIL */
-        let modalCarouselTouchStartX = 0;
-        const modalProductCarousel = document.getElementById('modalProductCarousel');
-        if (modalProductCarousel) {
-            modalProductCarousel.addEventListener('touchstart', e => {
-                modalCarouselTouchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-
-            modalProductCarousel.addEventListener('touchend', e => {
-                const diffX = e.changedTouches[0].screenX - modalCarouselTouchStartX;
-                if (Math.abs(diffX) > 30) {
-                    navigateModalCarousel(diffX < 0 ? 1 : -1);
-                }
-            }, { passive: true });
+            // Munculkan kembali tombol toggle live chat saat modal detail review ditutup
+            const chatToggleBtn = document.getElementById('floatingChatToggleBtn');
+            if (chatToggleBtn) chatToggleBtn.classList.remove('hidden');
         }
 
         function openProductZoomLightbox(prodIndex, initialImgIndex = 0) {
@@ -1017,8 +1017,32 @@
             `).join('');
         }
 
+        function navigateProductZoom(dir) {
+            if (zoomProductImageList.length <= 1) return;
+            zoomProductActiveIndex = (zoomProductActiveIndex + dir + zoomProductImageList.length) % zoomProductImageList.length;
+            renderProductZoomContent();
+        }
+
         function closeProductZoomLightbox() {
             document.getElementById('productZoomLightbox').classList.add('hidden');
+        }
+
+        let zoomTouchStartX = 0;
+        let zoomTouchStartY = 0;
+        const zoomSwipeArea = document.getElementById('zoomSwipeArea');
+        if (zoomSwipeArea) {
+            zoomSwipeArea.addEventListener('touchstart', e => {
+                zoomTouchStartX = e.changedTouches[0].screenX;
+                zoomTouchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            zoomSwipeArea.addEventListener('touchend', e => {
+                const diffX = e.changedTouches[0].screenX - zoomTouchStartX;
+                const diffY = e.changedTouches[0].screenY - zoomTouchStartY;
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+                    navigateProductZoom(diffX < 0 ? 1 : -1);
+                }
+            }, { passive: true });
         }
 
         function openMediaLightboxSlider(reviewIndex, mediaIndex) {
@@ -1029,7 +1053,6 @@
             document.getElementById('mediaLightboxModal').classList.remove('hidden');
         }
 
-        /* RENDERING MEDIA LIGHTBOX DENGAN AUTO PLAY VIDEO SAAT BERPINDAH */
         function renderLightboxMediaContent() {
             if (!currentReviewsListWithMedia || currentReviewsListWithMedia.length === 0) return;
 
@@ -1051,15 +1074,18 @@
                 img.classList.add('hidden');
                 videoWrapper.classList.remove('hidden');
                 video.src = currentMedia.url;
-                video.muted = false;
+                
+                videoWrapper.classList.add('playing');
                 video.currentTime = 0;
                 
-                // AUTO PLAY SAAT BERPINDAH VIDEO
-                videoWrapper.classList.add('playing');
+                // Pastikan auto-play menyala dengan suara aktif (tidak di-mute)
+                video.muted = false;
                 const playPromise = video.play();
                 if (playPromise !== undefined) {
-                    playPromise.catch(() => {
-                        videoWrapper.classList.remove('playing');
+                    playPromise.catch(error => {
+                        // Fallback jika browser memblokir audio otomatis, coba mute lalu play atau biarkan user klik
+                        video.muted = true;
+                        video.play().catch(() => {});
                     });
                 }
             } else {
@@ -1073,7 +1099,6 @@
             document.getElementById('lightboxUserCounter').innerText = `Ulasan ${activeUserReviewIndex + 1} dari ${currentReviewsListWithMedia.length}`;
         }
 
-        /* TOGGLE PLAY / PAUSE DENGAN KLIK PADA VIDEO */
         function toggleVideoPlayPause() {
             const video = document.getElementById('lightboxVideo');
             const wrapper = document.getElementById('videoWrapper');
@@ -1087,49 +1112,36 @@
             }
         }
 
+        function navigateMediaHorizontal(dir) {
+            const userReview = currentReviewsListWithMedia[activeUserReviewIndex];
+            if (!userReview || !userReview.media) return;
+
+            const totalMedia = userReview.media.length;
+            activeMediaItemIndex = (activeMediaItemIndex + dir + totalMedia) % totalMedia;
+            renderLightboxMediaContent();
+        }
+
         function closeMediaLightbox() {
             const video = document.getElementById('lightboxVideo');
             if (video) video.pause();
             document.getElementById('mediaLightboxModal').classList.add('hidden');
         }
 
-        /* GESTURE SWIPE ATAS/BAWAH & KIRI/KANAN UNTUK LIGHTBOX REVIEW */
-        let touchStartX = 0;
-        let touchStartY = 0;
+        let mediaTouchStartX = 0;
+        let mediaTouchStartY = 0;
         const lightboxSwipeArea = document.getElementById('lightboxSwipeArea');
-
         if (lightboxSwipeArea) {
             lightboxSwipeArea.addEventListener('touchstart', e => {
-                touchStartX = e.changedTouches[0].screenX;
-                touchStartY = e.changedTouches[0].screenY;
+                mediaTouchStartX = e.changedTouches[0].screenX;
+                mediaTouchStartY = e.changedTouches[0].screenY;
             }, { passive: true });
 
             lightboxSwipeArea.addEventListener('touchend', e => {
-                const diffX = e.changedTouches[0].screenX - touchStartX;
-                const diffY = e.changedTouches[0].screenY - touchStartY;
-
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    // Geser Horizontal (Kiri / Kanan) -> Ganti Media dalam 1 Ulasan
-                    if (Math.abs(diffX) > 40) {
-                        const userReview = currentReviewsListWithMedia[activeUserReviewIndex];
-                        if (userReview && userReview.media && userReview.media.length > 1) {
-                            const totalMedia = userReview.media.length;
-                            const dir = diffX < 0 ? 1 : -1;
-                            activeMediaItemIndex = (activeMediaItemIndex + dir + totalMedia) % totalMedia;
-                            renderLightboxMediaContent();
-                        }
-                    }
-                } else {
-                    // Geser Vertikal (Atas / Bawah) -> Ganti Ulasan Pembeli
-                    if (Math.abs(diffY) > 40) {
-                        const totalReviews = currentReviewsListWithMedia.length;
-                        if (totalReviews > 1) {
-                            const dir = diffY < 0 ? 1 : -1;
-                            activeUserReviewIndex = (activeUserReviewIndex + dir + totalReviews) % totalReviews;
-                            activeMediaItemIndex = 0;
-                            renderLightboxMediaContent();
-                        }
-                    }
+                const diffX = e.changedTouches[0].screenX - mediaTouchStartX;
+                const diffY = e.changedTouches[0].screenY - mediaTouchStartY;
+                // Hanya jalankan perpindahan media jika geseran horizontal lebih dominan daripada vertikal
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+                    navigateMediaHorizontal(diffX < 0 ? 1 : -1);
                 }
             }, { passive: true });
         }
@@ -1502,9 +1514,9 @@
 
                     let hargaCorethtml = produk.harga_diskon ? `
                         <div class="text-[11px] font-bold text-slate-400 line-through">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga)}</div>
-                        <div class="text-base font-black font-cyber text-amber-500">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga_diskon)}</div>
+                        <div class="text-base font-black font-cyber text-neoYellow">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga_diskon)}</div>
                     ` : `
-                        <div class="text-base font-black font-cyber text-amber-500">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga)}</div>
+                        <div class="text-base font-black font-cyber text-neoYellow">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga)}</div>
                     `;
 
                     return `
@@ -1523,7 +1535,7 @@
                                             ${deskripsiTeks}
                                         </p>
                                         ${isLong ? `
-                                            <button onclick="event.stopPropagation(); toggleWaDesc(${originalIndex})" id="desc-btn-${originalIndex}" class="text-amber-600 font-black underline mt-0.5 inline-block text-xs">
+                                            <button onclick="event.stopPropagation(); toggleWaDesc(${originalIndex})" id="desc-btn-${originalIndex}" class="text-neoYellow font-black underline mt-0.5 inline-block text-xs">
                                                 ... baca selengkapnya
                                             </button>
                                         ` : ''}
@@ -1562,7 +1574,7 @@
                 }).join('');
 
                 return `
-                    <div class="space-y-3">
+                    <div class="p-0 space-y-3">
                         <div class="flex items-center justify-between border-b-2 border-black pb-2">
                             <h3 class="text-sm font-black font-cyber uppercase tracking-wider flex items-center gap-2 text-black">
                                 <i class="fa-solid fa-folder-open text-neoYellow bg-black px-1.5 py-0.5 rounded"></i> ${catName}
@@ -1751,6 +1763,87 @@
 
             window.open(`https://wa.me/6285122629940?text=${encodeURIComponent(message)}`, '_blank');
             closeCheckoutModal();
+        }
+
+        /* LOGIKA FLOATING LIVE CHAT WIDGET */
+        function toggleChatWidget() {
+            const windowEl = document.getElementById('floatingChatWindow');
+            const isHidden = windowEl.classList.contains('hidden');
+
+            if (isHidden) {
+                windowEl.classList.remove('hidden');
+                loadWidgetMessages();
+                if (!widgetChatInterval) widgetChatInterval = setInterval(loadWidgetMessages, 3000);
+            } else {
+                windowEl.classList.add('hidden');
+                if (widgetChatInterval) {
+                    clearInterval(widgetChatInterval);
+                    widgetChatInterval = null;
+                }
+            }
+        }
+
+        async function loadWidgetMessages() {
+            try {
+                const res = await fetch('/api/bantuan/messages');
+                const data = await res.json();
+                const container = document.getElementById('widgetChatMessages');
+
+                if (data.status && data.messages) {
+                    if (data.messages.length === 0) {
+                        container.innerHTML = `
+                            <div class="neo-box p-3 rounded-xl bg-white text-xs text-black space-y-1">
+                                <p class="font-black font-cyber">Halo! Selamat datang 👋</p>
+                                <p class="text-[10px] font-bold text-slate-600">Silakan kirimkan pertanyaan Anda. Customer Service kami siap membantu.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = data.messages.map(msg => {
+                        const isUser = msg.sender === 'user';
+                        const alignClass = isUser ? 'justify-end' : 'justify-start';
+                        const bgClass = isUser 
+                            ? 'bg-neoYellow text-black font-bold rounded-br-none border-2 border-black' 
+                            : 'bg-white text-black font-bold rounded-bl-none border-2 border-black';
+                        
+                        const timeStr = new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                        const displayName = isUser ? (msg.senderName || 'Anda') : 'Owner CS';
+
+                        return `
+                            <div class="flex ${alignClass}">
+                                <div class="max-w-[82%] p-2.5 rounded-2xl text-[11px] space-y-1 ${bgClass}">
+                                    <div class="flex items-center justify-between gap-2 border-b border-black/20 pb-1">
+                                        <span class="font-black font-cyber text-[10px] text-black">${displayName}</span>
+                                        <span class="text-[8px] opacity-75 font-mono font-bold">${timeStr}</span>
+                                    </div>
+                                    <p class="leading-relaxed break-words pt-0.5">${msg.message}</p>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    container.scrollTop = container.scrollHeight;
+                }
+            } catch(e) {}
+        }
+
+        async function sendWidgetMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('widgetChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+
+            try {
+                await fetch('/api/bantuan/send-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                loadWidgetMessages();
+            } catch(e) {}
         }
 
         async function initStorePage() {
