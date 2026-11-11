@@ -56,7 +56,7 @@
         
         .neo-box {
             background-color: #FFFFFF;
-            border: 3px solid #000000;
+            border: 3.5px solid #000000;
             box-shadow: 5px 5px 0px #000000;
         }
 
@@ -88,7 +88,7 @@
 
         .swal2-popup.cyber-swal {
             background: #FFFFFF !important;
-            border: 3px solid #000000 !important;
+            border: 3.5px solid #000000 !important;
             border-radius: 20px !important;
             color: #000000 !important;
             box-shadow: 6px 6px 0px #000000 !important;
@@ -111,7 +111,7 @@
             position: absolute;
             inset: 0;
             background: #FFFFFF;
-            border: 3px solid #000000;
+            border: 3.5px solid #000000;
             border-radius: 32px;
             box-shadow: 5px 5px 0px #000000;
         }
@@ -163,7 +163,7 @@
         .nav-item-btn.active .nav-icon-box {
             transform: translateY(-22px);
             background-color: #FFDE59;
-            border: 3px solid #000000;
+            border: 3.5px solid #000000;
             box-shadow: 3px 3px 0px #000000;
         }
 
@@ -358,7 +358,7 @@
                 </div>
             </div>
 
-            <!-- CONTAINER CONTAINER LIST & SLIDER PRODUK -->
+            <!-- CONTAINER LIST & SLIDER PRODUK -->
             <div class="md:col-span-3 space-y-6">
                 <div class="flex items-center justify-between neo-box p-3.5 rounded-xl bg-white">
                     <p class="text-xs font-bold font-cyber uppercase">
@@ -444,12 +444,12 @@
                         <div class="flex items-center justify-between px-1">
                             <div class="flex items-center gap-1.5">
                                 <span id="reviewModeBadge" class="text-[10px] font-black font-cyber">Rating:</span>
-                                <div class="flex items-center gap-1 text-sm text-black" id="starInputGroup">
-                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-400" onclick="setRating(1)"></i>
-                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-400" onclick="setRating(2)"></i>
-                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-400" onclick="setRating(3)"></i>
-                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-400" onclick="setRating(4)"></i>
-                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-400" onclick="setRating(5)"></i>
+                                <div class="flex items-center gap-1 text-sm text-amber-400" id="starInputGroup">
+                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-300" onclick="setRating(1)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-300" onclick="setRating(2)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-300" onclick="setRating(3)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-300" onclick="setRating(4)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer transition text-slate-300" onclick="setRating(5)"></i>
                                 </div>
                             </div>
 
@@ -483,7 +483,7 @@
         </div>
     </div>
 
-    <!-- MODAL LIGHTBOX FULLSCREEN SLIDER -->
+    <!-- MODAL LIGHTBOX FULLSCREEN SLIDER DENGAN SUARA VIDEO -->
     <div id="mediaLightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex flex-col justify-between p-3 sm:p-6 select-none" onclick="closeMediaLightbox()">
         
         <div class="flex items-center justify-between text-white z-20" onclick="event.stopPropagation()">
@@ -504,7 +504,8 @@
                 <img id="lightboxImage" src="" class="hidden max-w-full max-h-[80vh] rounded-2xl object-contain border-3 border-black bg-white">
                 
                 <div id="videoWrapper" class="video-container hidden max-w-full max-h-[80vh] rounded-2xl overflow-hidden border-3 border-black bg-black" onclick="toggleVideoPlayPause()">
-                    <video id="lightboxVideo" loop playsinline autoplay muted class="w-full h-full max-h-[80vh] object-contain"></video>
+                    <!-- VIDEO DENGAN KONTROL DENGAN SUARA -->
+                    <video id="lightboxVideo" loop playsinline controls class="w-full h-full max-h-[80vh] object-contain"></video>
                     <div id="videoPlayOverlayBtn" class="play-overlay-btn">
                         <i class="fa-solid fa-play"></i>
                     </div>
@@ -800,14 +801,7 @@
             }
         }
 
-        function recordPurchasedProduct(productId) {
-            let purchased = JSON.parse(localStorage.getItem('purchased_products') || '[]');
-            if (!purchased.includes(productId)) {
-                purchased.push(productId);
-                localStorage.setItem('purchased_products', JSON.stringify(purchased));
-            }
-        }
-
+        /* BINTANG EMAS UNTUK RATING PRODUK */
         function renderStarRating(rating) {
             const fullStars = Math.floor(rating);
             const hasHalfStar = rating % 1 >= 0.5;
@@ -815,14 +809,14 @@
 
             for (let i = 1; i <= 5; i++) {
                 if (i <= fullStars) {
-                    starsHtml += `<i class="fa-solid fa-star text-black"></i>`;
+                    starsHtml += `<i class="fa-solid fa-star text-amber-400"></i>`;
                 } else if (i === fullStars + 1 && hasHalfStar) {
-                    starsHtml += `<i class="fa-solid fa-star-half-stroke text-black"></i>`;
+                    starsHtml += `<i class="fa-solid fa-star-half-stroke text-amber-400"></i>`;
                 } else {
-                    starsHtml += `<i class="fa-regular fa-star text-slate-400"></i>`;
+                    starsHtml += `<i class="fa-regular fa-star text-slate-300"></i>`;
                 }
             }
-            return `<div class="flex items-center gap-0.5 text-xs">${starsHtml} <span class="font-black font-cyber text-black ml-1">${rating > 0 ? rating : '0.0'}</span></div>`;
+            return `<div class="flex items-center gap-0.5 text-xs">${starsHtml} <span class="font-black font-cyber text-black ml-1">${rating > 0 ? rating.toFixed(1) : '0.0'}</span></div>`;
         }
 
         function setRating(val) {
@@ -832,11 +826,11 @@
             const stars = document.querySelectorAll('#starInputGroup i');
             stars.forEach((star, idx) => {
                 if (idx < val) {
-                    star.classList.remove('text-slate-400');
-                    star.classList.add('text-black');
+                    star.classList.remove('text-slate-300');
+                    star.classList.add('text-amber-400');
                 } else {
-                    star.classList.remove('text-black');
-                    star.classList.add('text-slate-400');
+                    star.classList.remove('text-amber-400');
+                    star.classList.add('text-slate-300');
                 }
             });
         }
@@ -1018,21 +1012,6 @@
             document.getElementById('productZoomLightbox').classList.add('hidden');
         }
 
-        let zoomTouchStartX = 0;
-        const zoomSwipeArea = document.getElementById('zoomSwipeArea');
-        if (zoomSwipeArea) {
-            zoomSwipeArea.addEventListener('touchstart', e => {
-                zoomTouchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-
-            zoomSwipeArea.addEventListener('touchend', e => {
-                const diffX = e.changedTouches[0].screenX - zoomTouchStartX;
-                if (Math.abs(diffX) > 40) {
-                    navigateProductZoom(diffX < 0 ? 1 : -1);
-                }
-            }, { passive: true });
-        }
-
         function openMediaLightboxSlider(reviewIndex, mediaIndex) {
             activeUserReviewIndex = reviewIndex;
             activeMediaItemIndex = mediaIndex;
@@ -1041,6 +1020,7 @@
             document.getElementById('mediaLightboxModal').classList.remove('hidden');
         }
 
+        /* RENDERING MEDIA LIGHTBOX DENGAN FITUR SUARA DILENGKAPI KONTROL */
         function renderLightboxMediaContent() {
             if (!currentReviewsListWithMedia || currentReviewsListWithMedia.length === 0) return;
 
@@ -1062,15 +1042,16 @@
                 img.classList.add('hidden');
                 videoWrapper.classList.remove('hidden');
                 video.src = currentMedia.url;
+                video.muted = false; // MENCEGAH TERBISU / MUTE OTOMATIS
                 
                 videoWrapper.classList.add('playing');
                 video.currentTime = 0;
                 
                 const playPromise = video.play();
                 if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        video.muted = true;
-                        video.play().catch(() => {});
+                    playPromise.catch(() => {
+                        // Jika diproteksi browser saat bersuara, fallback dengan tombol play
+                        wrapper.classList.remove('playing');
                     });
                 }
             } else {
@@ -1089,6 +1070,7 @@
             const wrapper = document.getElementById('videoWrapper');
 
             if (video.paused) {
+                video.muted = false;
                 video.play();
                 wrapper.classList.add('playing');
             } else {
@@ -1110,21 +1092,6 @@
             const video = document.getElementById('lightboxVideo');
             if (video) video.pause();
             document.getElementById('mediaLightboxModal').classList.add('hidden');
-        }
-
-        let mediaTouchStartX = 0;
-        const lightboxSwipeArea = document.getElementById('lightboxSwipeArea');
-        if (lightboxSwipeArea) {
-            lightboxSwipeArea.addEventListener('touchstart', e => {
-                mediaTouchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-
-            lightboxSwipeArea.addEventListener('touchend', e => {
-                const diffX = e.changedTouches[0].screenX - mediaTouchStartX;
-                if (Math.abs(diffX) > 40) {
-                    navigateMediaHorizontal(diffX < 0 ? 1 : -1);
-                }
-            }, { passive: true });
         }
 
         function escapeHtml(str) {
@@ -1452,6 +1419,7 @@
             renderProduk();
         }
 
+        /* PERBAIKAN: MENGHAPUS TABEL/KOTAK KATEGORI GANDA DI BELAKANG PRODUK */
         function renderProduk() {
             const grid = document.getElementById('productGrid');
             const emptyState = document.getElementById('emptyState');
@@ -1495,9 +1463,9 @@
 
                     let hargaCorethtml = produk.harga_diskon ? `
                         <div class="text-[11px] font-bold text-slate-400 line-through">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga)}</div>
-                        <div class="text-base font-black font-cyber text-neoYellow">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga_diskon)}</div>
+                        <div class="text-base font-black font-cyber text-amber-500">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga_diskon)}</div>
                     ` : `
-                        <div class="text-base font-black font-cyber text-neoYellow">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga)}</div>
+                        <div class="text-base font-black font-cyber text-amber-500">Rp ${new Intl.NumberFormat('id-ID').format(produk.harga)}</div>
                     `;
 
                     return `
@@ -1516,7 +1484,7 @@
                                             ${deskripsiTeks}
                                         </p>
                                         ${isLong ? `
-                                            <button onclick="event.stopPropagation(); toggleWaDesc(${originalIndex})" id="desc-btn-${originalIndex}" class="text-neoYellow font-black underline mt-0.5 inline-block text-xs">
+                                            <button onclick="event.stopPropagation(); toggleWaDesc(${originalIndex})" id="desc-btn-${originalIndex}" class="text-amber-600 font-black underline mt-0.5 inline-block text-xs">
                                                 ... baca selengkapnya
                                             </button>
                                         ` : ''}
@@ -1555,7 +1523,7 @@
                 }).join('');
 
                 return `
-                    <div class="neo-box p-4 rounded-2xl bg-white space-y-3">
+                    <div class="space-y-3">
                         <div class="flex items-center justify-between border-b-2 border-black pb-2">
                             <h3 class="text-sm font-black font-cyber uppercase tracking-wider flex items-center gap-2 text-black">
                                 <i class="fa-solid fa-folder-open text-neoYellow bg-black px-1.5 py-0.5 rounded"></i> ${catName}
