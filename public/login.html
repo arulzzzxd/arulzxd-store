@@ -59,7 +59,6 @@
             box-shadow: 2px 2px 0px #000000;
         }
 
-        /* STATE TOMBOL MEMUDAR DAN TIDAK BISA DIKLIK */
         .btn-disabled {
             opacity: 0.45 !important;
             filter: grayscale(40%) !important;
@@ -227,12 +226,18 @@
             </div>
         </div>
 
-        <!-- BANNER VIDEO MP4 AUTOPLAY (DI BAWAH ARULZXD-STORE) -->
-        <div class="relative w-full h-32 sm:h-36 rounded-xl border-3 border-black shadow-[3px_3px_0px_#000] overflow-hidden bg-black shrink-0">
+        <!-- BANNER ASPECT 16:9 PRESISI -->
+        <div class="relative w-full aspect-video rounded-xl border-3 border-black shadow-[3px_3px_0px_#000] overflow-hidden bg-black shrink-0">
+            <!-- Menampilkan GIF / Gambar Banner -->
+            <img src="https://cdn.larasxd.my.id/files/gmNmPPTi.gif" alt="Banner ArulzXD" class="w-full h-full object-cover pointer-events-none opacity-90">
+
+            <!-- Opsi Video MP4 (Jika Menggunakan Video) -->
+            <!--
             <video autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none opacity-90">
-                <source src="https://cdn.larasxd.my.id/files/gmNmPPTi.gif" type="video/gif">
-                Browser Anda tidak mendukung tag video MP4.
+                <source src="https://arulz-xd.my.id/files/F803Z7.mp4" type="video/mp4">
             </video>
+            -->
+            
             <div class="absolute bottom-2 left-2 bg-black/75 backdrop-blur-sm text-white text-[9px] font-cyber font-bold px-2 py-0.5 rounded border border-white/30 flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-neoGreen animate-pulse"></span> ARULZXD OFFICIAL
             </div>
@@ -411,7 +416,6 @@
             buttonsStyling: false
         };
 
-        // MASKING USERNAME / EMAIL DENGAN ICON FA-EYE / FA-EYE-SLASH
         let rawUsernameInput = '';
         let isUsernameVisible = false;
 
