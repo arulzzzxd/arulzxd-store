@@ -198,7 +198,7 @@
             0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
         }
 
-        /* CUSTOM VIDEO OVERLAY PLAY BUTTON */
+        /* CUSTOM VIDEO OVERLAY PLAY/PAUSE */
         .video-container {
             position: relative;
             cursor: pointer;
@@ -210,17 +210,17 @@
         }
         .play-overlay-btn {
             position: absolute;
-            width: 56px;
-            height: 56px;
+            width: 64px;
+            height: 64px;
             background: rgba(255, 255, 255, 0.9);
-            border: 3px solid #000000;
+            border: 3.5px solid #000000;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #000000;
-            font-size: 20px;
-            box-shadow: 3px 3px 0px #000;
+            font-size: 22px;
+            box-shadow: 4px 4px 0px #000;
             transition: opacity 0.2s ease, transform 0.2s ease;
             pointer-events: none;
             z-index: 20;
@@ -230,7 +230,14 @@
             transform: scale(0.8);
         }
 
-        /* CARD SLIDER KATEGORI STYLING */
+        /* HIDE DEFAULT VIDEO CONTROLS */
+        video::-webkit-media-controls {
+            display: none !important;
+        }
+        video::-webkit-media-controls-enclosure {
+            display: none !important;
+        }
+
         .product-card-horizontal {
             width: 280px;
             flex-shrink: 0;
@@ -483,7 +490,7 @@
         </div>
     </div>
 
-    <!-- MODAL LIGHTBOX FULLSCREEN SLIDER DENGAN SUARA VIDEO -->
+    <!-- MODAL LIGHTBOX FULLSCREEN DENGAN SWIPE ATAS/BAWAH & KIRI/KANAN -->
     <div id="mediaLightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex flex-col justify-between p-3 sm:p-6 select-none" onclick="closeMediaLightbox()">
         
         <div class="flex items-center justify-between text-white z-20" onclick="event.stopPropagation()">
@@ -504,8 +511,8 @@
                 <img id="lightboxImage" src="" class="hidden max-w-full max-h-[80vh] rounded-2xl object-contain border-3 border-black bg-white">
                 
                 <div id="videoWrapper" class="video-container hidden max-w-full max-h-[80vh] rounded-2xl overflow-hidden border-3 border-black bg-black" onclick="toggleVideoPlayPause()">
-                    <!-- VIDEO DENGAN KONTROL DENGAN SUARA -->
-                    <video id="lightboxVideo" loop playsinline controls class="w-full h-full max-h-[80vh] object-contain"></video>
+                    <!-- VIDEO TANPA KONTROL BAWAAN, KLIK UNTUK PLAY/PAUSE -->
+                    <video id="lightboxVideo" loop playsinline class="w-full h-full max-h-[80vh] object-contain"></video>
                     <div id="videoPlayOverlayBtn" class="play-overlay-btn">
                         <i class="fa-solid fa-play"></i>
                     </div>
@@ -736,12 +743,6 @@
         </div>
     </div>
 
-    <!-- FLOATING LIVE CHAT BUTTON -->
-    <button id="floatingChatToggleBtn" onclick="toggleChatWidget()" title="Bantuan & Live Chat" class="fixed bottom-24 right-5 z-[99990] flex items-center justify-center w-12 h-12 rounded-full bg-neoYellow border-3 border-black text-black shadow-[4px_4px_0px_#000] hover:scale-110 transition-transform duration-200 font-black">
-        <i class="fa-solid fa-comment-dots text-xl"></i>
-        <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-neoGreen border-2 border-black rounded-full"></span>
-    </button>
-
     <!-- JAVASCRIPT LOGIC FULL INTEGRATED -->
     <script>
         document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
@@ -764,7 +765,6 @@
 
         const REVIEWS_CACHE = {};
 
-        let cardCarouselIndices = {};
         let currentModalImages = [];
         let currentModalImageIndex = 0;
 
@@ -774,8 +774,6 @@
         let currentReviewsListWithMedia = [];
         let activeUserReviewIndex = 0;
         let activeMediaItemIndex = 0;
-
-        let widgetChatInterval = null;
 
         async function fetchCurrentUserStatus() {
             try {
@@ -801,7 +799,6 @@
             }
         }
 
-        /* BINTANG EMAS UNTUK RATING PRODUK */
         function renderStarRating(rating) {
             const fullStars = Math.floor(rating);
             const hasHalfStar = rating % 1 >= 0.5;
@@ -1002,12 +999,6 @@
             `).join('');
         }
 
-        function navigateProductZoom(dir) {
-            if (zoomProductImageList.length <= 1) return;
-            zoomProductActiveIndex = (zoomProductActiveIndex + dir + zoomProductImageList.length) % zoomProductImageList.length;
-            renderProductZoomContent();
-        }
-
         function closeProductZoomLightbox() {
             document.getElementById('productZoomLightbox').classList.add('hidden');
         }
@@ -1020,7 +1011,6 @@
             document.getElementById('mediaLightboxModal').classList.remove('hidden');
         }
 
-        /* RENDERING MEDIA LIGHTBOX DENGAN FITUR SUARA DILENGKAPI KONTROL */
         function renderLightboxMediaContent() {
             if (!currentReviewsListWithMedia || currentReviewsListWithMedia.length === 0) return;
 
@@ -1042,18 +1032,11 @@
                 img.classList.add('hidden');
                 videoWrapper.classList.remove('hidden');
                 video.src = currentMedia.url;
-                video.muted = false; // MENCEGAH TERBISU / MUTE OTOMATIS
+                video.muted = false;
                 
-                videoWrapper.classList.add('playing');
+                videoWrapper.classList.remove('playing');
                 video.currentTime = 0;
-                
-                const playPromise = video.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(() => {
-                        // Jika diproteksi browser saat bersuara, fallback dengan tombol play
-                        wrapper.classList.remove('playing');
-                    });
-                }
+                video.pause();
             } else {
                 video.pause();
                 videoWrapper.classList.add('hidden');
@@ -1065,12 +1048,12 @@
             document.getElementById('lightboxUserCounter').innerText = `Ulasan ${activeUserReviewIndex + 1} dari ${currentReviewsListWithMedia.length}`;
         }
 
+        /* TOGGLE PLAY / PAUSE DENGAN KLIK PADA VIDEO */
         function toggleVideoPlayPause() {
             const video = document.getElementById('lightboxVideo');
             const wrapper = document.getElementById('videoWrapper');
 
             if (video.paused) {
-                video.muted = false;
                 video.play();
                 wrapper.classList.add('playing');
             } else {
@@ -1079,19 +1062,51 @@
             }
         }
 
-        function navigateMediaHorizontal(dir) {
-            const userReview = currentReviewsListWithMedia[activeUserReviewIndex];
-            if (!userReview || !userReview.media) return;
-
-            const totalMedia = userReview.media.length;
-            activeMediaItemIndex = (activeMediaItemIndex + dir + totalMedia) % totalMedia;
-            renderLightboxMediaContent();
-        }
-
         function closeMediaLightbox() {
             const video = document.getElementById('lightboxVideo');
             if (video) video.pause();
             document.getElementById('mediaLightboxModal').classList.add('hidden');
+        }
+
+        /* GESTURE SWIPE ATAS/BAWAH & KIRI/KANAN UNTUK LIGHTBOX REVIEW */
+        let touchStartX = 0;
+        let touchStartY = 0;
+        const lightboxSwipeArea = document.getElementById('lightboxSwipeArea');
+
+        if (lightboxSwipeArea) {
+            lightboxSwipeArea.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            lightboxSwipeArea.addEventListener('touchend', e => {
+                const diffX = e.changedTouches[0].screenX - touchStartX;
+                const diffY = e.changedTouches[0].screenY - touchStartY;
+
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    // Geser Horizontal (Kiri / Kanan) -> Ganti Media dalam 1 Ulasan
+                    if (Math.abs(diffX) > 40) {
+                        const userReview = currentReviewsListWithMedia[activeUserReviewIndex];
+                        if (userReview && userReview.media && userReview.media.length > 1) {
+                            const totalMedia = userReview.media.length;
+                            const dir = diffX < 0 ? 1 : -1;
+                            activeMediaItemIndex = (activeMediaItemIndex + dir + totalMedia) % totalMedia;
+                            renderLightboxMediaContent();
+                        }
+                    }
+                } else {
+                    // Geser Vertikal (Atas / Bawah) -> Ganti Ulasan Pembeli
+                    if (Math.abs(diffY) > 40) {
+                        const totalReviews = currentReviewsListWithMedia.length;
+                        if (totalReviews > 1) {
+                            const dir = diffY < 0 ? 1 : -1; // Geser ke atas = ulasan berikutnya, geser ke bawah = ulasan sebelumnya
+                            activeUserReviewIndex = (activeUserReviewIndex + dir + totalReviews) % totalReviews;
+                            activeMediaItemIndex = 0; // Reset ke media pertama pada ulasan tersebut
+                            renderLightboxMediaContent();
+                        }
+                    }
+                }
+            }, { passive: true });
         }
 
         function escapeHtml(str) {
@@ -1419,7 +1434,6 @@
             renderProduk();
         }
 
-        /* PERBAIKAN: MENGHAPUS TABEL/KOTAK KATEGORI GANDA DI BELAKANG PRODUK */
         function renderProduk() {
             const grid = document.getElementById('productGrid');
             const emptyState = document.getElementById('emptyState');
@@ -1712,87 +1726,6 @@
 
             window.open(`https://wa.me/6285122629940?text=${encodeURIComponent(message)}`, '_blank');
             closeCheckoutModal();
-        }
-
-        /* LOGIKA FLOATING LIVE CHAT WIDGET */
-        function toggleChatWidget() {
-            const windowEl = document.getElementById('floatingChatWindow');
-            const isHidden = windowEl.classList.contains('hidden');
-
-            if (isHidden) {
-                windowEl.classList.remove('hidden');
-                loadWidgetMessages();
-                if (!widgetChatInterval) widgetChatInterval = setInterval(loadWidgetMessages, 3000);
-            } else {
-                windowEl.classList.add('hidden');
-                if (widgetChatInterval) {
-                    clearInterval(widgetChatInterval);
-                    widgetChatInterval = null;
-                }
-            }
-        }
-
-        async function loadWidgetMessages() {
-            try {
-                const res = await fetch('/api/bantuan/messages');
-                const data = await res.json();
-                const container = document.getElementById('widgetChatMessages');
-
-                if (data.status && data.messages) {
-                    if (data.messages.length === 0) {
-                        container.innerHTML = `
-                            <div class="neo-box p-3 rounded-xl bg-white text-xs text-black space-y-1">
-                                <p class="font-black font-cyber">Halo! Selamat datang 👋</p>
-                                <p class="text-[10px] font-bold text-slate-600">Silakan kirimkan pertanyaan Anda. Customer Service kami siap membantu.</p>
-                            </div>
-                        `;
-                        return;
-                    }
-
-                    container.innerHTML = data.messages.map(msg => {
-                        const isUser = msg.sender === 'user';
-                        const alignClass = isUser ? 'justify-end' : 'justify-start';
-                        const bgClass = isUser 
-                            ? 'bg-neoYellow text-black font-bold rounded-br-none border-2 border-black' 
-                            : 'bg-white text-black font-bold rounded-bl-none border-2 border-black';
-                        
-                        const timeStr = new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                        const displayName = isUser ? (msg.senderName || 'Anda') : 'Owner CS';
-
-                        return `
-                            <div class="flex ${alignClass}">
-                                <div class="max-w-[82%] p-2.5 rounded-2xl text-[11px] space-y-1 ${bgClass}">
-                                    <div class="flex items-center justify-between gap-2 border-b border-black/20 pb-1">
-                                        <span class="font-black font-cyber text-[10px] text-black">${displayName}</span>
-                                        <span class="text-[8px] opacity-75 font-mono font-bold">${timeStr}</span>
-                                    </div>
-                                    <p class="leading-relaxed break-words pt-0.5">${msg.message}</p>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-
-                    container.scrollTop = container.scrollHeight;
-                }
-            } catch(e) {}
-        }
-
-        async function sendWidgetMessage(e) {
-            e.preventDefault();
-            const input = document.getElementById('widgetChatInput');
-            const message = input.value.trim();
-            if (!message) return;
-
-            input.value = '';
-
-            try {
-                await fetch('/api/bantuan/send-user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
-                });
-                loadWidgetMessages();
-            } catch(e) {}
         }
 
         async function initStorePage() {
