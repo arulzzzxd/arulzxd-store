@@ -198,6 +198,7 @@
             0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
         }
 
+        /* CUSTOM VIDEO OVERLAY PLAY/PAUSE */
         .video-container {
             position: relative;
             cursor: pointer;
@@ -229,6 +230,7 @@
             transform: scale(0.8);
         }
 
+        /* HIDE DEFAULT VIDEO CONTROLS */
         video::-webkit-media-controls { display: none !important; }
         video::-webkit-media-controls-enclosure { display: none !important; }
 
@@ -244,6 +246,48 @@
     </style>
 </head>
 <body class="font-sans antialiased text-black min-h-screen pb-36">
+
+    <!-- FLOATING LIVE CHAT WIDGET POP-UP -->
+    <div id="liveChatWidgetContainer">
+        <div id="floatingChatWindow" class="fixed bottom-20 right-4 sm:right-6 z-[99999] hidden w-[calc(100vw-2rem)] max-w-[360px] h-[420px] max-h-[calc(100vh-100px)] bg-white border-3 border-black rounded-2xl shadow-[6px_6px_0px_#000] overflow-hidden flex flex-col transition-all duration-300">
+            
+            <!-- HEADER WINDOW -->
+            <div class="bg-neoYellow p-3 border-b-3 border-black flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="relative">
+                        <div class="w-8 h-8 rounded-full bg-white text-black border-2 border-black flex items-center justify-center font-bold text-xs shadow-[2px_2px_0px_#000]">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-neoGreen border border-black rounded-full"></span>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-black font-cyber text-black">Customer Support</h3>
+                        <p class="text-[9px] text-black font-mono font-bold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-neoGreen animate-pulse"></span> Online 24/7
+                        </p>
+                    </div>
+                </div>
+                <button onclick="toggleChatWidget()" class="text-black font-black text-base transition p-1 hover:scale-110">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- AREA CHAT MESSAGES -->
+            <div id="widgetChatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 bg-neoBg scroll-smooth">
+                <div class="text-center text-[11px] text-slate-600 font-mono my-2 animate-pulse font-bold">Memuat pesan...</div>
+            </div>
+
+            <!-- FORM KIRIM PESAN -->
+            <form id="widgetChatForm" onsubmit="sendWidgetMessage(event)" class="p-2.5 bg-white border-t-3 border-black flex items-center gap-2 shrink-0">
+                <input type="text" id="widgetChatInput" required placeholder="Tuliskan pesan Anda..." 
+                       class="flex-1 bg-neoBg border-2 border-black rounded-xl px-3 py-2 text-xs text-black font-bold placeholder-slate-500 focus:outline-none">
+                <button type="submit" class="neo-btn w-9 h-9 rounded-xl bg-neoYellow text-black flex items-center justify-center shrink-0 font-black">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+
+        </div>
+    </div>
 
     <!-- LOADER OVERLAY -->
     <div id="cyber-loader-overlay">
@@ -274,6 +318,7 @@
                 Arulz<span class="bg-black text-white px-2 py-0.5 ml-1 rounded-md">Store</span>
             </a>
 
+            <!-- Form Pencarian Presisi -->
             <div class="flex-1 max-w-xl relative flex items-center">
                 <input type="text" id="searchInput" oninput="filterProduk()" placeholder="Cari modul / layanan..." 
                        class="w-full pl-4 pr-10 py-2 text-xs font-bold bg-white border-2 border-black rounded-xl text-black placeholder-slate-500 focus:outline-none shadow-[2px_2px_0px_#000]">
@@ -326,6 +371,7 @@
                 </div>
 
                 <div id="productGrid" class="space-y-6">
+                    <!-- SKELETON PLACEHOLDER -->
                     <div class="neo-box rounded-2xl p-4 space-y-3 bg-white animate-pulse">
                         <div class="bg-slate-200 h-44 rounded-xl border-3 border-black"></div>
                         <div class="h-4 bg-slate-200 rounded w-3/4"></div>
@@ -361,9 +407,8 @@
                 <!-- Ringkasan Produk -->
                 <div class="flex flex-col sm:flex-row gap-4 items-start neo-box p-3.5 rounded-2xl bg-neoBg">
                     
-                    <!-- CAROUSEL FOTO PRODUK UTAMA DENGAN SWIPE & KLIK RESPONSIF -->
-                    <div class="relative w-full sm:w-36 h-36 rounded-xl overflow-hidden bg-white border-2 border-black flex-shrink-0 group cursor-pointer" id="modalProductCarousel" onclick="zoomCurrentProductImage()">
-                        <div class="flex w-full h-full transition-transform duration-300 ease-out" id="modalCarouselTrack">
+                    <div class="relative w-full sm:w-36 h-36 rounded-xl overflow-hidden bg-white border-2 border-black flex-shrink-0 group cursor-pointer" id="modalProductCarousel">
+                        <div class="flex w-full h-full transition-transform duration-300 ease-out" id="modalCarouselTrack" onclick="zoomCurrentProductImage()">
                             <img id="detailImg" src="" class="w-full h-full object-cover flex-shrink-0">
                         </div>
                         
@@ -441,7 +486,7 @@
         </div>
     </div>
 
-    <!-- MODAL LIGHTBOX FULLSCREEN DENGAN SWIPE ATAS/BAWAH & KIRI/KANAN -->
+    <!-- MODAL LIGHTBOX FULLSCREEN DENGAN SWIPE & AUTO PLAY VIDEO -->
     <div id="mediaLightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex flex-col justify-between p-3 sm:p-6 select-none" onclick="closeMediaLightbox()">
         
         <div class="flex items-center justify-between text-white z-20" onclick="event.stopPropagation()">
@@ -462,8 +507,8 @@
                 <img id="lightboxImage" src="" class="hidden max-w-full max-h-[80vh] rounded-2xl object-contain border-3 border-black bg-white">
                 
                 <div id="videoWrapper" class="video-container hidden max-w-full max-h-[80vh] rounded-2xl overflow-hidden border-3 border-black bg-black" onclick="toggleVideoPlayPause()">
-                    <!-- VIDEO OTOMATIS AUTO-PLAY SAAT BERPINDAH -->
-                    <video id="lightboxVideo" loop playsinline autoplay class="w-full h-full max-h-[80vh] object-contain"></video>
+                    <!-- VIDEO DENGAN AUTO-PLAY SAAT BERPINDAH -->
+                    <video id="lightboxVideo" loop playsinline class="w-full h-full max-h-[80vh] object-contain"></video>
                     <div id="videoPlayOverlayBtn" class="play-overlay-btn">
                         <i class="fa-solid fa-play"></i>
                     </div>
@@ -906,29 +951,30 @@
             `).join('');
         }
 
-        /* GESTURE SWIPE & KLIK UNTUK CAROUSEL FOTO PRODUK UTAMA */
-        let modalTouchStartX = 0;
-        const modalCarouselEl = document.getElementById('modalProductCarousel');
-        if (modalCarouselEl) {
-            modalCarouselEl.addEventListener('touchstart', e => {
-                modalTouchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-
-            modalCarouselEl.addEventListener('touchend', e => {
-                const diffX = e.changedTouches[0].screenX - modalTouchStartX;
-                if (Math.abs(diffX) > 30 && currentModalImages.length > 1) {
-                    if (diffX < 0) {
-                        currentModalImageIndex = (currentModalImageIndex + 1) % currentModalImages.length;
-                    } else {
-                        currentModalImageIndex = (currentModalImageIndex - 1 + currentModalImages.length) % currentModalImages.length;
-                    }
-                    renderModalCarousel();
-                }
-            }, { passive: true });
+        function navigateModalCarousel(dir) {
+            if (currentModalImages.length <= 1) return;
+            currentModalImageIndex = (currentModalImageIndex + dir + currentModalImages.length) % currentModalImages.length;
+            renderModalCarousel();
         }
 
         function closeProductDetailModal() {
             document.getElementById('productDetailModal').classList.add('hidden');
+        }
+
+        /* SWIPE / GESER FOTO PRODUK PADA MODAL DETAIL */
+        let modalCarouselTouchStartX = 0;
+        const modalProductCarousel = document.getElementById('modalProductCarousel');
+        if (modalProductCarousel) {
+            modalProductCarousel.addEventListener('touchstart', e => {
+                modalCarouselTouchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            modalProductCarousel.addEventListener('touchend', e => {
+                const diffX = e.changedTouches[0].screenX - modalCarouselTouchStartX;
+                if (Math.abs(diffX) > 30) {
+                    navigateModalCarousel(diffX < 0 ? 1 : -1);
+                }
+            }, { passive: true });
         }
 
         function openProductZoomLightbox(prodIndex, initialImgIndex = 0) {
@@ -983,7 +1029,7 @@
             document.getElementById('mediaLightboxModal').classList.remove('hidden');
         }
 
-        /* RENDER MEDIA LIGHTBOX DENGAN AUTO-PLAY SAAT BERPINDAH VIDEO */
+        /* RENDERING MEDIA LIGHTBOX DENGAN AUTO PLAY VIDEO SAAT BERPINDAH */
         function renderLightboxMediaContent() {
             if (!currentReviewsListWithMedia || currentReviewsListWithMedia.length === 0) return;
 
@@ -1006,13 +1052,16 @@
                 videoWrapper.classList.remove('hidden');
                 video.src = currentMedia.url;
                 video.muted = false;
-                
                 video.currentTime = 0;
-                video.play().then(() => {
-                    videoWrapper.classList.add('playing');
-                }).catch(() => {
-                    videoWrapper.classList.remove('playing');
-                });
+                
+                // AUTO PLAY SAAT BERPINDAH VIDEO
+                videoWrapper.classList.add('playing');
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(() => {
+                        videoWrapper.classList.remove('playing');
+                    });
+                }
             } else {
                 video.pause();
                 videoWrapper.classList.add('hidden');
@@ -1024,12 +1073,12 @@
             document.getElementById('lightboxUserCounter').innerText = `Ulasan ${activeUserReviewIndex + 1} dari ${currentReviewsListWithMedia.length}`;
         }
 
+        /* TOGGLE PLAY / PAUSE DENGAN KLIK PADA VIDEO */
         function toggleVideoPlayPause() {
             const video = document.getElementById('lightboxVideo');
             const wrapper = document.getElementById('videoWrapper');
 
             if (video.paused) {
-                video.muted = false;
                 video.play();
                 wrapper.classList.add('playing');
             } else {
