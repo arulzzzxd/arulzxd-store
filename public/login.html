@@ -32,36 +32,27 @@
     <style>
         body { 
             background-color: #F5F2EB; 
-            background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1.2px, transparent 1.2px);
+            background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1.2px, transparent 1.2px);
             background-size: 16px 16px;
             color: #000000;
             overflow-x: hidden;
             touch-action: manipulation;
         }
-        
-        .viewport-outer-border {
-            position: fixed;
-            inset: 8px;
-            border: 4px solid #000000;
-            pointer-events: none;
-            z-index: 40;
-            box-shadow: inset 0 0 0 2px #FFFFFF;
-        }
 
         .neo-box {
             background-color: #FFFFFF;
-            border: 4px solid #000000;
+            border: 3.5px solid #000000;
             box-shadow: 6px 6px 0px #000000;
         }
 
         .neo-btn {
-            border: 3.5px solid #000000;
+            border: 3px solid #000000;
             box-shadow: 4px 4px 0px #000000;
             transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease, filter 0.2s ease;
         }
         .neo-btn:not(:disabled):hover {
             transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0px #000000;
+            box-shadow: 5.5px 5.5px 0px #000000;
         }
         .neo-btn:not(:disabled):active {
             transform: translate(2px, 2px);
@@ -100,7 +91,7 @@
             transition: all 0.15s ease;
         }
         .neo-input:focus {
-            box-shadow: 5px 5px 0px #000000;
+            box-shadow: 4.5px 4.5px 0px #000000;
             background-color: #FFFFFF;
         }
 
@@ -196,9 +187,7 @@
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-3 sm:p-4 antialiased text-black">
-
-    <div class="viewport-outer-border"></div>
+<body class="flex items-center justify-center min-h-screen p-4 antialiased text-black">
 
     <!-- LOADER OVERLAY -->
     <div id="cyber-loader-overlay">
@@ -222,21 +211,35 @@
         </div>
     </div>
 
-    <!-- MAIN CARD PORTAL AUTHENTICATION -->
-    <div class="neo-box p-5 sm:p-7 rounded-2xl w-full max-w-md bg-white relative overflow-hidden flex flex-col justify-between my-auto z-10">
+    <!-- MAIN PORTAL AUTHENTICATION CARD -->
+    <div class="neo-box p-5 sm:p-7 rounded-2xl w-full max-w-md bg-white relative overflow-hidden flex flex-col justify-start my-auto z-10 space-y-3.5">
         
-        <div class="text-left relative z-10 pt-1 pb-3 border-b-3 border-black">
+        <!-- HEADER PORTAL -->
+        <div class="text-center relative z-10 pt-1 pb-2 border-b-3 border-black">
             <h1 class="text-2xl sm:text-3xl font-black font-cyber tracking-tight uppercase leading-none">
-                <span class="brutal-glitch" data-text="ArulzXD-STORE">ArulzXD-STORE</span>
+                <span class="brutal-glitch" data-text="ARULZXD-STORE">ARULZXD-STORE</span>
             </h1>
-            <p class="text-[10px] sm:text-[11px] font-mono font-bold text-slate-700 tracking-wider uppercase mt-1.5 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-neoGreen inline-block border border-black animate-pulse"></span>
-                - AUTHENTICATION PORTAL -
-            </p>
+            <div class="mt-2 flex items-center justify-center">
+                <span class="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-slate-800 tracking-wider uppercase bg-white border-2 border-black px-3 py-0.5 rounded-full shadow-[2px_2px_0px_#000]">
+                    <i class="fa-solid fa-gear text-neoGreen text-xs animate-spin" style="animation-duration: 6s;"></i>
+                    AUTHENTICATION PORTAL
+                </span>
+            </div>
+        </div>
+
+        <!-- BANNER VIDEO MP4 AUTOPLAY (DI BAWAH ARULZXD-STORE) -->
+        <div class="relative w-full h-32 sm:h-36 rounded-xl border-3 border-black shadow-[3px_3px_0px_#000] overflow-hidden bg-black shrink-0">
+            <video autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none opacity-90">
+                <source src="https://cdn.larasxd.my.id/files/gmNmPPTi.gif" type="video/gif">
+                Browser Anda tidak mendukung tag video MP4.
+            </video>
+            <div class="absolute bottom-2 left-2 bg-black/75 backdrop-blur-sm text-white text-[9px] font-cyber font-bold px-2 py-0.5 rounded border border-white/30 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-neoGreen animate-pulse"></span> ARULZXD OFFICIAL
+            </div>
         </div>
 
         <!-- TAB NAVIGATION -->
-        <div class="grid grid-cols-3 gap-2 my-4">
+        <div class="grid grid-cols-3 gap-2">
             <button id="tab-login" onclick="switchTab('signin')" class="tab-nav-btn active py-2 text-xs font-black font-cyber uppercase tracking-wider text-black rounded-xl">
                 LOGIN
             </button>
@@ -249,29 +252,27 @@
         </div>
 
         <!-- ================= FORM SIGN IN ================= -->
-        <div id="signin-form" class="space-y-3.5 relative z-10 my-1">
-            <form id="loginForm" action="/auth/login" method="POST" class="space-y-3">
+        <div id="signin-form" class="space-y-3 relative z-10">
+            <form id="loginForm" action="/auth/login" method="POST" class="space-y-2.5">
                 <div>
                     <label class="block text-[11px] font-black uppercase font-cyber text-black mb-1">
                         USERNAME / EMAIL
                     </label>
-                    <input type="text" id="login-username" name="username" required placeholder="Masukkan username atau email" class="neo-input w-full bg-white rounded-xl px-3.5 py-2.5 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                    <div class="relative">
+                        <input type="text" id="login-username" name="username" required placeholder="Masukkan username atau email" class="neo-input w-full bg-white rounded-xl pl-3.5 pr-12 py-2.5 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition" oninput="handleUsernameInput(this.value)">
+                        <button type="button" onclick="toggleUsernameVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-black hover:text-amber-600 transition text-sm">
+                            <i id="eye-icon-login-user" class="fa-solid fa-eye-slash"></i>
+                        </button>
+                    </div>
                 </div>
                 <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-[11px] font-black uppercase font-cyber text-black">
-                            PASSWORD
-                        </label>
-                    </div>
+                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-1">
+                        PASSWORD
+                    </label>
                     <div class="relative">
                         <input id="login-password" type="password" name="password" required placeholder="Min. 8 karakter" class="neo-input w-full bg-white rounded-xl pl-3.5 pr-12 py-2.5 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
-                        <button type="button" onclick="togglePassword('login-password', 'eye-svg-login')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-black hover:text-amber-600 transition">
-                            <span id="eye-svg-login">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </span>
+                        <button type="button" onclick="togglePassword('login-password', 'eye-icon-login')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-black hover:text-amber-600 transition text-sm">
+                            <i id="eye-icon-login" class="fa-solid fa-eye-slash"></i>
                         </button>
                     </div>
                 </div>
@@ -283,12 +284,12 @@
                     </label>
                 </div>
 
-                <button type="submit" id="btnSubmitLogin" disabled class="neo-btn btn-disabled w-full bg-neoYellow text-black font-black font-cyber py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-1">
+                <button type="submit" id="btnSubmitLogin" disabled class="neo-btn btn-disabled w-full bg-neoYellow text-black font-black font-cyber py-2.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-1">
                     <i class="fa-solid fa-right-to-bracket text-xs"></i> MASUK KE AKUN
                 </button>
             </form>
 
-            <div class="relative flex py-1 items-center">
+            <div class="relative flex py-0.5 items-center">
                 <div class="flex-grow border-t-2 border-black"></div>
                 <span class="flex-shrink mx-2 text-black text-[9px] font-black font-cyber uppercase bg-neoBg px-2.5 py-0.5 border border-black rounded-md shadow-[1px_1px_0px_#000]">
                     atau
@@ -307,7 +308,7 @@
         </div>
 
         <!-- ================= FORM SIGN UP ================= -->
-        <div id="signup-form" class="space-y-3 relative z-10 hidden-form my-1">
+        <div id="signup-form" class="space-y-3 relative z-10 hidden-form">
             <form id="registerForm" action="/auth/register" method="POST" class="space-y-2.5">
                 <div>
                     <label class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5">NAMA LENGKAP / USERNAME</label>
@@ -321,13 +322,8 @@
                     <label class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5">PASSWORD</label>
                     <div class="relative">
                         <input id="register-password" type="password" name="password" required placeholder="Min. 8 karakter" class="neo-input w-full bg-white rounded-xl pl-3.5 pr-12 py-2 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
-                        <button type="button" onclick="togglePassword('register-password', 'eye-svg-register')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-black hover:text-amber-600 transition">
-                            <span id="eye-svg-register">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </span>
+                        <button type="button" onclick="togglePassword('register-password', 'eye-icon-register')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-black hover:text-amber-600 transition text-sm">
+                            <i id="eye-icon-register" class="fa-solid fa-eye-slash"></i>
                         </button>
                     </div>
                 </div>
@@ -347,7 +343,7 @@
                     </label>
                 </div>
 
-                <button type="submit" id="btnSubmitRegister" disabled class="neo-btn btn-disabled w-full bg-neoGreen text-black font-black font-cyber py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                <button type="submit" id="btnSubmitRegister" disabled class="neo-btn btn-disabled w-full bg-neoGreen text-black font-black font-cyber py-2.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2">
                     <i class="fa-solid fa-user-plus text-xs"></i> DAFTAR SEKARANG
                 </button>
             </form>
@@ -371,8 +367,8 @@
         </div>
 
         <!-- ================= FORM FORGOT PASSWORD (OTP 6 DIGIT) ================= -->
-        <div id="forgot-form" class="space-y-3.5 relative z-10 hidden-form my-1">
-            <form id="forgotForm" class="space-y-3">
+        <div id="forgot-form" class="space-y-3 relative z-10 hidden-form">
+            <form id="forgotForm" class="space-y-2.5">
                 <div>
                     <label class="block text-[11px] font-black uppercase font-cyber text-black mb-1">EMAIL ADDRESS TERDAFTAR</label>
                     <div class="flex gap-2">
@@ -388,15 +384,20 @@
 
                 <div>
                     <label class="block text-[11px] font-black uppercase font-cyber text-black mb-1">PASSWORD BARU</label>
-                    <input type="password" id="forgot-new-password" placeholder="••••••••" class="neo-input w-full bg-white rounded-xl px-3.5 py-2.5 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                    <div class="relative">
+                        <input type="password" id="forgot-new-password" placeholder="••••••••" class="neo-input w-full bg-white rounded-xl pl-3.5 pr-12 py-2.5 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                        <button type="button" onclick="togglePassword('forgot-new-password', 'eye-icon-forgot')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-black hover:text-amber-600 transition text-sm">
+                            <i id="eye-icon-forgot" class="fa-solid fa-eye-slash"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <button type="submit" class="neo-btn w-full bg-neoPink text-black font-black font-cyber py-3 rounded-xl text-xs uppercase tracking-wider">SIMPAN PASSWORD BARU</button>
+                <button type="submit" class="neo-btn w-full bg-neoPink text-black font-black font-cyber py-2.5 rounded-xl text-xs uppercase tracking-wider mt-1">SIMPAN PASSWORD BARU</button>
             </form>
         </div>
 
         <!-- FOOTER BADGES -->
-        <div class="pt-3 mt-3 border-t-2 border-black flex items-center justify-around text-[9px] sm:text-[10px] font-black font-cyber text-black">
+        <div class="pt-2.5 mt-2 border-t-2 border-black flex items-center justify-around text-[9px] sm:text-[10px] font-black font-cyber text-black">
             <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-neoGreen"></i> 100% Aman</span>
             <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-neoYellow"></i> Otomatis</span>
             <span class="flex items-center gap-1"><i class="fa-solid fa-headset text-neoCyan"></i> Fast Response</span>
@@ -410,30 +411,58 @@
             buttonsStyling: false
         };
 
-        const eyeOpenSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        </svg>`;
+        // MASKING USERNAME / EMAIL DENGAN ICON FA-EYE / FA-EYE-SLASH
+        let rawUsernameInput = '';
+        let isUsernameVisible = false;
 
-        const eyeClosedSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a8.959 8.959 0 013.682-.783c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m-6.115-3.486a3 3 0 11-4.243-4.243" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18" />
-        </svg>`;
+        function maskInputVal(val) {
+            if (!val) return '';
+            if (val.includes('@')) {
+                const [name, domain] = val.split('@');
+                if (name.length <= 2) return name + '***@' + domain;
+                return name.substring(0, 2) + '***@' + domain;
+            }
+            if (val.length <= 3) return val.substring(0, 1) + '***';
+            return val.substring(0, 2) + '***' + val.substring(val.length - 1);
+        }
 
-        function togglePassword(inputId, svgContainerId) {
-            const passwordInput = document.getElementById(inputId);
-            const svgContainer = document.getElementById(svgContainerId);
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                svgContainer.innerHTML = eyeClosedSvg;
+        function handleUsernameInput(val) {
+            if (isUsernameVisible) {
+                rawUsernameInput = val;
             } else {
-                passwordInput.type = 'password';
-                svgContainer.innerHTML = eyeOpenSvg;
+                if (!val.includes('***')) {
+                    rawUsernameInput = val;
+                }
             }
         }
 
-        // FUNGSI MEMATIKAN & MENGAKTIFKAN TOMBOL DENGAN STATE OPACITY
+        function toggleUsernameVisibility() {
+            const input = document.getElementById('login-username');
+            const iconElem = document.getElementById('eye-icon-login-user');
+            isUsernameVisible = !isUsernameVisible;
+
+            if (isUsernameVisible) {
+                input.value = rawUsernameInput;
+                iconElem.className = 'fa-solid fa-eye';
+            } else {
+                input.value = maskInputVal(rawUsernameInput);
+                iconElem.className = 'fa-solid fa-eye-slash';
+            }
+        }
+
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const iconElem = document.getElementById(iconId);
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                iconElem.className = 'fa-solid fa-eye';
+            } else {
+                passwordInput.type = 'password';
+                iconElem.className = 'fa-solid fa-eye-slash';
+            }
+        }
+
         function toggleFormButtons(mode) {
             if (mode === 'login') {
                 const isChecked = document.getElementById('terms-login').checked;
@@ -501,7 +530,6 @@
             }
         }
 
-        // FUNGSI REQUEST OTP SECARA OTOMATIS
         async function sendOTPRequest(email, type) {
             const res = await fetch('/auth/send-otp', {
                 method: 'POST',
@@ -587,12 +615,11 @@
             }
         });
 
-        // MASUK KE AKUN -> OTOMATIS KIRIM OTP -> MINTA INPUT OTP
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const formTarget = e.target;
             const terms = document.getElementById('terms-login');
-            const email = document.getElementById('login-username').value;
+            const targetUserOrEmail = rawUsernameInput || document.getElementById('login-username').value;
 
             if (!terms.checked) {
                 Swal.fire({
@@ -604,7 +631,7 @@
                 return;
             }
 
-            if (!email || !email.trim()) {
+            if (!targetUserOrEmail || !targetUserOrEmail.trim()) {
                 Swal.fire({
                     ...swalConfig,
                     icon: 'warning',
@@ -613,6 +640,8 @@
                 });
                 return;
             }
+
+            document.getElementById('login-username').value = targetUserOrEmail;
 
             Swal.fire({
                 ...swalConfig,
@@ -623,7 +652,7 @@
             });
 
             try {
-                const otpRes = await sendOTPRequest(email, 'login');
+                const otpRes = await sendOTPRequest(targetUserOrEmail, 'login');
 
                 if (!otpRes.status) {
                     Swal.fire({
@@ -635,30 +664,36 @@
                     return;
                 }
 
-                // Modal Pop-Up Memasukkan Kode OTP 6 Digit
                 const { value: otpCode } = await Swal.fire({
                     ...swalConfig,
-                    title: 'Verifikasi Kode OTP',
-                    text: `Kode verifikasi 6 digit telah dikirim ke email Anda (${email}). Silakan masukkan di bawah ini:`,
-                    input: 'text',
-                    inputPlaceholder: '123456',
-                    inputAttributes: {
-                        maxlength: '6',
-                        autocapitalize: 'off',
-                        autocorrect: 'off',
-                        style: 'text-align: center; font-size: 20px; font-weight: 800; letter-spacing: 6px;'
-                    },
+                    title: '<span class="font-black font-cyber uppercase tracking-wider text-black">VERIFIKASI KODE OTP</span>',
+                    html: `
+                        <div class="space-y-3 text-left my-2 font-sans">
+                            <p class="text-xs font-bold text-slate-800 leading-relaxed">
+                                Kode verifikasi 6 digit telah dikirim ke email Anda (<strong class="font-mono text-black">${targetUserOrEmail}</strong>).
+                            </p>
+                            <div class="space-y-1">
+                                <label class="block text-[11px] font-black font-cyber uppercase text-black">MASUKKAN KODE OTP</label>
+                                <input id="swal-neo-otp" type="text" maxlength="6" placeholder="123456" 
+                                       class="neo-input w-full bg-neoBg rounded-xl px-3 py-3 text-center text-xl font-mono font-black tracking-[8px] text-black focus:outline-none uppercase">
+                            </div>
+                        </div>
+                    `,
                     showCancelButton: true,
-                    confirmButtonText: 'VERIFIKASI & MASUK',
+                    confirmButtonText: '<i class="fa-solid fa-check"></i> VERIFIKASI & MASUK',
                     cancelButtonText: 'BATAL',
                     customClass: {
-                        confirmButton: 'neo-btn bg-neoYellow text-black font-black px-4 py-2 rounded-xl text-xs uppercase font-cyber mr-2',
-                        cancelButton: 'neo-btn bg-white text-black font-black px-4 py-2 rounded-xl text-xs uppercase font-cyber'
+                        popup: 'cyber-swal',
+                        confirmButton: 'neo-btn bg-neoYellow text-black font-black px-4 py-2.5 rounded-xl text-xs uppercase font-cyber mr-2',
+                        cancelButton: 'neo-btn bg-white text-black font-black px-4 py-2.5 rounded-xl text-xs uppercase font-cyber'
                     },
-                    inputValidator: (val) => {
+                    preConfirm: () => {
+                        const val = document.getElementById('swal-neo-otp').value.trim();
                         if (!val || val.length !== 6) {
-                            return 'Kode OTP harus berjumlah 6 digit angka!';
+                            Swal.showValidationMessage('Kode OTP harus berjumlah 6 digit angka!');
+                            return false;
                         }
+                        return val;
                     }
                 });
 
@@ -673,7 +708,7 @@
                     const verifyRes = await fetch('/auth/verify-otp', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, code: otpCode, type: 'login' })
+                        body: JSON.stringify({ email: targetUserOrEmail, code: otpCode, type: 'login' })
                     });
 
                     const verifyData = await verifyRes.json();
@@ -699,7 +734,6 @@
             }
         });
 
-        // DAFTAR SEKARANG -> OTOMATIS KIRIM OTP -> MINTA INPUT OTP
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const formTarget = e.target;
@@ -747,30 +781,36 @@
                     return;
                 }
 
-                // Modal Pop-Up Memasukkan Kode OTP 6 Digit
                 const { value: otpCode } = await Swal.fire({
                     ...swalConfig,
-                    title: 'Verifikasi Email Pendaftaran',
-                    text: `Kode verifikasi 6 digit telah dikirim ke email ${email}. Masukkan kode di bawah:`,
-                    input: 'text',
-                    inputPlaceholder: '123456',
-                    inputAttributes: {
-                        maxlength: '6',
-                        autocapitalize: 'off',
-                        autocorrect: 'off',
-                        style: 'text-align: center; font-size: 20px; font-weight: 800; letter-spacing: 6px;'
-                    },
+                    title: '<span class="font-black font-cyber uppercase tracking-wider text-black">VERIFIKASI EMAIL PENDAFTARAN</span>',
+                    html: `
+                        <div class="space-y-3 text-left my-2 font-sans">
+                            <p class="text-xs font-bold text-slate-800 leading-relaxed">
+                                Kode verifikasi 6 digit telah dikirim ke email <strong class="font-mono text-black">${email}</strong>. Masukkan kode di bawah:
+                            </p>
+                            <div class="space-y-1">
+                                <label class="block text-[11px] font-black font-cyber uppercase text-black">MASUKKAN KODE OTP</label>
+                                <input id="swal-neo-otp-reg" type="text" maxlength="6" placeholder="123456" 
+                                       class="neo-input w-full bg-neoBg rounded-xl px-3 py-3 text-center text-xl font-mono font-black tracking-[8px] text-black focus:outline-none uppercase">
+                            </div>
+                        </div>
+                    `,
                     showCancelButton: true,
-                    confirmButtonText: 'VERIFIKASI & DAFTAR',
+                    confirmButtonText: '<i class="fa-solid fa-user-check"></i> VERIFIKASI & DAFTAR',
                     cancelButtonText: 'BATAL',
                     customClass: {
-                        confirmButton: 'neo-btn bg-neoGreen text-black font-black px-4 py-2 rounded-xl text-xs uppercase font-cyber mr-2',
-                        cancelButton: 'neo-btn bg-white text-black font-black px-4 py-2 rounded-xl text-xs uppercase font-cyber'
+                        popup: 'cyber-swal',
+                        confirmButton: 'neo-btn bg-neoGreen text-black font-black px-4 py-2.5 rounded-xl text-xs uppercase font-cyber mr-2',
+                        cancelButton: 'neo-btn bg-white text-black font-black px-4 py-2.5 rounded-xl text-xs uppercase font-cyber'
                     },
-                    inputValidator: (val) => {
+                    preConfirm: () => {
+                        const val = document.getElementById('swal-neo-otp-reg').value.trim();
                         if (!val || val.length !== 6) {
-                            return 'Kode OTP harus berjumlah 6 digit angka!';
+                            Swal.showValidationMessage('Kode OTP harus berjumlah 6 digit angka!');
+                            return false;
                         }
+                        return val;
                     }
                 });
 
