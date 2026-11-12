@@ -392,7 +392,7 @@ app.get('/api/bantuan/messages', checkAuthSession, async (req, res) => {
 });
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '9289940600:AAF3_XHJlcfiD9be8KzNNw-7crGoOaenSyU';
-const TELEGRAM_ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID || -1004312316684';
+const TELEGRAM_ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID || '-1004312316684';
 
 async function sendTelegramNotification(senderName, userIdentifier, messageText) {
     if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN.includes('ISI_TOKEN')) return;
