@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Deposit Saldo - ArulzXD Store</title>
+    <!-- Open Graph / Facebook / WhatsApp / Telegram -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://arulzxd.biz.id/deposit">
     <meta property="og:title" content="Deposit Saldo Instan - ArulzXD Store">
@@ -14,12 +15,14 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://arulzxd.biz.id/deposit">
     <meta name="twitter:title" content="Deposit Saldo Instan - ArulzXD Store">
     <meta name="twitter:description" content="Isi ulang saldo akun Anda secara otomatis 24/7 menggunakan QRIS All Payment di ArulzXD Store.">
     <meta name="twitter:image" content="https://cdn.larasxd.my.id/files/wWSxaeJ0ka.jpg">
 
+    <!-- Perbaikan Favicon & Apple Touch Icon -->
     <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
     <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
     <link rel="shortcut icon" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
@@ -269,6 +272,27 @@
             </div>
         </div>
 
+        <!-- BANNER TRANSAKSI AKTIF (MUNCUL JIKA MODAL QRIS DITUTUP SEMENTARA) -->
+        <div id="activeDepositBanner" class="hidden neo-box rounded-2xl bg-neoYellow p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white border-2 border-black flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-qrcode text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-xs sm:text-sm font-black font-cyber uppercase">Ada Tagihan QRIS Belum Dibayar</h3>
+                    <p class="text-[11px] font-mono font-bold">Order ID: <span id="bannerOrderIdText">-</span></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <button onclick="reopenActiveDepositModal()" class="neo-btn flex-1 sm:flex-none bg-neoGreen text-black font-cyber font-black px-4 py-2.5 rounded-xl text-xs uppercase flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-eye"></i> Lanjutkan Bayar
+                </button>
+                <button onclick="manualCheckDepositStatus()" class="neo-btn flex-1 sm:flex-none bg-white text-black font-cyber font-black px-4 py-2.5 rounded-xl text-xs uppercase flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-rotate"></i> Cek Status
+                </button>
+            </div>
+        </div>
+
         <!-- GRID DUA KOLOM -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
@@ -330,8 +354,22 @@
                     </button>
                 </div>
 
-                <!-- INPUT MANUAL & TOMBOL -->
+                <!-- INPUT MANUAL, NOMOR HP PEMBELI & TOMBOL -->
                 <div class="space-y-3 pt-2">
+                    <div>
+                        <label class="block text-[11px] font-black font-cyber text-black uppercase tracking-wider mb-1.5">
+                            Nomor HP / WhatsApp Pembeli <span class="text-red-600">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-xs font-black text-black font-cyber">
+                                <i class="fa-solid fa-phone"></i>
+                            </span>
+                            <input type="tel" id="customerPhoneInput" placeholder="Contoh: 081234567890 atau 6281234567890" 
+                                   class="w-full pl-11 pr-4 py-3 text-xs bg-white border-3 border-black rounded-xl text-black font-black font-cyber shadow-[3px_3px_0px_#000]">
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-600 mt-1">Wajib nomor HP Indonesia asli (08xx / 62xx / +62) untuk validasi penyedia QRIS.</p>
+                    </div>
+
                     <label class="block text-[11px] font-black font-cyber text-black uppercase tracking-wider">
                         Atau Ketik Nominal Custom
                     </label>
@@ -432,7 +470,12 @@
                 <span>Menunggu Pembayaran Masuk...</span>
             </div>
 
-            <div class="flex items-center gap-2 pt-1">
+            <!-- TOMBOL CEK STATUS MANUAL -->
+            <button id="btnManualCheckStatus" onclick="manualCheckDepositStatus()" class="neo-btn w-full bg-neoGreen text-black text-xs font-black py-3 rounded-xl uppercase flex items-center justify-center gap-1.5 font-cyber">
+                <i class="fa-solid fa-rotate"></i> Cek Status Pembayaran
+            </button>
+
+            <div class="flex items-center gap-2">
                 <button onclick="cancelDepositTransaction()" class="neo-btn w-1/2 bg-neoPink text-black text-xs font-black py-3 rounded-xl uppercase flex items-center justify-center gap-1.5 font-cyber">
                     <i class="fa-solid fa-trash-can"></i> Batalkan
                 </button>
@@ -501,6 +544,19 @@
             if (btnElem) btnElem.classList.add('active');
         }
 
+        function updateActiveBannerUI() {
+            const activeDepId = localStorage.getItem('active_deposit_order_id');
+            const banner = document.getElementById('activeDepositBanner');
+            const modalHidden = document.getElementById('depositModal').classList.contains('hidden');
+
+            if (activeDepId && modalHidden) {
+                document.getElementById('bannerOrderIdText').innerText = activeDepId;
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
         async function loadDepositPageData() {
             try {
                 const res = await fetch('/api/user-status');
@@ -516,33 +572,125 @@
         }
 
         async function checkActiveDepositTransaction() {
+            const savedPhone = localStorage.getItem('user_customer_phone');
+            if (savedPhone) {
+                const phoneEl = document.getElementById('customerPhoneInput');
+                if (phoneEl) phoneEl.value = savedPhone;
+            }
+
             const activeDepId = localStorage.getItem('active_deposit_order_id');
-            if (!activeDepId) return;
+            if (!activeDepId) {
+                updateActiveBannerUI();
+                return;
+            }
 
             try {
                 const res = await fetch(`/transactions/${activeDepId}`);
                 const result = await res.json();
+                const qrDataString = result.data?.payment?.qrString || result.data?.paymentNumber;
 
-                if (result.data && result.data.status === 'pending') {
+                if (result.data && result.data.status === 'pending' && qrDataString) {
                     currentDepOrderId = result.data.orderId;
                     document.getElementById('depTotalAmountText').innerText = formatRupiah(result.data.amount);
                     document.getElementById('depOrderIdText').innerText = currentDepOrderId;
 
                     const qContainer = document.getElementById('depQrcodeContainer');
                     qContainer.innerHTML = '';
-                    new QRCode(qContainer, { text: result.data.paymentNumber, width: 220, height: 220 });
+                    new QRCode(qContainer, { text: qrDataString, width: 220, height: 220 });
 
                     document.getElementById('depositModal').classList.remove('hidden');
+                    updateActiveBannerUI();
                     startDepositPolling();
                 } else {
                     localStorage.removeItem('active_deposit_order_id');
+                    updateActiveBannerUI();
                 }
             } catch(e) {}
         }
 
+        function reopenActiveDepositModal() {
+            checkActiveDepositTransaction();
+        }
+
+        async function manualCheckDepositStatus() {
+            const orderIdToCheck = currentDepOrderId || localStorage.getItem('active_deposit_order_id');
+            if (!orderIdToCheck) return;
+
+            const btn = document.getElementById('btnManualCheckStatus');
+            const origHtml = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengecek Status...`;
+            }
+
+            try {
+                const res = await fetch(`/transactions/${orderIdToCheck}?refresh=1`);
+                const result = await res.json();
+                const status = (result.data?.status || "").toLowerCase();
+
+                if (["settlement", "success", "paid", "settled"].includes(status)) {
+                    if (depPollInterval) clearInterval(depPollInterval);
+                    localStorage.removeItem('active_deposit_order_id');
+                    currentDepOrderId = '';
+                    closeDepositModal();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'DEPOSIT BERHASIL!',
+                        text: 'Pembayaran terkonfirmasi! Saldo Anda telah ditambahkan.',
+                        customClass: { popup: 'cyber-swal' }
+                    });
+                    loadDepositPageData();
+                } else if (["cancelled", "failed", "expired"].includes(status)) {
+                    if (depPollInterval) clearInterval(depPollInterval);
+                    localStorage.removeItem('active_deposit_order_id');
+                    currentDepOrderId = '';
+                    closeDepositModal();
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'TRANSAKSI BATAL / KEDALUWARSA',
+                        text: 'Transaksi deposit ini telah dibatalkan atau melewati batas waktu.',
+                        customClass: { popup: 'cyber-swal' }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'MASIH MENUNGGU PEMBAYARAN',
+                        text: `Status saat ini: ${status.toUpperCase() || 'PENDING'}. Silakan selesaikan pembayaran QRIS Anda.`,
+                        timer: 2200,
+                        showConfirmButton: false,
+                        customClass: { popup: 'cyber-swal' }
+                    });
+                }
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'GAGAL CEK STATUS',
+                    text: 'Terjadi gangguan jaringan saat mengecek status transaksi.',
+                    customClass: { popup: 'cyber-swal' }
+                });
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = origHtml;
+                }
+            }
+        }
+
         async function processDeposit() {
             const amountInput = document.getElementById('depositAmountInput');
+            const phoneInput = document.getElementById('customerPhoneInput');
             const amount = parseInt(amountInput.value);
+            const customerPhone = (phoneInput?.value || '').replace(/[\s\-()]/g, '').trim();
+
+            if (!/^(\+62|62|08)[0-9]{8,12}$/.test(customerPhone)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'NOMOR HP TIDAK VALID',
+                    text: 'Masukkan nomor HP Indonesia yang valid (format: 08xx, 62xx, atau +62).',
+                    customClass: { popup: 'cyber-swal' }
+                });
+                return;
+            }
 
             if (isNaN(amount) || amount < 1000) {
                 Swal.fire({
@@ -553,6 +701,8 @@
                 });
                 return;
             }
+
+            localStorage.setItem('user_customer_phone', customerPhone);
 
             Swal.fire({
                 title: 'MEMPROSES DEPOSIT...',
@@ -566,13 +716,18 @@
                 const res = await fetch('/api/deposit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: amount })
+                    body: JSON.stringify({ 
+                        amount: amount,
+                        customerPhone: customerPhone
+                    })
                 });
 
                 const result = await res.json();
                 Swal.close();
 
-                if (result.status && result.data) {
+                const qrString = result.data?.payment?.qrString || result.data?.paymentNumber;
+
+                if (result.status && result.data && qrString) {
                     currentDepOrderId = result.data.orderId;
                     localStorage.setItem('active_deposit_order_id', currentDepOrderId);
 
@@ -581,9 +736,10 @@
 
                     const qContainer = document.getElementById('depQrcodeContainer');
                     qContainer.innerHTML = '';
-                    new QRCode(qContainer, { text: result.data.paymentNumber, width: 220, height: 220 });
+                    new QRCode(qContainer, { text: qrString, width: 220, height: 220 });
 
                     document.getElementById('depositModal').classList.remove('hidden');
+                    updateActiveBannerUI();
                     startDepositPolling();
                 } else {
                     throw new Error(result.message || 'Gagal memproses deposit');
@@ -610,6 +766,7 @@
                     if (["settlement", "success", "paid", "settled"].includes(status)) {
                         clearInterval(depPollInterval);
                         localStorage.removeItem('active_deposit_order_id');
+                        currentDepOrderId = '';
                         closeDepositModal();
                         Swal.fire({
                             icon: 'success',
@@ -621,6 +778,7 @@
                     } else if (["cancelled", "failed", "expired"].includes(status)) {
                         clearInterval(depPollInterval);
                         localStorage.removeItem('active_deposit_order_id');
+                        currentDepOrderId = '';
                         closeDepositModal();
                         Swal.fire({
                             icon: 'info',
@@ -653,6 +811,7 @@
 
                 if (depPollInterval) clearInterval(depPollInterval);
                 localStorage.removeItem('active_deposit_order_id');
+                currentDepOrderId = '';
                 closeDepositModal();
 
                 Swal.fire({
@@ -669,6 +828,7 @@
         function closeDepositModal() {
             if (depPollInterval) clearInterval(depPollInterval);
             document.getElementById('depositModal').classList.add('hidden');
+            updateActiveBannerUI();
         }
 
         /* LOGIKA FLOATING LIVE CHAT WIDGET */
