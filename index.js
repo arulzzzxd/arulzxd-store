@@ -1202,9 +1202,9 @@ app.post('/api/deposit', checkAuthSession, async (req, res) => {
         });
 
         const transactionData = paywuzRes.data?.data || paywuzRes.data;
-        // Ambil payment.qrString sesuai struktur response Paywuz v2
         const qrisString = transactionData?.payment?.qrString || 
                            transactionData?.qrString || 
+                           transactionData?.payment?.qrUrl ||
                            transactionData?.paymentNumber;
 
         if (!qrisString) {
