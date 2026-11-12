@@ -395,7 +395,7 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '9289940600:AAF3_XH
 const TELEGRAM_ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID || '-1004312316684';
 
 async function sendTelegramNotification(senderName, userIdentifier, messageText) {
-    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN.includes('ISI_TOKEN')) return;
+    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN.includes('9289940600:AAF3_XHJlcfiD9be8KzNNw-7crGoOaenSyU')) return;
 
     // Escape karakter khusus HTML agar pesan pengguna tidak merusak format Telegram
     const escapeHtml = (str) => String(str)
