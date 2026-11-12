@@ -22,7 +22,7 @@
     <meta name="twitter:description" content="Isi ulang saldo akun Anda secara otomatis 24/7 menggunakan QRIS All Payment di ArulzXD Store.">
     <meta name="twitter:image" content="https://cdn.larasxd.my.id/files/wWSxaeJ0ka.jpg">
 
-    <!-- Perbaikan Favicon & Apple Touch Icon -->
+    <!-- Favicon & Apple Touch Icon -->
     <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
     <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
     <link rel="shortcut icon" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
@@ -181,10 +181,22 @@
             font-family: 'Plus Jakarta Sans', sans-serif !important;
         }
 
+        /* FIX TAMPILAN QRIS: PRESISI, TAJAM, TIDAK TERPOTONG */
+        #depQrcodeContainer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 210px;
+            height: 210px;
+            background: #FFFFFF;
+        }
         #depQrcodeContainer canvas, #depQrcodeContainer img {
-            margin: 0 auto;
-            max-width: 100%;
-            height: auto !important;
+            width: 210px !important;
+            height: 210px !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            object-fit: contain;
+            image-rendering: pixelated;
             display: block;
         }
     </style>
@@ -423,7 +435,7 @@
                         </div>
                         <div>
                             <h4 class="font-black font-cyber">QRIS Otomatis</h4>
-                            <p class="text-[11px] mt-0.5">Scan QRIS menggunakan aplikasi e-wallet atau mobile banking favorit Anda.</p>
+                            <p class="text-[11px] mt-0.5">Download atau scan QRIS menggunakan aplikasi e-wallet atau mobile banking favorit Anda.</p>
                         </div>
                     </div>
 
@@ -443,26 +455,38 @@
 
     </main>
 
-    <!-- MODAL POPUP QRIS DEPOSIT -->
-    <div id="depositModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="neo-box w-full max-w-md rounded-2xl bg-white p-6 space-y-4 text-center relative">
-            <button onclick="closeDepositModal()" class="absolute top-4 right-4 text-black font-black text-lg">
+    <!-- MODAL POPUP QRIS DEPOSIT (TAMPILAN DIPERBARUI + TOMBOL DOWNLOAD QRIS) -->
+    <div id="depositModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="neo-box w-full max-w-md rounded-2xl bg-white p-5 space-y-3.5 text-center relative my-auto">
+            <button onclick="closeDepositModal()" class="w-8 h-8 rounded-lg border-2 border-black bg-neoBg hover:bg-neoPink flex items-center justify-center absolute top-4 right-4 text-black font-black text-sm transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             
-            <div class="space-y-1">
-                <h3 class="text-base font-black font-cyber uppercase">Scan QRIS Pembayaran</h3>
-                <p class="text-xs font-bold text-slate-600">Gunakan E-Wallet atau Bank Apps untuk scan</p>
+            <div class="space-y-0.5 pt-1">
+                <span class="inline-block bg-neoCyan border-2 border-black px-2.5 py-0.5 rounded-md text-[10px] font-black font-cyber uppercase">
+                    QRIS All Payment
+                </span>
+                <h3 class="text-base font-black font-cyber uppercase pt-1">Scan / Download QRIS</h3>
+                <p class="text-[11px] font-bold text-slate-600">Simpan gambar QRIS lalu upload di aplikasi E-Wallet / M-Banking</p>
             </div>
 
-            <div class="bg-neoBg p-3.5 rounded-xl border-2 border-black">
-                <p class="text-[10px] font-black font-cyber uppercase">Total Pembayaran Deposit</p>
-                <h4 id="depTotalAmountText" class="text-2xl font-black font-cyber mt-0.5">Rp 0</h4>
-                <p class="text-[10px] font-mono font-bold mt-1">Order ID: <span id="depOrderIdText">-</span></p>
-            </div>
-
-            <div class="bg-white p-3.5 rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] inline-block">
-                <div id="depQrcodeContainer"></div>
+            <!-- KARTU QRIS DENGAN QUIET ZONE LEBAR AGAR 100% TERBACA SCANNER -->
+            <div class="mx-auto w-fit bg-white rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] overflow-hidden">
+                <!-- Header QRIS -->
+                <div class="bg-neoBg border-b-2 border-black px-4 py-1.5 flex items-center justify-between gap-4">
+                    <span class="font-cyber font-black text-xs tracking-wider">QRIS</span>
+                    <span class="text-[9px] font-mono font-bold bg-white border border-black px-1.5 py-0.5 rounded">GPN</span>
+                </div>
+                <!-- Area Putih Quiet Zone -->
+                <div class="p-4 bg-white flex items-center justify-center">
+                    <div id="depQrcodeContainer"></div>
+                </div>
+                <!-- Footer Nominal & Order ID -->
+                <div class="bg-neoBg border-t-2 border-black px-4 py-2 text-center">
+                    <p class="text-[9px] font-black font-cyber uppercase text-slate-600">Total Pembayaran</p>
+                    <h4 id="depTotalAmountText" class="text-xl font-black font-cyber text-black leading-tight">Rp 0</h4>
+                    <p class="text-[9px] font-mono font-bold text-slate-700 mt-0.5">ID: <span id="depOrderIdText">-</span></p>
+                </div>
             </div>
 
             <div class="flex items-center justify-center gap-2 text-xs font-black font-cyber bg-neoYellow py-2 rounded-xl border-2 border-black">
@@ -470,16 +494,21 @@
                 <span>Menunggu Pembayaran Masuk...</span>
             </div>
 
-            <!-- TOMBOL CEK STATUS MANUAL -->
-            <button id="btnManualCheckStatus" onclick="manualCheckDepositStatus()" class="neo-btn w-full bg-neoGreen text-black text-xs font-black py-3 rounded-xl uppercase flex items-center justify-center gap-1.5 font-cyber">
-                <i class="fa-solid fa-rotate"></i> Cek Status Pembayaran
-            </button>
+            <!-- TOMBOL DOWNLOAD QRIS & CEK STATUS -->
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="downloadQrisImage()" class="neo-btn bg-neoCyan text-black text-xs font-black py-3 rounded-xl uppercase flex items-center justify-center gap-1.5 font-cyber">
+                    <i class="fa-solid fa-download"></i> Download QRIS
+                </button>
+                <button id="btnManualCheckStatus" onclick="manualCheckDepositStatus()" class="neo-btn bg-neoGreen text-black text-xs font-black py-3 rounded-xl uppercase flex items-center justify-center gap-1.5 font-cyber">
+                    <i class="fa-solid fa-rotate"></i> Cek Status
+                </button>
+            </div>
 
             <div class="flex items-center gap-2">
-                <button onclick="cancelDepositTransaction()" class="neo-btn w-1/2 bg-neoPink text-black text-xs font-black py-3 rounded-xl uppercase flex items-center justify-center gap-1.5 font-cyber">
+                <button onclick="cancelDepositTransaction()" class="neo-btn w-1/2 bg-neoPink text-black text-xs font-black py-2.5 rounded-xl uppercase flex items-center justify-center gap-1.5 font-cyber">
                     <i class="fa-solid fa-trash-can"></i> Batalkan
                 </button>
-                <button onclick="closeDepositModal()" class="neo-btn w-1/2 bg-white text-black text-xs font-black py-3 rounded-xl uppercase font-cyber">
+                <button onclick="closeDepositModal()" class="neo-btn w-1/2 bg-white text-black text-xs font-black py-2.5 rounded-xl uppercase font-cyber">
                     Tutup
                 </button>
             </div>
@@ -532,6 +561,8 @@
     <script>
         let depPollInterval = null;
         let currentDepOrderId = '';
+        let currentDepAmount = 0;
+        let currentQrPayload = '';
         let widgetChatInterval = null;
 
         function formatRupiah(angka) {
@@ -542,6 +573,116 @@
             document.getElementById('depositAmountInput').value = val;
             document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
             if (btnElem) btnElem.classList.add('active');
+        }
+
+        // RENDER QRIS PRESISI & TANGANI PAYLOAD MENTAH MAUPUN URL GAMBAR
+        function renderCleanQris(qrValue) {
+            currentQrPayload = (qrValue || '').trim();
+            const qContainer = document.getElementById('depQrcodeContainer');
+            qContainer.innerHTML = '';
+
+            if (!currentQrPayload) return;
+
+            // Jika server mengembalikan URL gambar atau Data URI base64 langsung
+            if (currentQrPayload.startsWith('http://') || currentQrPayload.startsWith('https://') || currentQrPayload.startsWith('data:image/')) {
+                const img = document.createElement('img');
+                img.crossOrigin = 'anonymous';
+                img.src = currentQrPayload;
+                img.alt = 'QRIS Pembayaran';
+                qContainer.appendChild(img);
+                return;
+            }
+
+            // Jika payload string QRIS standar (000201...), render resolusi tinggi dengan CorrectLevel.M agar tidak terlalu padat
+            new QRCode(qContainer, {
+                text: currentQrPayload,
+                width: 280,
+                height: 280,
+                colorDark: '#000000',
+                colorLight: '#FFFFFF',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        // DOWNLOAD QRIS LENGKAP DENGAN QUIET ZONE & INFO NOMINAL AGAR LANGSUNG TERBACA DI E-WALLET
+        async function downloadQrisImage() {
+            const qContainer = document.getElementById('depQrcodeContainer');
+            const sourceCanvas = qContainer.querySelector('canvas');
+            const sourceImg = qContainer.querySelector('img');
+
+            if (!sourceCanvas && !sourceImg) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'QRIS BELUM SIAP',
+                    text: 'Kode QRIS belum dimuat.',
+                    customClass: { popup: 'cyber-swal' }
+                });
+                return;
+            }
+
+            const outCanvas = document.createElement('canvas');
+            const ctx = outCanvas.getContext('2d');
+
+            const W = 600;
+            const H = 760;
+            outCanvas.width = W;
+            outCanvas.height = H;
+
+            // Background putih bersih
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, W, H);
+
+            // Border luar tipis
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(12, 12, W - 24, H - 24);
+
+            // Header bar kuning
+            ctx.fillStyle = '#FFDE59';
+            ctx.fillRect(15, 15, W - 30, 86);
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(15, 101, W - 30, 4);
+
+            ctx.font = '900 28px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('QRIS PEMBAYARAN - ARULZXD STORE', W / 2, 68);
+
+            // Gambar QRIS dengan quiet zone putih luas (420x420 di tengah area 600px)
+            ctx.imageSmoothingEnabled = false;
+            const qrSize = 420;
+            const qrX = (W - qrSize) / 2;
+            const qrY = 140;
+
+            try {
+                if (sourceCanvas) {
+                    ctx.drawImage(sourceCanvas, qrX, qrY, qrSize, qrSize);
+                } else if (sourceImg) {
+                    ctx.drawImage(sourceImg, qrX, qrY, qrSize, qrSize);
+                }
+            } catch (err) {
+                // Fallback jika gambar eksternal terkena CORS
+                window.open(sourceImg.src, '_blank');
+                return;
+            }
+
+            // Info Nominal & Order ID di bawah QR
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.fillText('TOTAL PEMBAYARAN', W / 2, 615);
+
+            ctx.font = '900 38px sans-serif';
+            ctx.fillText(formatRupiah(currentDepAmount), W / 2, 662);
+
+            ctx.font = 'bold 16px monospace';
+            ctx.fillStyle = '#334155';
+            ctx.fillText(`Order ID: ${currentDepOrderId || '-'}`, W / 2, 705);
+
+            const link = document.createElement('a');
+            link.download = `QRIS-${currentDepOrderId || Date.now()}.png`;
+            link.href = outCanvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function updateActiveBannerUI() {
@@ -591,12 +732,11 @@
 
                 if (result.data && result.data.status === 'pending' && qrDataString) {
                     currentDepOrderId = result.data.orderId;
-                    document.getElementById('depTotalAmountText').innerText = formatRupiah(result.data.amount);
+                    currentDepAmount = result.data.amount;
+                    document.getElementById('depTotalAmountText').innerText = formatRupiah(currentDepAmount);
                     document.getElementById('depOrderIdText').innerText = currentDepOrderId;
 
-                    const qContainer = document.getElementById('depQrcodeContainer');
-                    qContainer.innerHTML = '';
-                    new QRCode(qContainer, { text: qrDataString, width: 220, height: 220 });
+                    renderCleanQris(qrDataString);
 
                     document.getElementById('depositModal').classList.remove('hidden');
                     updateActiveBannerUI();
@@ -620,7 +760,7 @@
             const origHtml = btn ? btn.innerHTML : '';
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengecek Status...`;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengecek...`;
             }
 
             try {
@@ -729,14 +869,13 @@
 
                 if (result.status && result.data && qrString) {
                     currentDepOrderId = result.data.orderId;
+                    currentDepAmount = result.data.amount;
                     localStorage.setItem('active_deposit_order_id', currentDepOrderId);
 
-                    document.getElementById('depTotalAmountText').innerText = formatRupiah(result.data.amount);
+                    document.getElementById('depTotalAmountText').innerText = formatRupiah(currentDepAmount);
                     document.getElementById('depOrderIdText').innerText = currentDepOrderId;
 
-                    const qContainer = document.getElementById('depQrcodeContainer');
-                    qContainer.innerHTML = '';
-                    new QRCode(qContainer, { text: qrString, width: 220, height: 220 });
+                    renderCleanQris(qrString);
 
                     document.getElementById('depositModal').classList.remove('hidden');
                     updateActiveBannerUI();
