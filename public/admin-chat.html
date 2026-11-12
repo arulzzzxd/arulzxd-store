@@ -289,7 +289,18 @@
     <script>
         let selectedUserId = null;
         let selectedUsername = '';
+        let selectedUserEmail = '';
         let adminPollInterval = null;
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
 
         function scrollUserCarousel(direction) {
             const container = document.getElementById('adminUserList');
@@ -312,23 +323,26 @@
                     listEl.innerHTML = data.users.map(u => {
                         const isActive = u.userId === selectedUserId;
                         const activeClass = isActive ? 'active' : 'bg-white hover:bg-amber-50';
-                        const displayEmail = u.username.includes('@') ? u.username : `${u.username}@gmail.com`;
+                        const userEmailText = u.email || u.userId;
                         const unreadBadge = u.unreadCount > 0 
-                            ? `<span class="bg-neoPink text-black border border-black text-[9px] font-black font-cyber px-1.5 py-0.2 rounded-full ml-1 animate-pulse">${u.unreadCount}</span>` 
+                            ? `<span class="bg-neoPink text-black border border-black text-[9px] font-black font-cyber px-1.5 py-0.2 rounded-full ml-1.5 animate-pulse">${u.unreadCount}</span>` 
                             : '';
 
+                        const avatarHtml = u.avatar
+                            ? `<img src="${escapeHtml(u.avatar)}" alt="Avatar" class="w-8 h-8 rounded-full border-2 border-black object-cover shrink-0">`
+                            : `<div class="w-8 h-8 rounded-full bg-neoCyan border-2 border-black flex items-center justify-center font-black text-xs shrink-0"><i class="fa-solid fa-user"></i></div>`;
+
                         return `
-                            <button onclick="selectUserChat('${u.userId}', '${u.username}')" 
-                                    class="user-pill shrink-0 px-3 py-2 rounded-xl text-left flex items-center gap-2 cursor-pointer ${activeClass}">
-                                <div class="w-7 h-7 rounded-full bg-neoCyan border-2 border-black flex items-center justify-center font-black text-xs shrink-0">
-                                    <i class="fa-solid fa-user"></i>
-                                </div>
+                            <button onclick="selectUserChat('${escapeHtml(u.userId)}', '${escapeHtml(u.username)}', '${escapeHtml(userEmailText)}')" 
+                                    class="user-pill shrink-0 px-3 py-2 rounded-xl text-left flex items-center gap-2.5 cursor-pointer ${activeClass}">
+                                ${avatarHtml}
                                 <div class="whitespace-nowrap">
                                     <div class="text-xs font-black font-cyber text-black flex items-center">
-                                        <span>${displayEmail}</span>
+                                        <span>${escapeHtml(u.username)}</span>
                                         ${unreadBadge}
                                     </div>
-                                    <div class="text-[9px] font-bold text-slate-700 truncate max-w-[150px]">${u.lastMessage || 'Tidak ada pesan'}</div>
+                                    <div class="text-[10px] font-mono font-bold text-slate-600">${escapeHtml(userEmailText)}</div>
+                                    <div class="text-[10px] font-bold text-black/80 truncate max-w-[160px] mt-0.5 pt-0.5 border-t border-black/15">${escapeHtml(u.lastMessage || 'Tidak ada pesan')}</div>
                                 </div>
                             </button>
                         `;
@@ -339,9 +353,10 @@
             } catch(e) {}
         }
 
-        async function selectUserChat(userId, username) {
+        async function selectUserChat(userId, username, email) {
             selectedUserId = userId;
             selectedUsername = username;
+            selectedUserEmail = email || userId;
 
             const formEl = document.getElementById('adminChatForm');
             formEl.classList.remove('opacity-50', 'pointer-events-none');
@@ -360,7 +375,7 @@
         async function loadUserMessages() {
             if (!selectedUserId) return;
             try {
-                const res = await fetch(`/api/bantuan/admin/messages/${selectedUserId}`);
+                const res = await fetch(`/api/bantuan/admin/messages/${encodeURIComponent(selectedUserId)}`);
                 const data = await res.json();
                 const container = document.getElementById('adminChatMessages');
 
@@ -378,18 +393,18 @@
                             : 'bg-white text-black font-bold rounded-bl-none border-2 border-black shadow-[3px_3px_0px_#000]';
                         
                         const timeStr = new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                        const displayName = isAdmin ? 'Admin / Owner' : selectedUsername;
+                        const displayName = isAdmin ? 'Admin / Owner' : `${selectedUsername} (${selectedUserEmail})`;
 
                         return `
                             <div class="flex ${alignClass}">
                                 <div class="max-w-[85%] sm:max-w-[70%] p-3 rounded-2xl text-xs space-y-1 ${bgClass}">
                                     <div class="flex items-center justify-between gap-3 border-b border-black/20 pb-1">
                                         <span class="font-black font-cyber text-[10px] text-black">
-                                            ${isAdmin ? '<i class="fa-solid fa-shield-halved"></i>' : '<i class="fa-solid fa-user"></i>'} ${displayName}
+                                            ${isAdmin ? '<i class="fa-solid fa-shield-halved"></i>' : '<i class="fa-solid fa-user"></i>'} ${escapeHtml(displayName)}
                                         </span>
                                         <span class="text-[9px] font-mono font-bold opacity-75">${timeStr}</span>
                                     </div>
-                                    <p class="leading-relaxed break-words pt-1">${msg.message}</p>
+                                    <p class="leading-relaxed break-words pt-1">${escapeHtml(msg.message)}</p>
                                 </div>
                             </div>
                         `;

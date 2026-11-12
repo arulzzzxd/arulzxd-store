@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kebijakan Privasi & Syarat Layanan - ArulzXD STORE</title>
-    <!-- Perbaikan Favicon & Apple Touch Icon -->
-    <link rel="icon" type="image/jpeg" sizes="32x32" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
-    <link rel="icon" type="image/jpeg" sizes="16x16" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
     <link rel="shortcut icon" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
     <link rel="apple-touch-icon" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: { 
@@ -25,6 +23,7 @@
                         neoCyan: '#00E5FF',
                         neoPink: '#FF79C6',
                         neoGreen: '#00E676',
+                        neoPurple: '#BD93F9',
                         neoBg: '#F5F2EB',
                         neoCard: '#FFFFFF'
                     }
@@ -35,25 +34,20 @@
     <style>
         body { 
             background-color: #F5F2EB; 
-            /* BACKGROUND DOTS TIPIK HALUS & ELEGAN */
-            background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1.2px, transparent 1.2px);
-            background-size: 16px 16px;
+            background-image: radial-gradient(rgba(0, 0, 0, 0.06) 1.2px, transparent 1.2px);
+            background-size: 18px 18px;
             color: #000000;
-        }
-
-        .viewport-outer-border {
-            position: fixed;
-            inset: 8px;
-            border: 4px solid #000000;
-            pointer-events: none;
-            z-index: 50;
-            box-shadow: inset 0 0 0 2px #FFFFFF;
         }
 
         .neo-card {
             background-color: #FFFFFF;
             border: 3.5px solid #000000;
             box-shadow: 6px 6px 0px #000000;
+        }
+
+        .neo-subcard {
+            border: 2.5px solid #000000;
+            box-shadow: 3.5px 3.5px 0px #000000;
         }
 
         .neo-btn {
@@ -71,149 +65,267 @@
         }
     </style>
 </head>
-<body class="min-h-screen pb-16 antialiased">
+<body class="min-h-screen pb-14 antialiased selection:bg-neoYellow selection:text-black">
 
-    <!-- FRAME BORDER TEPI LAYAR -->
-    <div class="viewport-outer-border"></div>
-
-    <!-- STICKY TOP NAVIGATION BAR NEOBRUTALISM -->
-    <header class="sticky top-0 z-40 bg-[#F5F2EB]/90 backdrop-blur-md border-b-4 border-black px-4 sm:px-8 py-3">
-        <div class="max-w-5xl mx-auto flex items-center justify-between">
+    <!-- STICKY TOP NAVIGATION BAR (BERSIH TANPA BORDER SAMPING LAYAR) -->
+    <header class="sticky top-0 z-40 bg-[#F5F2EB]/95 backdrop-blur-md border-b-4 border-black px-4 sm:px-8 py-3.5">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
             <div class="flex items-center gap-3">
-                <img src="https://files.catbox.moe/kdowze.png" alt="Logo" class="w-9 h-9 rounded-full border-2 border-black shadow-[2px_2px_0px_#000]">
+                <!-- LOGO BULAT PRESISI TANPA EFEK GEPENG -->
+                <div class="w-10 h-10 rounded-full border-2.5 border-black overflow-hidden shrink-0 bg-black flex items-center justify-center">
+                    <img src="https://files.catbox.moe/kdowze.png" alt="Logo ArulzXD" class="w-full h-full object-cover">
+                </div>
                 <div>
-                    <span class="font-black font-cyber text-base tracking-tight block leading-none">ArulzXD STORE</span>
-                    <span class="text-[10px] font-mono font-bold text-slate-700 uppercase">LEGAL & PRIVACY POLICY</span>
+                    <span class="font-black font-cyber text-base sm:text-lg tracking-tight block leading-none">ArulzXD STORE</span>
+                    <span class="text-[10px] font-mono font-extrabold text-slate-700 tracking-wider uppercase mt-0.5 block">LEGAL &amp; PRIVACY POLICY</span>
                 </div>
             </div>
 
-            <!-- TOMBOL KEMBALI STYLISH NEOBRUTALISM -->
-            <a href="/login" class="neo-btn bg-neoYellow text-black font-black font-cyber text-xs px-3.5 py-2 rounded-xl uppercase flex items-center gap-2">
-                <i class="fa-solid fa-arrow-left text-xs"></i> <span>Kembali</span>
+            <!-- TOMBOL KEMBALI DENGAN ICON SVG -->
+            <a href="/login" class="neo-btn bg-neoYellow text-black font-black font-cyber text-xs px-4 py-2 rounded-xl uppercase flex items-center gap-2 shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                <span>Kembali</span>
             </a>
         </div>
     </header>
 
-    <!-- FULL SCREEN CONTENT CONTAINER -->
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-12 space-y-6">
+    <!-- KONTEN UTAMA -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 pt-7 pb-10 space-y-6">
 
-        <!-- HEADER BANNER DOKUMEN -->
-        <div class="neo-card p-6 sm:p-8 rounded-2xl bg-white relative overflow-hidden">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-3 border-black pb-5">
-                <div>
-                    <div class="inline-flex items-center gap-1.5 bg-neoGreen border-2 border-black text-black text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase font-cyber shadow-[2px_2px_0px_#000] mb-2">
-                        <i class="fa-solid fa-scale-balanced"></i> Kepatuhan Hukum & Privasi
-                    </div>
-                    <h1 class="text-2xl sm:text-4xl font-black font-cyber uppercase tracking-tight">Kebijakan Privasi</h1>
-                    <p class="text-xs font-bold text-slate-600 mt-1">Ketentuan Penggunaan Platform & Perlindungan Data Pribadi Pengguna</p>
+        <!-- HERO BANNER DOKUMEN -->
+        <div class="neo-card rounded-2xl overflow-hidden bg-white">
+            <!-- STRIP HEADER WARNA NEOBRUTALISM -->
+            <div class="bg-neoCyan border-b-3 border-black px-5 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-2">
+                <div class="inline-flex items-center gap-2 bg-white border-2 border-black text-black text-[10px] sm:text-xs font-black px-3 py-1 rounded-full uppercase font-cyber shadow-[2px_2px_0px_#000]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z" />
+                    </svg>
+                    <span>Kepatuhan Hukum &amp; Privasi</span>
                 </div>
-                <div class="text-right sm:text-right shrink-0">
-                    <span class="text-[10px] font-mono font-bold bg-neoBg border-2 border-black px-2.5 py-1 rounded-lg inline-block shadow-[2px_2px_0px_#000]">
-                        VERSI 2.4 / NOV 2026
-                    </span>
-                </div>
+                <span class="text-[10px] sm:text-xs font-mono font-black bg-neoYellow border-2 border-black px-3 py-1 rounded-lg shadow-[2px_2px_0px_#000]">
+                    VERSI 2.4 • NOV 2026
+                </span>
             </div>
 
-            <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed mt-4">
-                Selamat datang di <strong>ArulzXD STORE</strong> (operasional digital di bawah payung merek ArulzXD). Kami berkomitmen penuh menjaga privasi, keamanan data pribadi, serta transparansi transaksi digital Anda saat menggunakan marketplace source code, REST API, maupun layanan otomasi kami.
-            </p>
+            <div class="p-5 sm:p-8 space-y-3">
+                <h1 class="text-2xl sm:text-4xl font-black font-cyber uppercase tracking-tight leading-tight">
+                    Kebijakan Privasi &amp; Ketentuan Layanan
+                </h1>
+                <p class="text-xs sm:text-sm font-bold text-slate-600 border-b-2 border-dashed border-slate-300 pb-3">
+                    Pedoman Perlindungan Data Pribadi Pengguna &amp; Tata Kelola Transaksi Digital
+                </p>
+                <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed pt-1">
+                    Selamat datang di <strong>ArulzXD STORE</strong> (operasional layanan digital di bawah ekosistem ArulzXD). Dokumen ini menjelaskan secara transparan bagaimana kami mengumpulkan, menyimpan, melindungi, dan memproses data pribadi Anda saat mengakses marketplace <i>source code</i>, layanan REST API, maupun transaksi otomatis pada platform kami.
+                </p>
+            </div>
         </div>
 
-        <!-- SEKSI 1: DASAR HUKUM PDP & ITE -->
-        <div class="neo-card p-6 rounded-2xl bg-white space-y-3">
-            <h2 class="text-lg font-black font-cyber uppercase flex items-center gap-2.5 border-b-2 border-black pb-2">
-                <span class="w-7 h-7 rounded-lg bg-neoCyan border-2 border-black flex items-center justify-center text-xs shadow-[2px_2px_0px_#000]">1</span>
-                Dasar Hukum & Kepatuhan Perundang-Undangan
-            </h2>
-            <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
-                Pengelolaan dan pemrosesan data pribadi pada sistem ArulzXD STORE tunduk dan patuh sepenuhnya terhadap peraturan perundang-undangan Republik Indonesia yang berlaku:
-            </p>
-            <ul class="space-y-2 text-xs sm:text-sm font-semibold text-slate-800 pt-1">
-                <li class="flex items-start gap-2 bg-neoBg border-2 border-black p-2.5 rounded-xl">
-                    <i class="fa-solid fa-gavel text-amber-600 mt-0.5"></i>
-                    <div>
-                        <strong class="font-black">UU No. 27 Tahun 2022 tentang Perlindungan Data Pribadi (UU PDP):</strong> Menjamin hak pengguna sebagai subjek data pribadi meliputi hak atas kerahasiaan, perbaikan, dan penghapusan data.
+        <!-- SEKSI 1: DASAR HUKUM -->
+        <section class="neo-card rounded-2xl overflow-hidden bg-white">
+            <div class="bg-neoGreen/25 border-b-3 border-black px-5 sm:px-7 py-3.5 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-neoGreen border-2.5 border-black flex items-center justify-center font-black font-cyber text-sm shadow-[2.5px_2.5px_0px_#000] shrink-0">
+                    1
+                </span>
+                <h2 class="text-base sm:text-lg font-black font-cyber uppercase tracking-tight">
+                    Dasar Hukum &amp; Kepatuhan Regulasi RI
+                </h2>
+            </div>
+
+            <div class="p-5 sm:p-7 space-y-4">
+                <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
+                    Seluruh pemrosesan informasi dan transaksi elektronik pada sistem ArulzXD STORE tunduk sepenuhnya terhadap peraturan perundang-undangan Republik Indonesia:
+                </p>
+
+                <div class="space-y-3">
+                    <div class="neo-subcard bg-[#FFFDF7] p-4 rounded-xl flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-neoYellow border-2 border-black flex items-center justify-center shrink-0 mt-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                            </svg>
+                        </div>
+                        <div class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
+                            <strong class="font-black text-black block mb-0.5">UU No. 27 Tahun 2022 tentang Perlindungan Data Pribadi (UU PDP)</strong>
+                            Menjamin hak pengguna sebagai subjek data pribadi meliputi hak atas informasi pemrosesan, akses, pembaruan data, serta hak penghapusan akun dari basis data sistem.
+                        </div>
                     </div>
-                </li>
-                <li class="flex items-start gap-2 bg-neoBg border-2 border-black p-2.5 rounded-xl">
-                    <i class="fa-solid fa-gavel text-amber-600 mt-0.5"></i>
-                    <div>
-                        <strong class="font-black">UU No. 1 Tahun 2024 (Perubahan UU ITE):</strong> Mengatur keabsahan dokumen/transaksi elektronik serta perlindungan sistem elektronik platform dari akses tidak sah.
+
+                    <div class="neo-subcard bg-[#FFFDF7] p-4 rounded-xl flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-neoCyan border-2 border-black flex items-center justify-center shrink-0 mt-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                            </svg>
+                        </div>
+                        <div class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
+                            <strong class="font-black text-black block mb-0.5">UU No. 1 Tahun 2024 (Perubahan Kedua UU ITE)</strong>
+                            Mengatur keabsahan tanda tangan, bukti transaksi elektronik, serta perlindungan sistem elektronik dari tindakan peretasan maupun penyalahgunaan akses ilegal.
+                        </div>
                     </div>
-                </li>
-            </ul>
-        </div>
+                </div>
+            </div>
+        </section>
 
         <!-- SEKSI 2: PENGUMPULAN DATA -->
-        <div class="neo-card p-6 rounded-2xl bg-white space-y-3">
-            <h2 class="text-lg font-black font-cyber uppercase flex items-center gap-2.5 border-b-2 border-black pb-2">
-                <span class="w-7 h-7 rounded-lg bg-neoYellow border-2 border-black flex items-center justify-center text-xs shadow-[2px_2px_0px_#000]">2</span>
-                Data Pribadi yang Kami Kumpulkan
-            </h2>
-            <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
-                Untuk memberikan pengalaman autentikasi dan layanan transaksi yang aman, kami mengumpulkan jenis data berikut:
-            </p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div class="border-2 border-black p-3 rounded-xl bg-slate-50">
-                    <span class="text-xs font-black font-cyber uppercase text-black block mb-1">
-                        <i class="fa-solid fa-user-gear text-neoPink mr-1"></i> Data Akun & Profil
-                    </span>
-                    <p class="text-xs font-medium text-slate-700">Username, alamat email terdaftar, foto avatar profil, serta kata sandi terenkripsi (atau ID OAuth provider Google/GitHub).</p>
+        <section class="neo-card rounded-2xl overflow-hidden bg-white">
+            <div class="bg-neoYellow/35 border-b-3 border-black px-5 sm:px-7 py-3.5 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-neoYellow border-2.5 border-black flex items-center justify-center font-black font-cyber text-sm shadow-[2.5px_2.5px_0px_#000] shrink-0">
+                    2
+                </span>
+                <h2 class="text-base sm:text-lg font-black font-cyber uppercase tracking-tight">
+                    Data Pribadi yang Kami Kumpulkan
+                </h2>
+            </div>
+
+            <div class="p-5 sm:p-7 space-y-4">
+                <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
+                    Untuk mendukung fitur autentikasi, pengiriman produk instan, dan manajemen saldo akun, kami mengumpulkan kategori informasi berikut:
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="neo-subcard p-4 rounded-xl bg-pink-50/60 space-y-1.5">
+                        <div class="flex items-center gap-2 text-xs font-black font-cyber uppercase text-black">
+                            <span class="w-7 h-7 rounded-lg bg-neoPink border-2 border-black flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                </svg>
+                            </span>
+                            <span>Identitas Akun &amp; Profil</span>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-700 leading-relaxed pt-1">
+                            Username unik, alamat email aktif, foto avatar profil, kode referal undangan, serta token identifikasi OAuth (Google / GitHub).
+                        </p>
+                    </div>
+
+                    <div class="neo-subcard p-4 rounded-xl bg-emerald-50/60 space-y-1.5">
+                        <div class="flex items-center gap-2 text-xs font-black font-cyber uppercase text-black">
+                            <span class="w-7 h-7 rounded-lg bg-neoGreen border-2 border-black flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                                </svg>
+                            </span>
+                            <span>Riwayat Transaksi &amp; Saldo</span>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-700 leading-relaxed pt-1">
+                            Nomor referensi invoice (<code class="bg-white px-1 py-0.5 rounded border border-black text-[11px]">TRX-ID</code>), riwayat deposit QRIS, mutasi saldo internal, serta akses tautan produk yang dibeli.
+                        </p>
+                    </div>
                 </div>
-                <div class="border-2 border-black p-3 rounded-xl bg-slate-50">
-                    <span class="text-xs font-black font-cyber uppercase text-black block mb-1">
-                        <i class="fa-solid fa-receipt text-neoGreen mr-1"></i> Data Transaksi & Saldo
-                    </span>
-                    <p class="text-xs font-medium text-slate-700">Riwayat deposit QRIS, nomor referensi order (`TRX-ID`), akumulasi belanja, serta mutasi penggunaan saldo internal.</p>
+            </div>
+        </section>
+
+        <!-- SEKSI 3: KEAMANAN ENKRIPSI -->
+        <section class="neo-card rounded-2xl overflow-hidden bg-white">
+            <div class="bg-neoPink/25 border-b-3 border-black px-5 sm:px-7 py-3.5 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-neoPink border-2.5 border-black flex items-center justify-center font-black font-cyber text-sm shadow-[2.5px_2.5px_0px_#000] shrink-0">
+                    3
+                </span>
+                <h2 class="text-base sm:text-lg font-black font-cyber uppercase tracking-tight">
+                    Keamanan Data &amp; Perlindungan Sesi
+                </h2>
+            </div>
+
+            <div class="p-5 sm:p-7 space-y-3">
+                <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
+                    Kami menerapkan arsitektur keamanan berlapis untuk melindungi kredensial serta integritas akun pengguna:
+                </p>
+
+                <div class="space-y-2.5 pt-1">
+                    <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border-2 border-black">
+                        <span class="w-7 h-7 rounded-lg bg-neoGreen border-2 border-black flex items-center justify-center shrink-0 mt-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                            </svg>
+                        </span>
+                        <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
+                            <strong>Enkripsi Kata Sandi:</strong> Seluruh kata sandi akun lokal diproses menggunakan algoritma <i>hashing</i> satu arah <strong>Bcrypt</strong> sehingga tidak dapat dibaca dalam bentuk teks biasa.
+                        </p>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border-2 border-black">
+                        <span class="w-7 h-7 rounded-lg bg-neoYellow border-2 border-black flex items-center justify-center shrink-0 mt-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+                            </svg>
+                        </span>
+                        <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
+                            <strong>Sesi Terproteksi:</strong> Autentikasi menggunakan <strong>JSON Web Token (JWT)</strong> dalam cookie <code class="bg-white px-1 rounded border border-black text-[11px]">HttpOnly</code> &amp; <code class="bg-white px-1 rounded border border-black text-[11px]">Secure</code> untuk mencegah pencurian sesi XSS.
+                        </p>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border-2 border-black">
+                        <span class="w-7 h-7 rounded-lg bg-neoCyan border-2 border-black flex items-center justify-center shrink-0 mt-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                            </svg>
+                        </span>
+                        <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
+                            <strong>Infrastruktur &amp; Enkripsi Jaringan:</strong> Seluruh pertukaran data dilindungi sertifikat TLS/HTTPS 256-bit serta perlindungan Firewall Cloudflare WAF.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- SEKSI 3: KEAMANAN KATA SANDI & SESI -->
-        <div class="neo-card p-6 rounded-2xl bg-white space-y-3">
-            <h2 class="text-lg font-black font-cyber uppercase flex items-center gap-2.5 border-b-2 border-black pb-2">
-                <span class="w-7 h-7 rounded-lg bg-neoPink border-2 border-black flex items-center justify-center text-xs shadow-[2px_2px_0px_#000]">3</span>
-                Keamanan Enkripsi & Proteksi Sesi
-            </h2>
-            <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
-                Kami menerapkan standar keamanan teknis yang ketat untuk mencegah kebocoran atau akses ilegal:
+        <!-- SEKSI 4: KETENTUAN TRANSAKSI & HAK CIPTA -->
+        <section class="neo-card rounded-2xl overflow-hidden bg-white">
+            <div class="bg-neoPurple/25 border-b-3 border-black px-5 sm:px-7 py-3.5 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-neoPurple border-2.5 border-black flex items-center justify-center font-black font-cyber text-sm shadow-[2.5px_2.5px_0px_#000] shrink-0">
+                    4
+                </span>
+                <h2 class="text-base sm:text-lg font-black font-cyber uppercase tracking-tight">
+                    Syarat Penggunaan &amp; Kebijakan Transaksi
+                </h2>
+            </div>
+
+            <div class="p-5 sm:p-7 space-y-3 text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
+                <div class="flex items-start gap-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.8] text-black shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                    <p><strong>Lisensi Produk Digital:</strong> Setiap <i>source code</i>, script bot, maupun layanan API yang dibeli hanya berlaku untuk penggunaan pribadi atau proyek pembeli. Dilarang mendistribusikan ulang secara gratis maupun memperjualbelikan tanpa izin resmi pemilik hak cipta.</p>
+                </div>
+                <div class="flex items-start gap-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.8] text-black shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                    <p><strong>Kebijakan Pengembalian Dana (Non-Refundable):</strong> Produk digital yang sudah terkonfirmasi lunas dan tautan unduhannya telah terbuka tidak dapat dibatalkan atau di-<i>refund</i>, kecuali terjadi kegagalan sistem permanen yang terbukti berasal dari pihak ArulzXD STORE.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- KOTAK KONTAK & BANTUAN LEGAL -->
+        <div class="neo-card p-6 sm:p-8 rounded-2xl bg-neoYellow text-center space-y-3">
+            <div class="w-11 h-11 rounded-2xl bg-white border-3 border-black shadow-[3px_3px_0px_#000] mx-auto flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-[2.4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+            </div>
+            <h3 class="font-black font-cyber text-lg sm:text-xl uppercase tracking-tight">
+                Punya Pertanyaan Mengenai Privasi Anda?
+            </h3>
+            <p class="text-xs sm:text-sm font-bold text-slate-900 max-w-lg mx-auto">
+                Untuk permintaan penghapusan data pribadi atau bantuan terkait ketentuan layanan, hubungi tim administrator kami secara langsung.
             </p>
-            <div class="space-y-2 text-xs sm:text-sm font-semibold text-slate-800">
-                <p class="flex items-center gap-2"><i class="fa-solid fa-lock text-neoGreen"></i> Kata sandi lokal di-hash menggunakan algoritma <strong>Bcrypt</strong> dengan <i>salt round</i> aman.</p>
-                <p class="flex items-center gap-2"><i class="fa-solid fa-key text-neoYellow"></i> Sesi autentikasi dikelola secara aman via <strong>JSON Web Token (JWT)</strong> dalam cookie `HttpOnly` dan `SameSite` terkunci.</p>
-                <p class="flex items-center gap-2"><i class="fa-solid fa-shield-virus text-neoCyan"></i> Lalu lintas jaringan dilindungi enkripsi SSL/TLS 256-bit serta perlindungan mitigasi DDoS Cloudflare.</p>
-            </div>
-        </div>
-
-        <!-- SEKSI 4: SYARAT LAYANAN & TRANSAKSI -->
-        <div class="neo-card p-6 rounded-2xl bg-white space-y-3">
-            <h2 class="text-lg font-black font-cyber uppercase flex items-center gap-2.5 border-b-2 border-black pb-2">
-                <span class="w-7 h-7 rounded-lg bg-neoGreen border-2 border-black flex items-center justify-center text-xs shadow-[2px_2px_0px_#000]">4</span>
-                Ketentuan Pembelian & Hak Cipta produk
-            </h2>
-            <div class="space-y-2 text-xs sm:text-sm font-semibold text-slate-800">
-                <p>• <strong>Penggunaan Produk:</strong> Produk digital (Source code, script bot, API Key) yang dibeli di ArulzXD STORE lisensinya diperuntukkan bagi pembeli dan dilarang diperjualbelikan ulang secara ilegal tanpa izin tertulis.</p>
-                <p>• <strong>Kebijakan Pengembalian (Refund):</strong> Karena sifat produk berupa aset digital instan, pembelian yang sudah diproses dan berhasil tidak dapat dibatalkan atau di-refund kecuali terdapat kesalahan teknis permanen pada sistem kami.</p>
-            </div>
-        </div>
-
-        <!-- FOOTER CONTACT LEGAL -->
-        <div class="neo-card p-6 rounded-2xl bg-neoYellow border-3 border-black text-center space-y-2">
-            <h3 class="font-black font-cyber text-base uppercase">Punya Pertanyaan Mengenai Privasi Anda?</h3>
-            <p class="text-xs font-bold text-slate-900">Tim bantuan dan Customer Service kami siap melayani Anda.</p>
             <div class="pt-2 flex flex-wrap items-center justify-center gap-3">
-                <a href="mailto:haqqi.official13@gmail.com" class="neo-btn bg-white text-black font-black font-cyber text-xs px-4 py-2 rounded-xl flex items-center gap-2">
-                    <i class="fa-solid fa-envelope"></i> haqqi.official13@gmail.com
+                <a href="mailto:haqqi.official13@gmail.com" class="neo-btn bg-white text-black font-black font-cyber text-xs px-4 py-2.5 rounded-xl flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                    </svg>
+                    <span>servicearulzxd@gmail.com</span>
                 </a>
-                <a href="/login" class="neo-btn bg-black text-white font-black font-cyber text-xs px-4 py-2 rounded-xl flex items-center gap-2">
-                    <i class="fa-solid fa-right-to-bracket"></i> Masuk Ke Akun
+                <a href="/login" class="neo-btn bg-black text-white font-black font-cyber text-xs px-5 py-2.5 rounded-xl flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                    </svg>
+                    <span>Masuk Ke Akun</span>
                 </a>
             </div>
         </div>
 
     </main>
 
-    <footer class="text-center text-[11px] font-black font-cyber text-slate-600">
+    <footer class="text-center text-[11px] font-black font-cyber text-slate-700 pt-2">
         &copy; 2026 ArulzXD STORE. All Rights Reserved.
     </footer>
 
