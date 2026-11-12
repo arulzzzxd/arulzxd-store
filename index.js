@@ -2427,7 +2427,31 @@ app.get('/profile', checkAuthSession, (req, res) => {
 });
 app.get('/sitemap.xml', (req, res) => {
     res.header('Content-Type', 'application/xml');
-    res.sendFile(path.join(__dirname, 'public', 'sitemap.xml'));
+    const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://arulzxd.biz.id/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://arulzxd.biz.id/store</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arulzxd.biz.id/login</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arulzxd.biz.id/privacy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+</urlset>
+`;
+    res.send(xmlContent);
 });
 
 app.get('/robots.txt', (req, res) => {
