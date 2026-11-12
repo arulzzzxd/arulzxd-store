@@ -395,7 +395,7 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '9289940600:AAF3_XH
 const TELEGRAM_ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID || '-1004312316684';
 
 async function sendTelegramNotification(senderName, userIdentifier, messageText) {
-    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN.includes('9289940600:AAF3_XHJlcfiD9be8KzNNw-7crGoOaenSyU')) return;
+    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_ADMIN_CHAT_ID) return;
 
     const escapeHtml = (str) => String(str)
         .replace(/&/g, '&amp;')
@@ -414,12 +414,12 @@ ${escapeHtml(messageText)}
     `.trim();
 
     try {
-        await axios.post(`https://api.telegram.org/bot9289940600:AAF3_XHJlcfiD9be8KzNNw-7crGoOaenSyU/sendMessage`, {
+        await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
             chat_id: TELEGRAM_ADMIN_CHAT_ID,
             text: text,
             parse_mode: 'HTML',
             disable_web_page_preview: true
-        });
+        }, { timeout: 8000 });
     } catch (error) {
         console.error('❌ Gagal mengirim notifikasi ke Telegram:', error.response?.data || error.message);
     }
@@ -446,7 +446,8 @@ app.post('/api/bantuan/send-user', checkAuthSession, async (req, res) => {
 
         await newMsg.save();
 
-        sendTelegramNotification(senderName, userIdentifier, cleanMessage);
+        // Gunakan await agar proses tidak terputus sebelum pesan terkirim ke Telegram
+        await sendTelegramNotification(senderName, userIdentifier, cleanMessage);
 
         return res.json({ status: true, message: 'Pesan berhasil dikirim!', data: newMsg });
     } catch (e) {
