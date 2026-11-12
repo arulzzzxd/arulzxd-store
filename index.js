@@ -391,6 +391,41 @@ app.get('/api/bantuan/messages', checkAuthSession, async (req, res) => {
     }
 });
 
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '9289940600:AAF3_XHJlcfiD9be8KzNNw-7crGoOaenSyU';
+const TELEGRAM_ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID || '@information_arulzxd';
+
+async function sendTelegramNotification(senderName, userIdentifier, messageText) {
+    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN.includes('ISI_TOKEN')) return;
+
+    // Escape karakter khusus HTML agar pesan pengguna tidak merusak format Telegram
+    const escapeHtml = (str) => String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    const text = `
+📩 <b>PESAN LIVE CHAT BARU!</b>
+━━━━━━━━━━━━━━━━━━━━
+👤 <b>Pengirim:</b> ${escapeHtml(senderName)}
+📧 <b>Email/ID:</b> <code>${escapeHtml(userIdentifier)}</code>
+💬 <b>Pesan:</b>
+${escapeHtml(messageText)}
+━━━━━━━━━━━━━━━━━━━━
+🔗 <a href="https://arulzxd.biz.id/admin/livechat">Buka Panel Admin Live Chat</a>
+    `.trim();
+
+    try {
+        await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            chat_id: TELEGRAM_ADMIN_CHAT_ID,
+            text: text,
+            parse_mode: 'HTML',
+            disable_web_page_preview: true
+        });
+    } catch (error) {
+        console.error('❌ Gagal mengirim notifikasi ke Telegram:', error.response?.data || error.message);
+    }
+}
+
 app.post('/api/bantuan/send-user', checkAuthSession, async (req, res) => {
     try {
         const { message } = req.body;
@@ -400,16 +435,21 @@ app.post('/api/bantuan/send-user', checkAuthSession, async (req, res) => {
 
         const userIdentifier = getUserIdentifier(req);
         const senderName = req.user ? (req.user.username || req.user.name) : 'Pengguna Guest';
+        const cleanMessage = message.trim();
 
         const newMsg = new ChatMessage({
             userEmail: userIdentifier,
             sender: 'user',
             senderName: senderName,
-            message: message.trim(),
+            message: cleanMessage,
             readByAdmin: false
         });
 
         await newMsg.save();
+
+        // Kirim notifikasi ke Telegram secara asynchronous (tanpa membuat user menunggu lama)
+        sendTelegramNotification(senderName, userIdentifier, cleanMessage);
+
         return res.json({ status: true, message: 'Pesan berhasil dikirim!', data: newMsg });
     } catch (e) {
         return res.status(500).json({ status: false, message: 'Gagal mengirim pesan.' });
