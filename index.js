@@ -86,7 +86,7 @@ const userSchemaV2 = new mongoose.Schema({
     providerId: { type: String, default: null },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
-    avatar: { type: String, default: 'https://arulz-xd.my.id/files/X1F0Cn.png' }, 
+    avatar: { type: String, default: 'https://arulz-xd.my.id/files/Z9zjj0RF7G7ena.png' }, 
     banner: { type: String, default: 'https://cdn.larasxd.my.id/files/Tk4GavOaHEEP2ykm.mp4' },
     saldo: { type: Number, default: 0 },
     referralCode: { type: String, unique: true },
@@ -196,7 +196,7 @@ const productSchemaV2 = new mongoose.Schema({
     stok: { type: Number, default: 0 },
     gambar: { 
         type: [String], 
-        default: ["https://arulz-xd.my.id/files/X1F0Cn.png"] 
+        default: ["https://arulz-xd.my.id/files/Z9zjj0RF7G7ena.png"] 
     },    
     deskripsi: { type: String, default: "" },
     link: { type: String, required: true },
@@ -211,7 +211,7 @@ const reviewSchemaV2 = new mongoose.Schema({
     productId: { type: String, required: true, index: true },
     userId: { type: String, default: null, index: true },
     username: { type: String, required: true },
-    userAvatar: { type: String, default: 'https://arulz-xd.my.id/files/X1F0Cn.png' },
+    userAvatar: { type: String, default: 'https://arulz-xd.my.id/files/Z9zjj0RF7G7ena.png' },
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String, required: true, trim: true },
     media: [{
@@ -813,7 +813,7 @@ app.post('/api/reviews', checkAuthSession, (req, res) => {
             }
 
             const username = req.user.username || req.user.name;
-            const userAvatar = req.user.avatar || 'https://arulz-xd.my.id/files/X1F0Cn.png';
+            const userAvatar = req.user.avatar || 'https://arulz-xd.my.id/files/Z9zjj0RF7G7ena.png';
             const userId = (req.user.id || req.user._id).toString();
             const userEmail = (req.user.email || "").toLowerCase().trim();
 
@@ -2004,7 +2004,7 @@ app.post('/auth/login', (req, res, next) => {
                     username: user.username,
                     email: user.email,
                     name: user.username,
-                    avatar: user.avatar || 'https://arulz-xd.my.id/files/X1F0Cn.png',
+                    avatar: user.avatar || 'https://arulz-xd.my.id/files/Z9zjj0RF7G7ena.png',
                     createdAt: user.createdAt
                 };
 
@@ -2048,7 +2048,7 @@ app.post('/auth/register', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const defaultAvatar = 'https://arulz-xd.my.id/files/X1F0Cn.png';
+        const defaultAvatar = 'https://arulz-xd.my.id/files/Z9zjj0RF7G7ena.png';
         const myReferralCode = generateReferralCode();
 
         let initialSaldo = 0;
@@ -2248,7 +2248,7 @@ app.get('/auth/github/callback', async (req, res) => {
                 email: finalEmail,
                 provider: 'github',
                 providerId: String(userData.id),
-                avatar: userData.avatar_url || 'https://arulz-xd.my.id/files/X1F0Cn.png',
+                avatar: userData.avatar_url || 'https://arulz-xd.my.id/files/Z9zjj0RF7G7ena.png',
                 saldo: initialSaldo,
                 referralCode: generateReferralCode(),
                 referredBy: inviterUser ? inviterUser.referralCode : null,
@@ -2358,7 +2358,7 @@ app.get('/auth/google/callback', async (req, res) => {
                 email: email,
                 provider: 'google',
                 providerId: String(userData.id),
-                avatar: userData.picture || 'https://arulz-xd.my.id/files/X1F0Cn.png',
+                avatar: userData.picture || 'https://arulz-xd.my.id/files/Z9zjj0RF7G7ena.png',
                 saldo: initialSaldo,
                 referralCode: generateReferralCode(),
                 referredBy: inviterUser ? inviterUser.referralCode : null,
@@ -2483,6 +2483,7 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3) {
     ctx.fillText(line.trim(), x, y);
 }
 
+// ENDPOINT GENERATOR OPEN GRAPH CANVAS (1200 x 630)
 app.get('/api/og/product/:productId', async (req, res) => {
     try {
         const { productId } = req.params;
@@ -2502,7 +2503,6 @@ app.get('/api/og/product/:productId', async (req, res) => {
         ctx.fillStyle = '#00E5FF';
         ctx.fillRect(0, 0, width, height);
 
-        // Dekorasi Sudut Kuning (Kanan Atas & Kiri Bawah)
         ctx.fillStyle = '#FFDE59';
         ctx.beginPath();
         ctx.moveTo(820, 0);
@@ -2522,7 +2522,7 @@ app.get('/api/og/product/:productId', async (req, res) => {
         ctx.fill();
         ctx.stroke();
 
-        // 2. PANEL KIRI UTAMA (KREM / PUTIH GADING)
+        // 2. PANEL KIRI UTAMA
         drawNeoBox(ctx, 35, 35, 620, 560, 28, '#F4F0EA', 8, 5);
 
         // Pill URL di Kiri Atas
@@ -2533,19 +2533,19 @@ app.get('/api/og/product/:productId', async (req, res) => {
         ctx.fill();
         ctx.fillStyle = '#FFFFFF';
         ctx.font = 'bold 14px sans-serif';
-        ctx.fillText('➔', 85, 92);
+        ctx.fillText('->', 84, 92);
 
         ctx.fillStyle = '#000000';
-        ctx.font = 'bold 17px sans-serif';
+        ctx.font = 'bold 16px sans-serif';
         ctx.fillText(`https://arulzxd.biz.id/store/${product ? (product.Id || productId) : ''}`.slice(0, 34), 115, 93);
 
-        // Judul Produk / Brand
+        // Judul Produk
         const namaProduk = product ? product.nama : 'ArulzXD Store';
         ctx.fillStyle = '#000000';
-        ctx.font = '900 54px sans-serif';
-        wrapText(ctx, namaProduk, 68, 175, 550, 62, 2);
+        ctx.font = '900 50px sans-serif';
+        wrapText(ctx, namaProduk, 68, 175, 550, 58, 2);
 
-        // Badge Kategori & Harga
+        // Badge Harga & Kategori
         const hargaFinal = product ? (product.harga_diskon || product.harga) : 0;
         const hargaText = new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -2564,13 +2564,13 @@ app.get('/api/og/product/:productId', async (req, res) => {
         ctx.font = '900 18px sans-serif';
         ctx.fillText(kategoriText.slice(0, 18), 332, 295);
 
-        // Deskripsi Singkat Produk
+        // Deskripsi Produk
         ctx.fillStyle = '#222222';
         ctx.font = '600 21px sans-serif';
         const descText = product?.deskripsi || 'Penyedia Source Code, Script, & Layanan Digital Premium Terpercaya dengan Akses Otomatis.';
         wrapText(ctx, descText, 68, 355, 540, 30, 3);
 
-        // Tombol CTA "Beli Sekarang" & Info Stok
+        // Tombol CTA
         drawNeoBox(ctx, 68, 475, 260, 56, 28, '#000000', 5, 3);
         ctx.fillStyle = '#FFFFFF';
         ctx.font = '900 21px sans-serif';
@@ -2579,9 +2579,9 @@ app.get('/api/og/product/:productId', async (req, res) => {
         drawNeoBox(ctx, 275, 483, 44, 40, 10, '#FFDE59', 0, 2);
         ctx.fillStyle = '#000000';
         ctx.font = '900 18px sans-serif';
-        ctx.fillText('▶▶', 284, 509);
+        ctx.fillText('>>', 284, 509);
 
-        // Badge Online di Kanan Bawah Panel Kiri
+        // Info Stok & Terjual
         drawNeoBox(ctx, 360, 480, 230, 48, 12, '#FFFFFF', 4, 3);
         ctx.fillStyle = '#00E676';
         ctx.beginPath();
@@ -2592,32 +2592,41 @@ app.get('/api/og/product/:productId', async (req, res) => {
         ctx.stroke();
 
         ctx.fillStyle = '#000000';
-        ctx.font = '800 16px sans-serif';
-        ctx.fillText(`Stok: ${product?.stok ?? 99} • Terjual ${product?.terjual ?? 0}`, 402, 510);
+        ctx.font = '800 15px sans-serif';
+        ctx.fillText(`Stok: ${product?.stok ?? 99} | Terjual ${product?.terjual ?? 0}`, 402, 510);
 
-        // 3. AREA KANAN (YANG DITANDAI MERAH): MAKSIMAL 3 GAMBAR PRODUK
+        // 3. AMBIL MAKSIMAL 3 GAMBAR PRODUK DENGAN TIMEOUT AXIOS (AGAR TIDAK HANG)
         let rawImages = [];
         if (product && Array.isArray(product.gambar) && product.gambar.length > 0) {
-            rawImages = product.gambar.slice(0, 3); // Ambil maksimal 3 gambar produk
+            rawImages = product.gambar.slice(0, 3);
         } else if (product && typeof product.gambar === 'string' && product.gambar.trim() !== '') {
             rawImages = [product.gambar];
         } else {
-            rawImages = ['https://arulz-xd.my.id/files/X1F0Cn.png'];
+            rawImages = ['https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png'];
         }
 
-        // Load semua gambar secara paralel (maksimal 3)
         const loadedImages = await Promise.all(
-            rawImages.map(async (url) => {
+            rawImages.map(async (src) => {
                 try {
-                    return await loadImage(url);
+                    if (src.startsWith('data:image/')) {
+                        const base64Data = src.split(',')[1];
+                        return await loadImage(Buffer.from(base64Data, 'base64'));
+                    }
+                    const imgRes = await axios.get(src, {
+                        responseType: 'arraybuffer',
+                        timeout: 4000, // Maksimal tunggu 4 detik per gambar
+                        headers: { 'User-Agent': 'Mozilla/5.0' }
+                    });
+                    return await loadImage(Buffer.from(imgRes.data));
                 } catch (e) {
+                    console.warn('Gagal load gambar produk untuk OG:', src, e.message);
                     return null;
                 }
             })
         );
         const validImages = loadedImages.filter(Boolean);
 
-        // Header Mini Kategori di Kanan Atas (Mirip UI Store)
+        // Header Mini Galeri di Kanan Atas
         ctx.save();
         ctx.translate(690, 45);
         ctx.rotate((3 * Math.PI) / 180);
@@ -2626,104 +2635,97 @@ app.get('/api/og/product/:productId', async (req, res) => {
         ctx.font = '900 15px sans-serif';
         ctx.fillText('PREVIEW GALERI PRODUK (' + validImages.length + ' FOTO)', 22, 28);
 
-        // Pill Tag (Maks 3 Foto)
         drawNeoBox(ctx, 20, 40, 140, 32, 10, '#FFDE59', 3, 2.5);
         ctx.font = '800 13px sans-serif';
         ctx.fillText('Preview Utama', 38, 61);
 
         if (validImages.length > 1) {
             drawNeoBox(ctx, 172, 40, 120, 32, 10, '#FFFFFF', 3, 2.5);
-            ctx.fillText(`Foto #2`, 205, 61);
+            ctx.fillText('Foto #2', 205, 61);
         }
         if (validImages.length > 2) {
             drawNeoBox(ctx, 304, 40, 120, 32, 10, '#00E5FF', 3, 2.5);
-            ctx.fillText(`Foto #3`, 337, 61);
+            ctx.fillText('Foto #3', 337, 61);
         }
         ctx.restore();
 
-        // Render Kartu-Kartu Gambar Produk (Tampilan Bertumpuk / Grid Miring Dinamis 1, 2, atau 3 Gambar)
+        // Render Kartu-Kartu Gambar Produk (1, 2, atau 3 gambar)
         const cardLayouts = {
-            1: [
-                { x: 710, y: 165, w: 430, h: 410, angle: -2 }
-            ],
+            1: [{ x: 710, y: 165, w: 430, h: 410, angle: -2 }],
             2: [
                 { x: 685, y: 175, w: 250, h: 380, angle: -4 },
                 { x: 925, y: 160, w: 250, h: 380, angle: 4 }
             ],
             3: [
-                { x: 675, y: 170, w: 235, h: 245, angle: -4 }, // Gambar 1 (Kiri Atas)
-                { x: 925, y: 155, w: 235, h: 245, angle: 3 },  // Gambar 2 (Kanan Atas)
-                { x: 785, y: 365, w: 265, h: 225, angle: -1.5 } // Gambar 3 (Tengah Bawah)
+                { x: 675, y: 170, w: 235, h: 245, angle: -4 },
+                { x: 925, y: 155, w: 235, h: 245, angle: 3 },
+                { x: 785, y: 365, w: 265, h: 225, angle: -1.5 }
             ]
         };
 
         const count = Math.min(validImages.length, 3);
-        const layouts = cardLayouts[count] || cardLayouts[1];
+        if (count > 0) {
+            const layouts = cardLayouts[count];
+            layouts.forEach((layout, idx) => {
+                const img = validImages[idx];
+                if (!img) return;
 
-        layouts.forEach((layout, idx) => {
-            const img = validImages[idx];
-            if (!img) return;
+                ctx.save();
+                const centerX = layout.x + layout.w / 2;
+                const centerY = layout.y + layout.h / 2;
+                ctx.translate(centerX, centerY);
+                ctx.rotate((layout.angle * Math.PI) / 180);
+                ctx.translate(-centerX, -centerY);
 
-            ctx.save();
-            const centerX = layout.x + layout.w / 2;
-            const centerY = layout.y + layout.h / 2;
-            ctx.translate(centerX, centerY);
-            ctx.rotate((layout.angle * Math.PI) / 180);
-            ctx.translate(-centerX, -centerY);
+                drawNeoBox(ctx, layout.x, layout.y, layout.w, layout.h, 20, '#FFFFFF', 7, 4);
 
-            // Bingkai Kartu Putih Neo-Brutalism
-            drawNeoBox(ctx, layout.x, layout.y, layout.w, layout.h, 20, '#FFFFFF', 7, 4);
+                const pad = 12;
+                const footerH = 38;
+                const imgBoxX = layout.x + pad;
+                const imgBoxY = layout.y + pad;
+                const imgBoxW = layout.w - pad * 2;
+                const imgBoxH = layout.h - pad * 2 - footerH;
 
-            // Area Foto di Dalam Kartu (Object-Fit Cover)
-            const pad = 12;
-            const footerH = 38;
-            const imgBoxX = layout.x + pad;
-            const imgBoxY = layout.y + pad;
-            const imgBoxW = layout.w - pad * 2;
-            const imgBoxH = layout.h - pad * 2 - footerH;
+                ctx.save();
+                ctx.beginPath();
+                ctx.roundRect(imgBoxX, imgBoxY, imgBoxW, imgBoxH, 12);
+                ctx.clip();
 
-            ctx.save();
-            ctx.beginPath();
-            ctx.roundRect(imgBoxX, imgBoxY, imgBoxW, imgBoxH, 12);
-            ctx.clip();
+                const scale = Math.max(imgBoxW / img.width, imgBoxH / img.height);
+                const drawW = img.width * scale;
+                const drawH = img.height * scale;
+                const drawX = imgBoxX + (imgBoxW - drawW) / 2;
+                const drawY = imgBoxY + (imgBoxH - drawH) / 2;
 
-            // Hitung rasio crop cover agar gambar tidak gepeng
-            const scale = Math.max(imgBoxW / img.width, imgBoxH / img.height);
-            const drawW = img.width * scale;
-            const drawH = img.height * scale;
-            const drawX = imgBoxX + (imgBoxW - drawW) / 2;
-            const drawY = imgBoxY + (imgBoxH - drawH) / 2;
+                ctx.drawImage(img, drawX, drawY, drawW, drawH);
+                ctx.restore();
 
-            ctx.drawImage(img, drawX, drawY, drawW, drawH);
-            ctx.restore();
+                ctx.lineWidth = 2.5;
+                ctx.strokeStyle = '#000000';
+                ctx.beginPath();
+                ctx.roundRect(imgBoxX, imgBoxY, imgBoxW, imgBoxH, 12);
+                ctx.stroke();
 
-            // Border tipis di sekeliling foto
-            ctx.lineWidth = 2.5;
-            ctx.strokeStyle = '#000000';
-            ctx.beginPath();
-            ctx.roundRect(imgBoxX, imgBoxY, imgBoxW, imgBoxH, 12);
-            ctx.stroke();
+                const labelY = layout.y + layout.h - 16;
+                ctx.fillStyle = '#000000';
+                ctx.font = '900 14px sans-serif';
+                ctx.fillText(`Gambar #${idx + 1}`, layout.x + 16, labelY);
 
-            // Label Footer Kartu (Contoh: "Preview 1/3" + Badge Kuning)
-            const labelY = layout.y + layout.h - 16;
-            ctx.fillStyle = '#000000';
-            ctx.font = '900 14px sans-serif';
-            ctx.fillText(`Gambar #${idx + 1}`, layout.x + 16, labelY);
+                drawNeoBox(ctx, layout.x + layout.w - 86, layout.y + layout.h - 33, 72, 22, 8, '#FFDE59', 0, 2);
+                ctx.fillStyle = '#000000';
+                ctx.font = '900 11px sans-serif';
+                ctx.fillText(`${idx + 1} / ${count}`, layout.x + layout.w - 64, layout.y + layout.h - 18);
 
-            // Pill Kuning Kecil di Kanan Footer Kartu
-            drawNeoBox(ctx, layout.x + layout.w - 86, layout.y + layout.h - 33, 72, 22, 8, '#FFDE59', 0, 2);
-            ctx.fillStyle = '#000000';
-            ctx.font = '900 11px sans-serif';
-            ctx.fillText(`${idx + 1} / ${count}`, layout.x + layout.w - 64, layout.y + layout.h - 18);
+                ctx.restore();
+            });
+        }
 
-            ctx.restore();
-        });
-
-        // Output PNG ke Response
-        const pngBuffer = await canvas.encode('png');
-        res.setHeader('Content-Type', 'image/png');
+        // Convert ke JPEG berkualitas tinggi (lebih ringan dari PNG untuk WhatsApp < 300KB)
+        const jpegBuffer = await canvas.encode('jpeg', 90);
+        res.setHeader('Content-Type', 'image/jpeg');
+        res.setHeader('Content-Length', jpegBuffer.length);
         res.setHeader('Cache-Control', 'public, max-age=3600');
-        return res.send(pngBuffer);
+        return res.send(jpegBuffer);
 
     } catch (error) {
         console.error('Error generate OG Canvas:', error);
@@ -2746,7 +2748,10 @@ app.get('/store/:productId', async (req, res) => {
             return res.sendFile(path.join(__dirname, 'public', 'store.html'));
         }
 
-        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        // PAKSA HTTPS AGAR WHATSAPP MAU MERENDER PREVIEW
+        const host = req.get('host');
+        const protocol = host.includes('localhost') ? 'http' : 'https';
+        const baseUrl = `${protocol}://${host}`;
         const ogCanvasUrl = `${baseUrl}/api/og/product/${productId}`;
         const fullUrl = `${baseUrl}/store/${productId}`;
 
@@ -2756,42 +2761,56 @@ app.get('/store/:productId', async (req, res) => {
             minimumFractionDigits: 0
         }).format(product.harga_diskon || product.harga);
 
-        const shareTitle = `${product.nama} (${priceFormatted}) - ArulzXD Store`;
-        const shareDesc = product.deskripsi
-            ? product.deskripsi.slice(0, 160)
-            : 'Beli source code dan layanan digital berkualitas di ArulzXD Store.';
+        const escapeMeta = (str) => String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
 
-        res.send(`
-        <!DOCTYPE html>
-        <html lang="id">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>${shareTitle}</title>
+        const shareTitle = escapeMeta(`${product.nama} (${priceFormatted}) - ArulzXD Store`);
+        const shareDesc = escapeMeta(
+            product.deskripsi
+                ? product.deskripsi.slice(0, 160)
+                : 'Beli source code dan layanan digital berkualitas di ArulzXD Store.'
+        );
 
-            <meta property="og:type" content="website">
-            <meta property="og:url" content="${fullUrl}">
-            <meta property="og:title" content="${shareTitle}">
-            <meta property="og:description" content="${shareDesc}">
-            <meta property="og:image" content="${ogCanvasUrl}">
-            <meta property="og:image:type" content="image/png">
-            <meta property="og:image:width" content="1200">
-            <meta property="og:image:height" content="630">
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.send(`<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${shareTitle}</title>
+    <meta name="description" content="${shareDesc}">
 
-            <meta name="twitter:card" content="summary_large_image">
-            <meta name="twitter:title" content="${shareTitle}">
-            <meta name="twitter:description" content="${shareDesc}">
-            <meta name="twitter:image" content="${ogCanvasUrl}">
+    <!-- Open Graph / WhatsApp / Facebook / Telegram -->
+    <meta property="og:site_name" content="ArulzXD Store">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="${fullUrl}">
+    <meta property="og:title" content="${shareTitle}">
+    <meta property="og:description" content="${shareDesc}">
+    <meta property="og:image" content="${ogCanvasUrl}">
+    <meta property="og:image:secure_url" content="${ogCanvasUrl}">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
-            <script>
-                window.location.href = "/store?shareId=${productId}";
-            </script>
-        </head>
-        <body style="background-color: #F4F0EA; color: #000000; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh;">
-            <p>Mengarahkan ke produk...</p>
-        </body>
-        </html>
-        `);
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="${fullUrl}">
+    <meta name="twitter:title" content="${shareTitle}">
+    <meta name="twitter:description" content="${shareDesc}">
+    <meta name="twitter:image" content="${ogCanvasUrl}">
+</head>
+<body style="background-color: #F4F0EA; color: #000000; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <p>Mengarahkan ke produk...</p>
+    <script>
+        setTimeout(function() {
+            window.location.replace("/store?shareId=${encodeURIComponent(productId)}");
+        }, 150);
+    </script>
+</body>
+</html>`);
     } catch (error) {
         console.error("Error Open Graph Share:", error);
         res.redirect('/store');
