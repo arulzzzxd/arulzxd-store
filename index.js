@@ -41,9 +41,38 @@ app.set('trust proxy', 1);
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://arulz-xd-owner:Haqqi0213@cluster0.fgxhxqm.mongodb.net/?appName=Cluster0'; 
 
-mongoose.connect(MONGODB_URI)
-    .then(() => console.log('📦 Berhasil terhubung ke Database Utama!'))
-    .catch(err => console.error('❌ Gagal koneksi ke Database:', err));
+let cached = global.mongoose;
+if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+    if (cached.conn && mongoose.connection.readyState === 1) {
+        return cached.conn;
+    }
+
+    if (!cached.promise) {
+        cached.promise = mongoose.connect(MONGODB_URI, {
+            bufferCommands: false,
+            serverSelectionTimeoutMS: 10000,
+            socketTimeoutMS: 45000,
+            maxPoolSize: 10
+        }).then((mongooseInstance) => {
+            console.log('📦 Berhasil terhubung ke Database Utama!');
+            return mongooseInstance;
+        }).catch((err) => {
+            cached.promise = null;
+            console.error('❌ Gagal koneksi ke Database:', err);
+            throw err;
+        });
+    }
+
+    cached.conn = await cached.promise;
+    return cached.conn;
+}
+
+// Jalankan inisialisasi koneksi
+const dbPromise = connectDB();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'arulzxd-super-secret-jwt-key-999';
 
@@ -289,12 +318,22 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.error('Database connection middleware error:', err.message);
+        res.status(503).json({ status: false, message: 'Database sedang bersiap, silakan muat ulang halaman.' });
+    }
+});
+
 app.use(session({
     secret: 'arulzxd_secret_session_key_99', 
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        mongoUrl: MONGODB_URI,
+        clientPromise: dbPromise.then(m => m.connection.getClient()),
         dbName: 'sessions',
         ttl: 24 * 60 * 60
     }),
