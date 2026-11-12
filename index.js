@@ -22,6 +22,7 @@ import crypto from 'crypto';
 import compression from 'compression';
 import os from 'os';
 import { fileURLToPath } from 'url';
+import { createCanvas, loadImage, GlobalFonts } from '@napi-rs/canvas';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -394,7 +395,7 @@ app.get('/api/bantuan/messages', checkAuthSession, async (req, res) => {
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '9289940600:AAF3_XHJlcfiD9be8KzNNw-7crGoOaenSyU';
 const TELEGRAM_ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID || '-1004312316684';
 
-async function sendTelegramNotification(senderName, userIdentifier, messageText) {
+async function sendTelegramNotification(username, userEmail, messageText) {
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_ADMIN_CHAT_ID) return;
 
     const escapeHtml = (str) => String(str)
@@ -405,9 +406,9 @@ async function sendTelegramNotification(senderName, userIdentifier, messageText)
     const text = `
 📩 <b>PESAN LIVE CHAT BARU!</b>
 ━━━━━━━━━━━━━━━━━━━━
-👤 <b>Pengirim:</b> ${escapeHtml(senderName)}
-📧 <b>Email/ID:</b> <code>${escapeHtml(userIdentifier)}</code>
-💬 <b>Pesan:</b>
+👤 <b>Username:</b> ${escapeHtml(username)}
+📧 <b>Email:</b> <code>${escapeHtml(userEmail)}</code>
+💬 <b>Percakapan:</b>
 ${escapeHtml(messageText)}
 ━━━━━━━━━━━━━━━━━━━━
 🔗 <a href="https://arulzxd.biz.id/admin/livechat">Buka Panel Admin Live Chat</a>
@@ -433,21 +434,28 @@ app.post('/api/bantuan/send-user', checkAuthSession, async (req, res) => {
         }
 
         const userIdentifier = getUserIdentifier(req);
-        const senderName = req.user ? (req.user.username || req.user.name) : 'Pengguna Guest';
+        let displayUsername = 'Pengguna Guest';
+        let displayEmail = userIdentifier;
+        
+        if (req.user) {
+            const activeUser = await UserV2.findById(req.user.id || req.user._id).select('username email').lean();
+            displayUsername = activeUser?.username || req.user.username || req.user.name || 'User';
+            displayEmail = (activeUser?.email || req.user.email || userIdentifier).toLowerCase().trim();
+        }
+
         const cleanMessage = message.trim();
 
         const newMsg = new ChatMessage({
-            userEmail: userIdentifier,
+            userEmail: displayEmail,
             sender: 'user',
-            senderName: senderName,
+            senderName: displayUsername,
             message: cleanMessage,
             readByAdmin: false
         });
 
         await newMsg.save();
 
-        // Gunakan await agar proses tidak terputus sebelum pesan terkirim ke Telegram
-        await sendTelegramNotification(senderName, userIdentifier, cleanMessage);
+        await sendTelegramNotification(displayUsername, displayEmail, cleanMessage);
 
         return res.json({ status: true, message: 'Pesan berhasil dikirim!', data: newMsg });
     } catch (e) {
@@ -480,13 +488,35 @@ app.get('/api/bantuan/admin/users', checkAuthSession, checkAdminRole, async (req
             { $sort: { updatedAt: -1 } }
         ]);
 
-        const formattedUsers = rooms.map(r => ({
-            userId: r._id,
-            username: r.senderName || r._id,
-            lastMessage: r.lastMessage,
-            unreadCount: r.unreadCount,
-            updatedAt: r.updatedAt
-        }));
+        const emails = rooms.map(r => r._id).filter(e => e && e.includes('@'));
+        const dbUsers = await UserV2.find({ email: { $in: emails } }).select('email username avatar').lean();
+        const userMap = {};
+        dbUsers.forEach(u => {
+            userMap[u.email.toLowerCase().trim()] = u;
+        });
+
+        const formattedUsers = rooms.map(r => {
+            const cleanEmail = (r._id || '').toLowerCase().trim();
+            const matchedUser = userMap[cleanEmail];
+            const isRegisteredEmail = cleanEmail.includes('@');
+
+            let resolvedUsername = matchedUser?.username;
+            if (!resolvedUsername) {
+                resolvedUsername = (r.senderName && r.senderName !== 'Cs Owner')
+                    ? r.senderName
+                    : (isRegisteredEmail ? cleanEmail.split('@')[0] : 'Pengguna Guest');
+            }
+
+            return {
+                userId: r._id,
+                username: resolvedUsername,
+                email: isRegisteredEmail ? cleanEmail : `Guest (${cleanEmail})`,
+                avatar: matchedUser?.avatar || null,
+                lastMessage: r.lastMessage,
+                unreadCount: r.unreadCount,
+                updatedAt: r.updatedAt
+            };
+        });
 
         return res.json({ status: true, users: formattedUsers });
     } catch (e) {
@@ -523,7 +553,7 @@ app.post('/api/bantuan/admin/reply', checkAuthSession, checkAdminRole, async (re
         const replyMsg = new ChatMessage({
             userEmail: userId.toLowerCase().trim(),
             sender: 'owner',
-            senderName: 'Admin / Owner',
+            senderName: 'Cs Owner',
             message: message.trim(),
             readByAdmin: true
         });
@@ -2396,11 +2426,309 @@ app.get('/profile', checkAuthSession, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
 app.get('/sitemap.xml', (req, res) => {
+    res.header('Content-Type', 'application/xml');
     res.sendFile(path.join(__dirname, 'public', 'sitemap.xml'));
 });
 
 app.get('/robots.txt', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'robots.txt'));
+});
+
+function drawNeoBox(ctx, x, y, w, h, radius, fillColor, shadowOffset = 6, borderWidth = 4) {
+    ctx.save();
+    // Hard Shadow Hitam
+    if (shadowOffset > 0) {
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.roundRect(x + shadowOffset, y + shadowOffset, w, h, radius);
+        ctx.fill();
+    }
+    // Box Utama
+    ctx.fillStyle = fillColor;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, radius);
+    ctx.fill();
+
+    // Border Hitam Tebal
+    if (borderWidth > 0) {
+        ctx.lineWidth = borderWidth;
+        ctx.strokeStyle = '#000000';
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+// Helper memotong teks panjang agar tidak keluar batas
+function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3) {
+    const words = String(text || '').split(' ');
+    let line = '';
+    let lineCount = 0;
+
+    for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+            lineCount++;
+            if (lineCount >= maxLines) {
+                ctx.fillText(line.trim() + '...', x, y);
+                return;
+            }
+            ctx.fillText(line.trim(), x, y);
+            line = words[n] + ' ';
+            y += lineHeight;
+        } else {
+            line = testLine;
+        }
+    }
+    ctx.fillText(line.trim(), x, y);
+}
+
+app.get('/api/og/product/:productId', async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const product = await ProductV2.findOne({
+            $or: [
+                { Id: productId },
+                { _id: mongoose.Types.ObjectId.isValid(productId) ? productId : null }
+            ]
+        }).lean();
+
+        const width = 1200;
+        const height = 630;
+        const canvas = createCanvas(width, height);
+        const ctx = canvas.getContext('2d');
+
+        // 1. BACKGROUND CYAN & AKSEN KUNING NEO-BRUTALISM
+        ctx.fillStyle = '#00E5FF';
+        ctx.fillRect(0, 0, width, height);
+
+        // Dekorasi Sudut Kuning (Kanan Atas & Kiri Bawah)
+        ctx.fillStyle = '#FFDE59';
+        ctx.beginPath();
+        ctx.moveTo(820, 0);
+        ctx.lineTo(width, 0);
+        ctx.lineTo(width, 350);
+        ctx.closePath();
+        ctx.fill();
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#000000';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, 420);
+        ctx.lineTo(360, height);
+        ctx.lineTo(0, height);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // 2. PANEL KIRI UTAMA (KREM / PUTIH GADING)
+        drawNeoBox(ctx, 35, 35, 620, 560, 28, '#F4F0EA', 8, 5);
+
+        // Pill URL di Kiri Atas
+        drawNeoBox(ctx, 65, 65, 340, 44, 22, '#FFFFFF', 4, 3);
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(92, 87, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText('➔', 85, 92);
+
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 17px sans-serif';
+        ctx.fillText(`https://arulzxd.biz.id/store/${product ? (product.Id || productId) : ''}`.slice(0, 34), 115, 93);
+
+        // Judul Produk / Brand
+        const namaProduk = product ? product.nama : 'ArulzXD Store';
+        ctx.fillStyle = '#000000';
+        ctx.font = '900 54px sans-serif';
+        wrapText(ctx, namaProduk, 68, 175, 550, 62, 2);
+
+        // Badge Kategori & Harga
+        const hargaFinal = product ? (product.harga_diskon || product.harga) : 0;
+        const hargaText = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(hargaFinal);
+
+        drawNeoBox(ctx, 68, 265, 230, 46, 10, '#000000', 0, 0);
+        ctx.fillStyle = '#FFDE59';
+        ctx.font = '900 22px sans-serif';
+        ctx.fillText(hargaText, 85, 296);
+
+        const kategoriText = (product?.kategori || 'DIGITAL PRODUCT').toUpperCase();
+        drawNeoBox(ctx, 315, 265, 240, 46, 10, '#FFDE59', 4, 3);
+        ctx.fillStyle = '#000000';
+        ctx.font = '900 18px sans-serif';
+        ctx.fillText(kategoriText.slice(0, 18), 332, 295);
+
+        // Deskripsi Singkat Produk
+        ctx.fillStyle = '#222222';
+        ctx.font = '600 21px sans-serif';
+        const descText = product?.deskripsi || 'Penyedia Source Code, Script, & Layanan Digital Premium Terpercaya dengan Akses Otomatis.';
+        wrapText(ctx, descText, 68, 355, 540, 30, 3);
+
+        // Tombol CTA "Beli Sekarang" & Info Stok
+        drawNeoBox(ctx, 68, 475, 260, 56, 28, '#000000', 5, 3);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '900 21px sans-serif';
+        ctx.fillText('Beli Sekarang', 95, 510);
+
+        drawNeoBox(ctx, 275, 483, 44, 40, 10, '#FFDE59', 0, 2);
+        ctx.fillStyle = '#000000';
+        ctx.font = '900 18px sans-serif';
+        ctx.fillText('▶▶', 284, 509);
+
+        // Badge Online di Kanan Bawah Panel Kiri
+        drawNeoBox(ctx, 360, 480, 230, 48, 12, '#FFFFFF', 4, 3);
+        ctx.fillStyle = '#00E676';
+        ctx.beginPath();
+        ctx.arc(385, 504, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#000000';
+        ctx.stroke();
+
+        ctx.fillStyle = '#000000';
+        ctx.font = '800 16px sans-serif';
+        ctx.fillText(`Stok: ${product?.stok ?? 99} • Terjual ${product?.terjual ?? 0}`, 402, 510);
+
+        // 3. AREA KANAN (YANG DITANDAI MERAH): MAKSIMAL 3 GAMBAR PRODUK
+        let rawImages = [];
+        if (product && Array.isArray(product.gambar) && product.gambar.length > 0) {
+            rawImages = product.gambar.slice(0, 3); // Ambil maksimal 3 gambar produk
+        } else if (product && typeof product.gambar === 'string' && product.gambar.trim() !== '') {
+            rawImages = [product.gambar];
+        } else {
+            rawImages = ['https://arulz-xd.my.id/files/X1F0Cn.png'];
+        }
+
+        // Load semua gambar secara paralel (maksimal 3)
+        const loadedImages = await Promise.all(
+            rawImages.map(async (url) => {
+                try {
+                    return await loadImage(url);
+                } catch (e) {
+                    return null;
+                }
+            })
+        );
+        const validImages = loadedImages.filter(Boolean);
+
+        // Header Mini Kategori di Kanan Atas (Mirip UI Store)
+        ctx.save();
+        ctx.translate(690, 45);
+        ctx.rotate((3 * Math.PI) / 180);
+        drawNeoBox(ctx, 0, 0, 470, 85, 18, '#FFFFFF', 6, 4);
+        ctx.fillStyle = '#000000';
+        ctx.font = '900 15px sans-serif';
+        ctx.fillText('PREVIEW GALERI PRODUK (' + validImages.length + ' FOTO)', 22, 28);
+
+        // Pill Tag (Maks 3 Foto)
+        drawNeoBox(ctx, 20, 40, 140, 32, 10, '#FFDE59', 3, 2.5);
+        ctx.font = '800 13px sans-serif';
+        ctx.fillText('Preview Utama', 38, 61);
+
+        if (validImages.length > 1) {
+            drawNeoBox(ctx, 172, 40, 120, 32, 10, '#FFFFFF', 3, 2.5);
+            ctx.fillText(`Foto #2`, 205, 61);
+        }
+        if (validImages.length > 2) {
+            drawNeoBox(ctx, 304, 40, 120, 32, 10, '#00E5FF', 3, 2.5);
+            ctx.fillText(`Foto #3`, 337, 61);
+        }
+        ctx.restore();
+
+        // Render Kartu-Kartu Gambar Produk (Tampilan Bertumpuk / Grid Miring Dinamis 1, 2, atau 3 Gambar)
+        const cardLayouts = {
+            1: [
+                { x: 710, y: 165, w: 430, h: 410, angle: -2 }
+            ],
+            2: [
+                { x: 685, y: 175, w: 250, h: 380, angle: -4 },
+                { x: 925, y: 160, w: 250, h: 380, angle: 4 }
+            ],
+            3: [
+                { x: 675, y: 170, w: 235, h: 245, angle: -4 }, // Gambar 1 (Kiri Atas)
+                { x: 925, y: 155, w: 235, h: 245, angle: 3 },  // Gambar 2 (Kanan Atas)
+                { x: 785, y: 365, w: 265, h: 225, angle: -1.5 } // Gambar 3 (Tengah Bawah)
+            ]
+        };
+
+        const count = Math.min(validImages.length, 3);
+        const layouts = cardLayouts[count] || cardLayouts[1];
+
+        layouts.forEach((layout, idx) => {
+            const img = validImages[idx];
+            if (!img) return;
+
+            ctx.save();
+            const centerX = layout.x + layout.w / 2;
+            const centerY = layout.y + layout.h / 2;
+            ctx.translate(centerX, centerY);
+            ctx.rotate((layout.angle * Math.PI) / 180);
+            ctx.translate(-centerX, -centerY);
+
+            // Bingkai Kartu Putih Neo-Brutalism
+            drawNeoBox(ctx, layout.x, layout.y, layout.w, layout.h, 20, '#FFFFFF', 7, 4);
+
+            // Area Foto di Dalam Kartu (Object-Fit Cover)
+            const pad = 12;
+            const footerH = 38;
+            const imgBoxX = layout.x + pad;
+            const imgBoxY = layout.y + pad;
+            const imgBoxW = layout.w - pad * 2;
+            const imgBoxH = layout.h - pad * 2 - footerH;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(imgBoxX, imgBoxY, imgBoxW, imgBoxH, 12);
+            ctx.clip();
+
+            // Hitung rasio crop cover agar gambar tidak gepeng
+            const scale = Math.max(imgBoxW / img.width, imgBoxH / img.height);
+            const drawW = img.width * scale;
+            const drawH = img.height * scale;
+            const drawX = imgBoxX + (imgBoxW - drawW) / 2;
+            const drawY = imgBoxY + (imgBoxH - drawH) / 2;
+
+            ctx.drawImage(img, drawX, drawY, drawW, drawH);
+            ctx.restore();
+
+            // Border tipis di sekeliling foto
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = '#000000';
+            ctx.beginPath();
+            ctx.roundRect(imgBoxX, imgBoxY, imgBoxW, imgBoxH, 12);
+            ctx.stroke();
+
+            // Label Footer Kartu (Contoh: "Preview 1/3" + Badge Kuning)
+            const labelY = layout.y + layout.h - 16;
+            ctx.fillStyle = '#000000';
+            ctx.font = '900 14px sans-serif';
+            ctx.fillText(`Gambar #${idx + 1}`, layout.x + 16, labelY);
+
+            // Pill Kuning Kecil di Kanan Footer Kartu
+            drawNeoBox(ctx, layout.x + layout.w - 86, layout.y + layout.h - 33, 72, 22, 8, '#FFDE59', 0, 2);
+            ctx.fillStyle = '#000000';
+            ctx.font = '900 11px sans-serif';
+            ctx.fillText(`${idx + 1} / ${count}`, layout.x + layout.w - 64, layout.y + layout.h - 18);
+
+            ctx.restore();
+        });
+
+        // Output PNG ke Response
+        const pngBuffer = await canvas.encode('png');
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        return res.send(pngBuffer);
+
+    } catch (error) {
+        console.error('Error generate OG Canvas:', error);
+        return res.redirect('https://cdn.larasxd.my.id/files/t19j.jpg');
+    }
 });
 
 app.get('/store/:productId', async (req, res) => {
@@ -2418,17 +2746,20 @@ app.get('/store/:productId', async (req, res) => {
             return res.sendFile(path.join(__dirname, 'public', 'store.html'));
         }
 
-        let imageUrl = 'https://files.catbox.moe/kdowze.png';
-        if (Array.isArray(product.gambar) && product.gambar.length > 0) {
-            imageUrl = product.gambar[0];
-        } else if (typeof product.gambar === 'string') {
-            imageUrl = product.gambar;
-        }
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const ogCanvasUrl = `${baseUrl}/api/og/product/${productId}`;
+        const fullUrl = `${baseUrl}/store/${productId}`;
 
-        const priceFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.harga_diskon || product.harga);
+        const priceFormatted = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(product.harga_diskon || product.harga);
+
         const shareTitle = `${product.nama} (${priceFormatted}) - ArulzXD Store`;
-        const shareDesc = product.deskripsi ? product.deskripsi.slice(0, 160) : 'Beli source code dan layanan digital berkualitas di ArulzXD Store.';
-        const fullUrl = `${req.protocol}://${req.get('host')}/store/${productId}`;
+        const shareDesc = product.deskripsi
+            ? product.deskripsi.slice(0, 160)
+            : 'Beli source code dan layanan digital berkualitas di ArulzXD Store.';
 
         res.send(`
         <!DOCTYPE html>
@@ -2442,20 +2773,21 @@ app.get('/store/:productId', async (req, res) => {
             <meta property="og:url" content="${fullUrl}">
             <meta property="og:title" content="${shareTitle}">
             <meta property="og:description" content="${shareDesc}">
-            <meta property="og:image" content="${imageUrl}">
+            <meta property="og:image" content="${ogCanvasUrl}">
+            <meta property="og:image:type" content="image/png">
             <meta property="og:image:width" content="1200">
             <meta property="og:image:height" content="630">
 
             <meta name="twitter:card" content="summary_large_image">
             <meta name="twitter:title" content="${shareTitle}">
             <meta name="twitter:description" content="${shareDesc}">
-            <meta name="twitter:image" content="${imageUrl}">
+            <meta name="twitter:image" content="${ogCanvasUrl}">
 
             <script>
                 window.location.href = "/store?shareId=${productId}";
             </script>
         </head>
-        <body style="background-color: #050b14; color: #ffffff; font-family: sans-serif; display: flex; justify-content: center; items-center; height: 100vh;">
+        <body style="background-color: #F4F0EA; color: #000000; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh;">
             <p>Mengarahkan ke produk...</p>
         </body>
         </html>
