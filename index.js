@@ -2425,9 +2425,18 @@ app.get('/profile', checkAuthSession, (req, res) => {
     }
     res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
-app.get('/sitemap.xml', (req, res) => {
+app.get('/sitemap.xml', async (req, res) => {
     res.header('Content-Type', 'application/xml');
-    const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+    try {
+        const products = await ProductV2.find({}).select('Id updatedAt createdAt').lean();
+        const productUrls = products.map(p => `
+  <url>
+    <loc>https://arulzxd.biz.id/store/${p.Id}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`).join('');
+
+        const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://arulzxd.biz.id/</loc>
@@ -2437,21 +2446,28 @@ app.get('/sitemap.xml', (req, res) => {
   <url>
     <loc>https://arulzxd.biz.id/store</loc>
     <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://arulzxd.biz.id/login</loc>
-    <changefreq>daily</changefreq>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://arulzxd.biz.id/riwayat</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://arulzxd.biz.id/privacy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
-  </url>
-</urlset>
-`;
-    res.send(xmlContent);
+  </url>${productUrls}
+</urlset>`;
+        res.send(xmlContent);
+    } catch (e) {
+        res.status(500).send('');
+    }
 });
 
 app.get('/robots.txt', (req, res) => {
