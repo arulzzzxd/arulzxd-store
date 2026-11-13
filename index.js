@@ -269,6 +269,8 @@ const transactionSchemaV2 = new mongoose.Schema({
         qty: Number
     },
     productLink: { type: String, default: null },
+    downloadCount: { type: Number, default: 0 },
+    downloadedAt: { type: Date, default: null },
     createdAt: { type: Date, default: Date.now },
     expiredAt: { type: Date, required: true },
     updatedAt: { type: Date, default: Date.now }
@@ -1339,6 +1341,68 @@ app.post('/api/deposit', checkAuthSession, async (req, res) => {
     }
 });
 
+function classifyProductLink(rawLink) {
+    const link = (rawLink || '').trim();
+    const lower = link.toLowerCase();
+
+    const normalizeHref = (url) => {
+        if (/^(https?:\/\/|whatsapp:\/\/|tg:\/\/)/i.test(url)) return url;
+        return `https://${url}`;
+    };
+
+    if (
+        lower.includes('wa.me/') ||
+        lower.includes('whatsapp.com') ||
+        lower.startsWith('whatsapp://')
+    ) {
+        return {
+            linkType: 'whatsapp',
+            platformName: 'WhatsApp',
+            chatUrl: normalizeHref(link),
+            specialDescription: 'Lanjut chat admin mengenai produk'
+        };
+    }
+
+    if (
+        lower.includes('t.me/') ||
+        lower.includes('telegram.me/') ||
+        lower.includes('telegram.dog/') ||
+        lower.startsWith('tg://')
+    ) {
+        return {
+            linkType: 'telegram',
+            platformName: 'Telegram',
+            chatUrl: normalizeHref(link),
+            specialDescription: 'Lanjut chat admin mengenai produk'
+        };
+    }
+
+    return {
+        linkType: 'download',
+        platformName: 'Download',
+        chatUrl: null,
+        specialDescription: null
+    };
+}
+
+// HELPER KONVERSI LINK CLOUD KE DIRECT DOWNLOAD STREAM
+function normalizeDirectDownloadUrl(rawUrl) {
+    let url = (rawUrl || '').trim();
+
+    // Google Drive file link -> direct download
+    const gdriveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/i) || url.match(/drive\.google\.com\/open\?id=([^&]+)/i);
+    if (gdriveMatch && gdriveMatch[1]) {
+        return `https://drive.google.com/uc?export=download&id=${gdriveMatch[1]}`;
+    }
+
+    // Dropbox dl=0 -> dl=1
+    if (url.includes('dropbox.com') && url.includes('dl=0')) {
+        return url.replace('dl=0', 'dl=1');
+    }
+
+    return url;
+}
+
 app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
     try {
         if (!req.user) {
@@ -1421,10 +1485,14 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
                 qty: buyQty
             },
             productLink: dbProduct.link,
+            downloadCount: 0,
+            downloadedAt: null,
             expiredAt: new Date()
         });
 
         await newTransaction.save();
+
+        const linkInfo = classifyProductLink(dbProduct.link);
 
         return res.json({
             status: true,
@@ -1432,7 +1500,11 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
             data: {
                 orderId: orderId,
                 amount: finalPrice,
-                productLink: dbProduct.link,
+                linkType: linkInfo.linkType,
+                chatUrl: linkInfo.chatUrl,
+                specialDescription: linkInfo.specialDescription,
+                downloadCount: 0,
+                maxDownloads: 1,
                 remainingBalance: user.saldo
             }
         });
@@ -1440,6 +1512,143 @@ app.post('/api/store/pay-with-balance', checkAuthSession, async (req, res) => {
     } catch (err) {
         console.error("Error Pay with balance:", err);
         return res.status(500).json({ status: false, message: "Terjadi kesalahan server saat memproses transaksi saldo." });
+    }
+});
+
+app.get('/api/store/download/:orderId', checkAuthSession, async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ status: false, message: 'Silakan login terlebih dahulu!' });
+        }
+
+        const { orderId } = req.params;
+        const userEmail = (req.user.email || '').toLowerCase().trim();
+
+        const trx = await TransactionV2.findOne({ orderId });
+        if (!trx) {
+            return res.status(404).json({ status: false, message: 'Transaksi tidak ditemukan!' });
+        }
+
+        if (trx.userEmail && trx.userEmail.toLowerCase().trim() !== userEmail) {
+            return res.status(403).json({ status: false, message: 'Anda tidak memiliki akses ke transaksi ini!' });
+        }
+
+        const status = (trx.status || '').toLowerCase();
+        if (!['settlement', 'success', 'paid', 'settled'].includes(status)) {
+            return res.status(400).json({ status: false, message: 'Pembayaran transaksi belum lunas!' });
+        }
+
+        let targetLink = trx.productLink || trx.itemDetails?.link || '';
+        if (!targetLink && trx.itemDetails?.nama) {
+            const dbProduct = await ProductV2.findOne({
+                nama: { $regex: new RegExp(`^${trx.itemDetails.nama.trim()}$`, 'i') }
+            }).lean();
+            if (dbProduct?.link) targetLink = dbProduct.link;
+        }
+
+        if (!targetLink) {
+            return res.status(404).json({ status: false, message: 'File produk tidak ditemukan.' });
+        }
+
+        const linkInfo = classifyProductLink(targetLink);
+        if (linkInfo.linkType !== 'download') {
+            return res.status(400).json({
+                status: false,
+                isChatLink: true,
+                ...linkInfo
+            });
+        }
+
+        // Kunci kuota download secara atomik (hanya jika downloadCount < 1)
+        const lockedTrx = await TransactionV2.findOneAndUpdate(
+            {
+                orderId,
+                $or: [{ downloadCount: { $lt: 1 } }, { downloadCount: { $exists: false } }]
+            },
+            {
+                $set: { downloadCount: 1, downloadedAt: new Date() }
+            },
+            { new: true }
+        );
+
+        if (!lockedTrx) {
+            return res.status(403).json({
+                status: false,
+                alreadyDownloaded: true,
+                message: 'Kuota download untuk transaksi ini sudah digunakan (Maksimal 1x per transaksi).'
+            });
+        }
+
+        const directUrl = normalizeDirectDownloadUrl(targetLink);
+
+        try {
+            const upstream = await axios({
+                method: 'get',
+                url: directUrl,
+                responseType: 'stream',
+                maxRedirects: 5,
+                timeout: 30000,
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ArulzXD-Downloader/1.0'
+                }
+            });
+
+            const contentType = upstream.headers['content-type'] || 'application/octet-stream';
+            const contentDisp = upstream.headers['content-disposition'] || '';
+
+            let filename = '';
+            const filenameMatch = contentDisp.match(/filename\*?=(?:UTF-8'')?["']?([^;"'\n]+)["']?/i);
+            if (filenameMatch && filenameMatch[1]) {
+                filename = decodeURIComponent(filenameMatch[1].trim());
+            } else {
+                try {
+                    const urlPath = new URL(directUrl).pathname;
+                    const base = path.basename(urlPath);
+                    if (base && base.includes('.') && !base.startsWith('uc')) {
+                        filename = decodeURIComponent(base);
+                    }
+                } catch (e) {}
+            }
+
+            if (!filename) {
+                const safeProdName = (trx.itemDetails?.nama || 'produk-arulzxd')
+                    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+                    .replace(/^-+|-+$/g, '')
+                    .toLowerCase();
+                const ext = mime.extension(contentType) || 'zip';
+                filename = `${safeProdName}.${ext}`;
+            }
+
+            res.setHeader('Content-Disposition', `attachment; filename="${filename.replace(/"/g, '')}"`);
+            res.setHeader('Content-Type', contentType);
+            res.setHeader('X-Download-Filename', filename);
+            res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition, X-Download-Filename');
+
+            upstream.data.on('error', (streamErr) => {
+                console.error('Stream error saat download produk:', streamErr.message);
+                if (!res.headersSent) {
+                    res.status(502).end();
+                } else {
+                    res.end();
+                }
+            });
+
+            upstream.data.pipe(res);
+        } catch (fetchErr) {
+            // Rollback kuota jika gagal terhubung ke server file sebelum stream dimulai
+            await TransactionV2.updateOne(
+                { orderId },
+                { $set: { downloadCount: 0, downloadedAt: null } }
+            );
+            console.error('Gagal mengambil file dari upstream:', fetchErr.message);
+            return res.status(502).json({
+                status: false,
+                message: 'Gagal mengunduh file produk dari server sumber. Silakan klik tombol download lagi.'
+            });
+        }
+    } catch (err) {
+        console.error('Error One-Time Download:', err);
+        return res.status(500).json({ status: false, message: 'Terjadi kesalahan saat memproses download produk.' });
     }
 });
 
@@ -1519,6 +1728,9 @@ app.get('/transactions/:orderId', async (req, res) => {
             }
         }
 
+        const rawLink = isSuccess ? localTrx.productLink : null;
+        const linkInfo = rawLink ? classifyProductLink(rawLink) : { linkType: null, chatUrl: null, specialDescription: null };
+
         const responseData = {
             orderId: localTrx.orderId,
             status: currentStatus,
@@ -1528,8 +1740,21 @@ app.get('/transactions/:orderId', async (req, res) => {
                 qrString: localTrx.paymentNumber
             },
             expiredAt: localTrx.expiredAt,
-            productLink: isSuccess ? localTrx.productLink : null,
-            itemDetails: localTrx.itemDetails
+            linkType: isSuccess ? linkInfo.linkType : null,
+            chatUrl: isSuccess ? linkInfo.chatUrl : null,
+            specialDescription: isSuccess ? linkInfo.specialDescription : null,
+            downloadCount: localTrx.downloadCount || 0,
+            maxDownloads: 1,
+            itemDetails: localTrx.itemDetails ? {
+                nama: localTrx.itemDetails.nama,
+                harga: localTrx.itemDetails.harga,
+                harga_diskon: localTrx.itemDetails.harga_diskon,
+                harga_setelah_voucher: localTrx.itemDetails.harga_setelah_voucher,
+                kategori: localTrx.itemDetails.kategori,
+                gambar: localTrx.itemDetails.gambar,
+                buyer: localTrx.itemDetails.buyer,
+                qty: localTrx.itemDetails.qty
+            } : null
         };
 
         await setCache(`trx_${orderId}`, responseData);
@@ -1711,7 +1936,7 @@ app.post('/api/store/manual-order', checkAuthSession, async (req, res) => {
     }
 });
 
-app.get('/api/user/transactions', checkAuthSession, async (req, res) => {
+app.get(['/api/user/transactions', '/api/my-transactions'], checkAuthSession, async (req, res) => {
     try {
         let transactions = [];
         const orderIds = req.query.orderIds ? req.query.orderIds.split(',').filter(Boolean) : [];
@@ -1733,7 +1958,19 @@ app.get('/api/user/transactions', checkAuthSession, async (req, res) => {
             transactions = [];
         }
 
-        return res.json({ status: true, transactions: transactions });
+        // Sanitasi penuh: hilangkan productLink dan itemDetails.link dari riwayat
+        const sanitizedTransactions = transactions.map(trx => ({
+            orderId: trx.orderId,
+            amount: trx.amount,
+            paymentMethod: trx.paymentMethod,
+            type: trx.type,
+            status: trx.status,
+            productName: trx.itemDetails?.nama || (trx.type === 'DEPOSIT' ? 'Deposit Saldo Akun' : 'Pembelian Produk'),
+            createdAt: trx.createdAt,
+            expiredAt: trx.expiredAt
+        }));
+
+        return res.json({ status: true, transactions: sanitizedTransactions });
     } catch (err) {
         console.error("Error fetching transaction history:", err);
         return res.status(500).json({ status: false, message: "Gagal mengambil riwayat transaksi" });
