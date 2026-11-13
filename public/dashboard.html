@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard - ArulzXD Store</title>
-        <!-- Open Graph / Facebook / WhatsApp / Telegram -->
+    <title>ArulzXD Store - Marketplace Source Code & Layanan Digital</title>
+    <!-- Open Graph / Facebook / WhatsApp / Telegram -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.arulzxd.biz.id/">
-    <meta property="og:title" content="Dashboard - ArulzXD Store">
-    <meta property="og:description" content="Pantau grafik analitik, total pesanan harian, pengguna aktif, dan status transaksi marketplace.">
+    <meta property="og:title" content="ArulzXD Store - Marketplace Source Code & Layanan Digital">
+    <meta property="og:description" content="Marketplace penyedia Source Code, Script, dan Layanan Digital Premium otomatis 24/7.">
     <meta property="og:image" content="https://cdn.larasxd.my.id/files/7TZ5vL.jpg">
     <meta property="og:image:secure_url" content="https://cdn.larasxd.my.id/files/7TZ5vL.jpg">
     <meta property="og:image:type" content="image/jpg">
@@ -18,14 +18,12 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://www.arulzxd.biz.id/">
-    <meta name="twitter:title" content="Dashboard - ArulzXD Store">
-    <meta name="twitter:description" content="Pantau grafik analitik, total pesanan harian, pengguna aktif, dan status transaksi marketplace.">
+    <meta name="twitter:title" content="ArulzXD Store - Marketplace Source Code & Layanan Digital">
+    <meta name="twitter:description" content="Marketplace penyedia Source Code, Script, dan Layanan Digital Premium otomatis 24/7.">
     <meta name="twitter:image" content="https://cdn.larasxd.my.id/files/7TZ5vL.jpg">
 
-    <!-- Perbaikan Favicon & Apple Touch Icon -->
-    <link rel="icon" type="image/png" sizes="48x48" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
-    <link rel="apple-touch-icon" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
+    <!-- Favicon -->
+    <link rel="icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
     
     <link rel="canonical" href="https://www.arulzxd.biz.id/">
     
@@ -49,8 +47,8 @@
       "@id": "https://www.arulzxd.biz.id/#website",
       "url": "https://www.arulzxd.biz.id/",
       "name": "ArulzXD Store",
-      "alternateName": ["ArulzXD", "Arulz Store"],
-      "description": "Marketplace Source Code, Script, dan Layanan Digital Premium otomatis 24/7."
+      "alternateName": ["ArulzXD", "Arulz Store", "arulzxd.biz.id"],
+      "description": "Marketplace penyedia Source Code, Script, dan Layanan Digital Premium otomatis 24/7."
     },
     {
       "@type": "ItemList",
@@ -58,26 +56,32 @@
         {
           "@type": "SiteNavigationElement",
           "position": 1,
-          "name": "Toko",
+          "name": "Katalog Toko",
           "url": "https://www.arulzxd.biz.id/store"
         },
         {
           "@type": "SiteNavigationElement",
           "position": 2,
-          "name": "Autentikasi & Masuk",
+          "name": "Masuk & Daftar Akun",
           "url": "https://www.arulzxd.biz.id/login"
         },
         {
           "@type": "SiteNavigationElement",
           "position": 3,
-          "name": "Kebijakan Privasi",
-          "url": "https://www.arulzxd.biz.id/privacy"
+          "name": "Deposit Saldo",
+          "url": "https://www.arulzxd.biz.id/deposit"
         },
         {
           "@type": "SiteNavigationElement",
           "position": 4,
           "name": "Riwayat Transaksi",
           "url": "https://www.arulzxd.biz.id/riwayat"
+        },
+        {
+          "@type": "SiteNavigationElement",
+          "position": 5,
+          "name": "Kebijakan Privasi",
+          "url": "https://www.arulzxd.biz.id/privacy"
         }
       ]
     }
@@ -225,59 +229,14 @@
             background-color: #000000;
             border-radius: 50%;
         }
-
-        #cyber-loader-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            background-color: #F4F0EA;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
-        }
-        #cyber-loader-overlay.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
-
-        .animated-dots::after {
-            content: '';
-            display: inline-block;
-            width: 1.5em;
-            text-align: left;
-            animation: dotsAnimation 1.5s steps(4, end) infinite;
-        }
-        @keyframes dotsAnimation {
-            0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
-        }
     </style>
 </head>
 <body class="font-sans antialiased text-black min-h-screen pb-32">
 
-<div id="cyber-loader-overlay">
-    <div class="neo-box p-6 rounded-2xl flex flex-col items-center bg-white">
-        <img src="https://files.catbox.moe/kdowze.png" alt="Logo" class="w-20 h-20 rounded-full border-3 border-black mb-4 shadow-[4px_4px_0px_#000]">
-        <div id="loader-title-text" class="text-base font-black tracking-wider uppercase font-cyber mb-1">
-            Memuat Dashboard<span class="animated-dots"></span>
-        </div>
-        <div class="text-[11px] font-bold font-mono tracking-wider uppercase bg-neoYellow border-2 border-black px-2 py-0.5">
-            SYSTEM INITIALIZING
-        </div>
-        <div class="w-64 mt-6">
-            <div class="flex items-center justify-between text-xs font-black font-cyber mb-1">
-                <span>STATUS</span>
-                <span id="loader-percentage">0%</span>
-            </div>
-            <div class="w-full h-4 bg-white rounded-none border-3 border-black p-0.5">
-                <div id="loader-progress-fill" class="h-full bg-neoCyan w-0 border-r-2 border-black"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
     <!-- TOP NAVBAR -->
-    <nav class="sticky top-0 z-40 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
+    <header class="sticky top-0 z-40 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
         <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/store" class="text-2xl font-black font-cyber tracking-tight text-black">
+            <a href="/" class="text-2xl font-black font-cyber tracking-tight text-black">
                 Arulz<span class="bg-black text-white px-2 py-0.5 ml-1 rounded-md">Store</span>
             </a>
             <span class="text-xs font-cyber font-black bg-white text-black px-3 py-1 rounded-lg border-2 border-black shadow-[2px_2px_0px_#000] flex items-center gap-1.5">
@@ -285,10 +244,10 @@
                 <span>SERVER ONLINE</span>
             </span>
         </div>
-    </nav>
+    </header>
 
     <!-- MAIN DASHBOARD CONTENT -->
-    <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+    <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
 
         <!-- WELCOME BANNER -->
         <div class="p-6 sm:p-8 neo-box rounded-2xl bg-neoCyan relative overflow-hidden">
@@ -422,44 +381,59 @@
             </div>
         </div>
 
-    </div>
+    </main>
 
-    <!-- PRESISI FIXED BOTTOM NAV BAR SEPERTI VIDEO -->
-    <div class="bottom-nav-fixed">
+    <!-- FOOTER SEO -->
+    <footer class="max-w-6xl mx-auto px-4 mt-4 mb-4 text-center">
+        <div class="neo-box p-4 rounded-2xl bg-white flex flex-wrap items-center justify-center gap-4 text-xs font-black font-cyber">
+            <a href="/store" class="hover:underline">Katalog Toko</a>
+            <span>•</span>
+            <a href="/login" class="hover:underline">Masuk & Daftar Akun</a>
+            <span>•</span>
+            <a href="/deposit" class="hover:underline">Deposit Saldo</a>
+            <span>•</span>
+            <a href="/riwayat" class="hover:underline">Riwayat Transaksi</a>
+            <span>•</span>
+            <a href="/privacy" class="hover:underline">Kebijakan Privasi</a>
+        </div>
+    </footer>
+
+    <!-- FIXED BOTTOM NAV BAR -->
+    <nav aria-label="Navigasi Utama" class="bottom-nav-fixed">
         <div class="bottom-nav-bg"></div>
         <div class="nav-items-wrapper">
-            <a href="/dashboard" class="nav-item-btn active">
+            <a href="/" title="Beranda ArulzXD Store" class="nav-item-btn active">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-house"></i>
                 </div>
                 <span>Home</span>
             </a>
-            <a href="/store" class="nav-item-btn">
+            <a href="/store" title="Katalog Toko" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-bag-shopping"></i>
                 </div>
                 <span>Toko</span>
             </a>
-            <a href="/deposit" class="nav-item-btn">
+            <a href="/deposit" title="Deposit Saldo" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-wallet"></i>
                 </div>
                 <span>Deposit</span>
             </a>
-            <a href="/riwayat" class="nav-item-btn">
+            <a href="/riwayat" title="Riwayat Transaksi" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                 </div>
                 <span>Riwayat</span>
             </a>
-            <a href="/profile" class="nav-item-btn">
+            <a href="/login" id="nav-auth-link" title="Masuk & Daftar Akun" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-regular fa-user"></i>
                 </div>
-                <span id="nav-auth-label">Profil</span>
+                <span id="nav-auth-label">Akun</span>
             </a>
         </div>
-    </div>
+    </nav>
 
     <script>
         let lineChartInstance = null;
@@ -549,10 +523,12 @@
             if (userStatusRes.status === 'fulfilled') {
                 const data = userStatusRes.value;
                 const authLabel = document.getElementById('nav-auth-label');
+                const authLink = document.getElementById('nav-auth-link');
 
                 if (data.loggedIn && data.user) {
                     document.getElementById('dashUsername').innerText = data.user.username;
                     if (authLabel) authLabel.innerText = 'Profil';
+                    if (authLink) authLink.href = '/profile';
                 }
             }
 
@@ -630,33 +606,6 @@
         }
 
         loadDashboardData();
-
-        let currentProgress = 0;
-        const progressFill = document.getElementById('loader-progress-fill');
-        const percentageText = document.getElementById('loader-percentage');
-        const loaderOverlay = document.getElementById('cyber-loader-overlay');
-
-        function updateProgress(targetVal) {
-            currentProgress = Math.min(Math.max(currentProgress, targetVal), 100);
-            if (progressFill) progressFill.style.width = currentProgress + '%';
-            if (percentageText) percentageText.innerText = Math.floor(currentProgress) + '%';
-        }
-
-        const progressInterval = setInterval(() => {
-            if (currentProgress < 85) updateProgress(currentProgress + Math.random() * 12 + 5);
-        }, 120);
-
-        window.addEventListener('load', () => {
-            clearInterval(progressInterval);
-            updateProgress(100);
-            setTimeout(() => { if (loaderOverlay) loaderOverlay.classList.add('fade-out'); }, 300);
-        });
-
-        setTimeout(() => {
-            clearInterval(progressInterval);
-            updateProgress(100);
-            if (loaderOverlay && !loaderOverlay.classList.contains('fade-out')) loaderOverlay.classList.add('fade-out');
-        }, 3500);
     </script>
 </body>
 </html>
