@@ -2426,46 +2426,51 @@ app.get('/profile', checkAuthSession, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
 app.get('/sitemap.xml', async (req, res) => {
-    res.header('Content-Type', 'application/xml');
+    res.header('Content-Type', 'application/xml; charset=utf-8');
     try {
         const products = await ProductV2.find({}).select('Id updatedAt createdAt').lean();
-        const productUrls = products.map(p => `
+        const productUrls = products.map(p => {
+            const lastMod = new Date(p.updatedAt || p.createdAt || Date.now()).toISOString().split('T')[0];
+            return `
   <url>
-    <loc>https://arulzxd.biz.id/store/${p.Id}</loc>
+    <loc>https://www.arulzxd.biz.id/store/${encodeURIComponent(p.Id)}</loc>
+    <lastmod>${lastMod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-  </url>`).join('');
+  </url>`;
+        }).join('');
 
         const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://arulzxd.biz.id/</loc>
+    <loc>https://www.arulzxd.biz.id/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://arulzxd.biz.id/store</loc>
+    <loc>https://www.arulzxd.biz.id/store</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://arulzxd.biz.id/login</loc>
+    <loc>https://www.arulzxd.biz.id/login</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://arulzxd.biz.id/riwayat</loc>
+    <loc>https://www.arulzxd.biz.id/riwayat</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://arulzxd.biz.id/privacy</loc>
+    <loc>https://www.arulzxd.biz.id/privacy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>${productUrls}
 </urlset>`;
         res.send(xmlContent);
     } catch (e) {
+        console.error('Error generate sitemap:', e);
         res.status(500).send('');
     }
 });
