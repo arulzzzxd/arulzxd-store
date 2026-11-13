@@ -2784,9 +2784,40 @@ function drawNeoBox(ctx, x, y, w, h, radius, fillColor, shadowOffset = 6, border
     ctx.restore();
 }
 
-// Helper memotong teks panjang agar tidak keluar batas
+let ogFontLoaded = false;
+async function ensureOgFonts() {
+    if (ogFontLoaded) return true;
+    try {
+        const [regRes, boldRes, blackRes] = await Promise.all([
+            axios.get('https://github.com/google/fonts/raw/main/ofl/plusjakartasans/PlusJakartaSans%5Bwght%5D.ttf', {
+                responseType: 'arraybuffer',
+                timeout: 6000
+            }),
+            axios.get('https://github.com/google/fonts/raw/main/ofl/spacegrotesk/SpaceGrotesk%5Bwght%5D.ttf', {
+                responseType: 'arraybuffer',
+                timeout: 6000
+            }),
+            axios.get('https://github.com/google/fonts/raw/main/ofl/jetbrainsmono/JetBrainsMono%5Bwght%5D.ttf', {
+                responseType: 'arraybuffer',
+                timeout: 6000
+            })
+        ]);
+
+        GlobalFonts.register(Buffer.from(regRes.data), 'JakartaSans');
+        GlobalFonts.register(Buffer.from(boldRes.data), 'SpaceGrotesk');
+        GlobalFonts.register(Buffer.from(blackRes.data), 'JetBrainsMono');
+        ogFontLoaded = true;
+        return true;
+    } catch (err) {
+        console.warn('⚠️ Gagal mengunduh font eksternal OG:', err.message);
+        return false;
+    }
+}
+
+// Helper memotong teks panjang agar rapi dan tidak keluar batas
 function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3) {
-    const words = String(text || '').split(' ');
+    const cleanText = String(text || '').replace(/\s+/g, ' ').trim();
+    const words = cleanText.split(' ');
     let line = '';
     let lineCount = 0;
 
@@ -2797,7 +2828,7 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3) {
             lineCount++;
             if (lineCount >= maxLines) {
                 ctx.fillText(line.trim() + '...', x, y);
-                return;
+                return y;
             }
             ctx.fillText(line.trim(), x, y);
             line = words[n] + ' ';
@@ -2807,11 +2838,14 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3) {
         }
     }
     ctx.fillText(line.trim(), x, y);
+    return y;
 }
 
 // ENDPOINT GENERATOR OPEN GRAPH CANVAS (1200 x 630)
 app.get('/api/og/product/:productId', async (req, res) => {
     try {
+        await ensureOgFonts();
+
         const { productId } = req.params;
         const product = await ProductV2.findOne({
             $or: [
@@ -2825,15 +2859,35 @@ app.get('/api/og/product/:productId', async (req, res) => {
         const canvas = createCanvas(width, height);
         const ctx = canvas.getContext('2d');
 
-        // 1. BACKGROUND CYAN & AKSEN KUNING NEO-BRUTALISM
+        const fontDisplay = ogFontLoaded ? 'SpaceGrotesk, sans-serif' : 'sans-serif';
+        const fontBody = ogFontLoaded ? 'JakartaSans, sans-serif' : 'sans-serif';
+        const fontMono = ogFontLoaded ? 'JetBrainsMono, monospace' : 'monospace';
+
+        // 1. BACKGROUND CYAN DENGAN PATTERN GRID HALUS NEO-BRUTALISM
         ctx.fillStyle = '#00E5FF';
         ctx.fillRect(0, 0, width, height);
 
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
+        ctx.lineWidth = 2;
+        for (let gx = 0; gx <= width; gx += 40) {
+            ctx.beginPath();
+            ctx.moveTo(gx, 0);
+            ctx.lineTo(gx, height);
+            ctx.stroke();
+        }
+        for (let gy = 0; gy <= height; gy += 40) {
+            ctx.beginPath();
+            ctx.moveTo(0, gy);
+            ctx.lineTo(width, gy);
+            ctx.stroke();
+        }
+
+        // Aksen Kuning Sudut Kanan Atas & Kiri Bawah
         ctx.fillStyle = '#FFDE59';
         ctx.beginPath();
-        ctx.moveTo(820, 0);
+        ctx.moveTo(860, 0);
         ctx.lineTo(width, 0);
-        ctx.lineTo(width, 350);
+        ctx.lineTo(width, 320);
         ctx.closePath();
         ctx.fill();
         ctx.lineWidth = 4;
@@ -2841,37 +2895,81 @@ app.get('/api/og/product/:productId', async (req, res) => {
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(0, 420);
-        ctx.lineTo(360, height);
+        ctx.moveTo(0, 460);
+        ctx.lineTo(280, height);
         ctx.lineTo(0, height);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
 
-        // 2. PANEL KIRI UTAMA
-        drawNeoBox(ctx, 35, 35, 620, 560, 28, '#F4F0EA', 8, 5);
+        // 2. PANEL UTAMA KIRI (KARTU INFORMASI PRODUK)
+        drawNeoBox(ctx, 36, 36, 650, 558, 24, '#F5F2EB', 10, 5);
 
-        // Pill URL di Kiri Atas
-        drawNeoBox(ctx, 65, 65, 340, 44, 22, '#FFFFFF', 4, 3);
-        ctx.fillStyle = '#000000';
+        // Header Bar Panel Kiri (Window Browser Style)
+        ctx.save();
         ctx.beginPath();
-        ctx.arc(92, 87, 12, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.roundRect(36, 36, 650, 56, [24, 24, 0, 0]);
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 14px sans-serif';
-        ctx.fillText('->', 84, 92);
+        ctx.fill();
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#000000';
+        ctx.stroke();
+        ctx.restore();
 
+        // Tiga Titik Window (Merah, Kuning, Hijau)
+        const dotColors = ['#FF5F56', '#FFBD2E', '#27C93F'];
+        dotColors.forEach((c, i) => {
+            ctx.fillStyle = c;
+            ctx.beginPath();
+            ctx.arc(68 + i * 24, 64, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#000000';
+            ctx.stroke();
+        });
+
+        // Brand Name di Header Bar
         ctx.fillStyle = '#000000';
-        ctx.font = 'bold 16px sans-serif';
-        ctx.fillText(`https://arulzxd.biz.id/store/${product ? (product.Id || productId) : ''}`.slice(0, 34), 115, 93);
+        ctx.font = `800 15px ${fontMono}`;
+        ctx.fillText('ARULZXD.BIZ.ID // OFFICIAL STORE', 155, 69);
 
-        // Judul Produk
-        const namaProduk = product ? product.nama : 'ArulzXD Store';
+        // Badge Kategori & Status Instan
+        const kategoriText = (product?.kategori || 'DIGITAL PRODUCT').toUpperCase();
+        ctx.font = `800 15px ${fontDisplay}`;
+        const katWidth = Math.min(260, Math.max(150, ctx.measureText(kategoriText).width + 36));
+        drawNeoBox(ctx, 64, 114, katWidth, 38, 10, '#FFDE59', 4, 3);
         ctx.fillStyle = '#000000';
-        ctx.font = '900 50px sans-serif';
-        wrapText(ctx, namaProduk, 68, 175, 550, 58, 2);
+        ctx.fillText(kategoriText.slice(0, 22), 82, 139);
 
-        // Badge Harga & Kategori
+        // Badge "OTOMATIS 24/7"
+        drawNeoBox(ctx, 64 + katWidth + 14, 114, 165, 38, 10, '#00E676', 4, 3);
+        ctx.fillStyle = '#000000';
+        ctx.font = `800 14px ${fontDisplay}`;
+        ctx.fillText('INSTAN 24/7', 64 + katWidth + 34, 139);
+
+        // Judul Produk Utama
+        const namaProduk = product ? product.nama : 'ArulzXD Digital Store';
+        ctx.fillStyle = '#000000';
+        ctx.font = `800 44px ${fontDisplay}`;
+        wrapText(ctx, namaProduk, 64, 206, 595, 52, 2);
+
+        // Deskripsi Singkat Produk
+        ctx.fillStyle = '#333333';
+        ctx.font = `500 20px ${fontBody}`;
+        const descText = product?.deskripsi || 'Source Code, REST API, & Layanan Digital Premium dengan pengiriman otomatis.';
+        wrapText(ctx, descText, 64, 305, 590, 28, 3);
+
+        // Garis Pemisah
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.moveTo(64, 412);
+        ctx.lineTo(656, 412);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Kotak Harga Utama
         const hargaFinal = product ? (product.harga_diskon || product.harga) : 0;
         const hargaText = new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -2879,56 +2977,43 @@ app.get('/api/og/product/:productId', async (req, res) => {
             minimumFractionDigits: 0
         }).format(hargaFinal);
 
-        drawNeoBox(ctx, 68, 265, 230, 46, 10, '#000000', 0, 0);
+        ctx.font = `800 28px ${fontDisplay}`;
+        const priceBoxW = Math.max(220, ctx.measureText(hargaText).width + 44);
+        drawNeoBox(ctx, 64, 434, priceBoxW, 58, 14, '#000000', 5, 0);
         ctx.fillStyle = '#FFDE59';
-        ctx.font = '900 22px sans-serif';
-        ctx.fillText(hargaText, 85, 296);
+        ctx.fillText(hargaText, 86, 473);
 
-        const kategoriText = (product?.kategori || 'DIGITAL PRODUCT').toUpperCase();
-        drawNeoBox(ctx, 315, 265, 240, 46, 10, '#FFDE59', 4, 3);
-        ctx.fillStyle = '#000000';
-        ctx.font = '900 18px sans-serif';
-        ctx.fillText(kategoriText.slice(0, 18), 332, 295);
+        // Info Stok & Terjual di Samping Harga
+        const infoBoxX = 64 + priceBoxW + 16;
+        const infoBoxW = 656 - infoBoxX;
+        drawNeoBox(ctx, infoBoxX, 434, infoBoxW, 58, 14, '#FFFFFF', 5, 3);
 
-        // Deskripsi Produk
-        ctx.fillStyle = '#222222';
-        ctx.font = '600 21px sans-serif';
-        const descText = product?.deskripsi || 'Penyedia Source Code, Script, & Layanan Digital Premium Terpercaya dengan Akses Otomatis.';
-        wrapText(ctx, descText, 68, 355, 540, 30, 3);
-
-        // Tombol CTA
-        drawNeoBox(ctx, 68, 475, 260, 56, 28, '#000000', 5, 3);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = '900 21px sans-serif';
-        ctx.fillText('Beli Sekarang', 95, 510);
-
-        drawNeoBox(ctx, 275, 483, 44, 40, 10, '#FFDE59', 0, 2);
-        ctx.fillStyle = '#000000';
-        ctx.font = '900 18px sans-serif';
-        ctx.fillText('>>', 284, 509);
-
-        // Info Stok & Terjual
-        drawNeoBox(ctx, 360, 480, 230, 48, 12, '#FFFFFF', 4, 3);
         ctx.fillStyle = '#00E676';
         ctx.beginPath();
-        ctx.arc(385, 504, 8, 0, Math.PI * 2);
+        ctx.arc(infoBoxX + 24, 463, 7, 0, Math.PI * 2);
         ctx.fill();
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#000000';
         ctx.stroke();
 
         ctx.fillStyle = '#000000';
-        ctx.font = '800 15px sans-serif';
-        ctx.fillText(`Stok: ${product?.stok ?? 99} | Terjual ${product?.terjual ?? 0}`, 402, 510);
+        ctx.font = `700 16px ${fontBody}`;
+        ctx.fillText(`Stok: ${product?.stok ?? 99}  •  Terjual: ${product?.terjual ?? 0}`, infoBoxX + 42, 469);
 
-        // 3. AMBIL MAKSIMAL 3 GAMBAR PRODUK DENGAN TIMEOUT AXIOS (AGAR TIDAK HANG)
+        // Tombol CTA Bawah Full-Width
+        drawNeoBox(ctx, 64, 512, 592, 56, 16, '#00E5FF', 5, 4);
+        ctx.fillStyle = '#000000';
+        ctx.font = `800 20px ${fontDisplay}`;
+        ctx.fillText('BELI SEKARANG  →', 245, 547);
+
+        // 3. AMBIL GAMBAR PRODUK
         let rawImages = [];
         if (product && Array.isArray(product.gambar) && product.gambar.length > 0) {
             rawImages = product.gambar.slice(0, 3);
         } else if (product && typeof product.gambar === 'string' && product.gambar.trim() !== '') {
             rawImages = [product.gambar];
         } else {
-            rawImages = ['https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png'];
+            rawImages = ['https://arulz-xd.my.id/files/Z9zjj0RF7G7ena.png'];
         }
 
         const loadedImages = await Promise.all(
@@ -2940,52 +3025,38 @@ app.get('/api/og/product/:productId', async (req, res) => {
                     }
                     const imgRes = await axios.get(src, {
                         responseType: 'arraybuffer',
-                        timeout: 4000, // Maksimal tunggu 4 detik per gambar
+                        timeout: 4500,
                         headers: { 'User-Agent': 'Mozilla/5.0' }
                     });
                     return await loadImage(Buffer.from(imgRes.data));
                 } catch (e) {
-                    console.warn('Gagal load gambar produk untuk OG:', src, e.message);
                     return null;
                 }
             })
         );
         const validImages = loadedImages.filter(Boolean);
 
-        // Header Mini Galeri di Kanan Atas
-        ctx.save();
-        ctx.translate(690, 45);
-        ctx.rotate((3 * Math.PI) / 180);
-        drawNeoBox(ctx, 0, 0, 470, 85, 18, '#FFFFFF', 6, 4);
+        // Header Badge Galeri di Kanan Atas
+        drawNeoBox(ctx, 718, 36, 446, 56, 16, '#FFFFFF', 6, 4);
         ctx.fillStyle = '#000000';
-        ctx.font = '900 15px sans-serif';
-        ctx.fillText('PREVIEW GALERI PRODUK (' + validImages.length + ' FOTO)', 22, 28);
+        ctx.font = `800 16px ${fontDisplay}`;
+        ctx.fillText(`PREVIEW PRODUK (${validImages.length} FOTO)`, 742, 70);
 
-        drawNeoBox(ctx, 20, 40, 140, 32, 10, '#FFDE59', 3, 2.5);
-        ctx.font = '800 13px sans-serif';
-        ctx.fillText('Preview Utama', 38, 61);
+        drawNeoBox(ctx, 1042, 46, 106, 36, 10, '#FFDE59', 0, 2.5);
+        ctx.font = `800 13px ${fontMono}`;
+        ctx.fillText('VERIFIED', 1060, 69);
 
-        if (validImages.length > 1) {
-            drawNeoBox(ctx, 172, 40, 120, 32, 10, '#FFFFFF', 3, 2.5);
-            ctx.fillText('Foto #2', 205, 61);
-        }
-        if (validImages.length > 2) {
-            drawNeoBox(ctx, 304, 40, 120, 32, 10, '#00E5FF', 3, 2.5);
-            ctx.fillText('Foto #3', 337, 61);
-        }
-        ctx.restore();
-
-        // Render Kartu-Kartu Gambar Produk (1, 2, atau 3 gambar)
+        // 4. RENDER KARTU GAMBAR PRODUK (RAPI & PROPORSIONAL)
         const cardLayouts = {
-            1: [{ x: 710, y: 165, w: 430, h: 410, angle: -2 }],
+            1: [{ x: 718, y: 114, w: 446, h: 480, angle: 0 }],
             2: [
-                { x: 685, y: 175, w: 250, h: 380, angle: -4 },
-                { x: 925, y: 160, w: 250, h: 380, angle: 4 }
+                { x: 718, y: 114, w: 446, h: 265, angle: 0 },
+                { x: 718, y: 396, w: 446, h: 198, angle: 0 }
             ],
             3: [
-                { x: 675, y: 170, w: 235, h: 245, angle: -4 },
-                { x: 925, y: 155, w: 235, h: 245, angle: 3 },
-                { x: 785, y: 365, w: 265, h: 225, angle: -1.5 }
+                { x: 718, y: 114, w: 446, h: 265, angle: 0 },
+                { x: 718, y: 396, w: 215, h: 198, angle: 0 },
+                { x: 949, y: 396, w: 215, h: 198, angle: 0 }
             ]
         };
 
@@ -2996,17 +3067,10 @@ app.get('/api/og/product/:productId', async (req, res) => {
                 const img = validImages[idx];
                 if (!img) return;
 
-                ctx.save();
-                const centerX = layout.x + layout.w / 2;
-                const centerY = layout.y + layout.h / 2;
-                ctx.translate(centerX, centerY);
-                ctx.rotate((layout.angle * Math.PI) / 180);
-                ctx.translate(-centerX, -centerY);
-
-                drawNeoBox(ctx, layout.x, layout.y, layout.w, layout.h, 20, '#FFFFFF', 7, 4);
+                drawNeoBox(ctx, layout.x, layout.y, layout.w, layout.h, 20, '#FFFFFF', 8, 4);
 
                 const pad = 12;
-                const footerH = 38;
+                const footerH = 34;
                 const imgBoxX = layout.x + pad;
                 const imgBoxY = layout.y + pad;
                 const imgBoxW = layout.w - pad * 2;
@@ -3032,22 +3096,20 @@ app.get('/api/og/product/:productId', async (req, res) => {
                 ctx.roundRect(imgBoxX, imgBoxY, imgBoxW, imgBoxH, 12);
                 ctx.stroke();
 
-                const labelY = layout.y + layout.h - 16;
+                // Label Bawah Gambar
+                const labelY = layout.y + layout.h - 14;
                 ctx.fillStyle = '#000000';
-                ctx.font = '900 14px sans-serif';
-                ctx.fillText(`Gambar #${idx + 1}`, layout.x + 16, labelY);
+                ctx.font = `700 13px ${fontMono}`;
+                ctx.fillText(idx === 0 ? 'UTAMA' : `FOTO #${idx + 1}`, layout.x + 16, labelY);
 
-                drawNeoBox(ctx, layout.x + layout.w - 86, layout.y + layout.h - 33, 72, 22, 8, '#FFDE59', 0, 2);
+                drawNeoBox(ctx, layout.x + layout.w - 64, layout.y + layout.h - 30, 50, 20, 6, '#FFDE59', 0, 2);
                 ctx.fillStyle = '#000000';
-                ctx.font = '900 11px sans-serif';
-                ctx.fillText(`${idx + 1} / ${count}`, layout.x + layout.w - 64, layout.y + layout.h - 18);
-
-                ctx.restore();
+                ctx.font = `800 11px ${fontMono}`;
+                ctx.fillText(`${idx + 1}/${count}`, layout.x + layout.w - 50, layout.y + layout.h - 16);
             });
         }
 
-        // Convert ke JPEG berkualitas tinggi (lebih ringan dari PNG untuk WhatsApp < 300KB)
-        const jpegBuffer = await canvas.encode('jpeg', 90);
+        const jpegBuffer = await canvas.encode('jpeg', 92);
         res.setHeader('Content-Type', 'image/jpeg');
         res.setHeader('Content-Length', jpegBuffer.length);
         res.setHeader('Cache-Control', 'public, max-age=3600');
@@ -3058,6 +3120,7 @@ app.get('/api/og/product/:productId', async (req, res) => {
         return res.redirect('https://cdn.larasxd.my.id/files/t19j.jpg');
     }
 });
+
 
 app.get('/store/:productId', async (req, res) => {
     try {
