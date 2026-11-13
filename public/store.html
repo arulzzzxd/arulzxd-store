@@ -5,16 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ArulzXD Store - Marketplace</title>
 
-    <!-- META TAGS OPEN GRAPH -->
+    <link rel="icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
+    <link rel="shortcut icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://cdn.larasxd.my.id/files/1wh5do.png">
+
+    <!-- Open Graph / Facebook / WhatsApp / Telegram -->
+    <title>ArulzXD Store - Marketplace</title>
+        <!-- Open Graph / Facebook / WhatsApp / Telegram -->
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.arulzxd.biz.id/store">
     <meta property="og:title" content="ArulzXD Store - Marketplace Source Code & Layanan Digital">
     <meta property="og:description" content="Penyedia Source Code, Script, & Layanan Digital Premium Terpercaya dengan Akses Super Cepat & Otomatis.">
-    <meta property="og:image" content="https://files.catbox.moe/kdowze.png">
+    <meta property="og:image" content="https://cdn.larasxd.my.id/files/t19j.jpg">
+    <meta property="og:image:secure_url" content="https://cdn.larasxd.my.id/files/t19j.jpg">
+    <meta property="og:image:type" content="image/jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:url" content="https://arulz-xd.my.id/store">
 
-    <link rel="icon" href="https://arulz-xd.my.id/files/Q2C70y.png" type="image/png">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.arulzxd.biz.id/store">
+    <meta name="twitter:title" content="ArulzXD Store - Marketplace Source Code & Layanan Digital">
+    <meta name="twitter:description" content="Penyedia Source Code, Script, & Layanan Digital Premium Terpercaya dengan Akses Super Cepat & Otomatis.">
+    <meta name="twitter:image" content="https://cdn.larasxd.my.id/files/t19j.jpg">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Fonts -->
@@ -174,30 +187,6 @@
             transform: translateY(-2px);
         }
 
-        #cyber-loader-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            background-color: #F4F0EA;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
-        }
-        #cyber-loader-overlay.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
-
-        .animated-dots::after {
-            content: '';
-            display: inline-block;
-            width: 1.5em;
-            text-align: left;
-            animation: dotsAnimation 1.5s steps(4, end) infinite;
-        }
-        @keyframes dotsAnimation {
-            0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
-        }
-
         /* CUSTOM VIDEO OVERLAY PLAY/PAUSE */
         .video-container {
             position: relative;
@@ -286,28 +275,6 @@
                 </button>
             </form>
 
-        </div>
-    </div>
-
-    <!-- LOADER OVERLAY -->
-    <div id="cyber-loader-overlay">
-        <div class="neo-box p-6 rounded-2xl flex flex-col items-center bg-white">
-            <img src="https://files.catbox.moe/kdowze.png" alt="Logo" class="w-20 h-20 rounded-full border-3 border-black mb-4 shadow-[4px_4px_0px_#000]">
-            <div id="loader-title-text" class="text-base font-black tracking-wider uppercase font-cyber mb-1">
-                Memuat Marketplace<span class="animated-dots"></span>
-            </div>
-            <div class="text-[11px] font-bold font-mono tracking-wider uppercase bg-neoYellow border-2 border-black px-2 py-0.5">
-                SYSTEM INITIALIZING
-            </div>
-            <div class="w-64 mt-6">
-                <div class="flex items-center justify-between text-xs font-black font-cyber mb-1">
-                    <span>STATUS</span>
-                    <span id="loader-percentage">0%</span>
-                </div>
-                <div class="w-full h-4 bg-white rounded-none border-3 border-black p-0.5">
-                    <div id="loader-progress-fill" class="h-full bg-neoCyan w-0 border-r-2 border-black"></div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -677,6 +644,7 @@
                     </div>
                 </form>
 
+                <!-- STEP 3: PEMBAYARAN BERHASIL (AUTO DOWNLOAD 1x / CHAT ADMIN WHATSAPP & TELEGRAM) -->
                 <div id="paymentStep3" class="hidden flex flex-col items-center justify-center space-y-4 text-center">
                     <div class="w-14 h-14 bg-neoGreen border-3 border-black rounded-full flex items-center justify-center text-2xl font-black shadow-[3px_3px_0px_#000]">
                         <i class="fa-solid fa-check"></i>
@@ -686,10 +654,38 @@
                         <p class="text-xs font-bold text-slate-600 mt-1">Transaksi Anda telah dikonfirmasi dan diproses secara otomatis.</p>
                     </div>
 
-                    <div class="w-full neo-box p-4 rounded-xl space-y-2 bg-neoCyan">
-                        <p class="text-[10px] font-black font-cyber uppercase">LINK AKSES PRODUK / SCRIPT:</p>
-                        <a id="productDownloadLink" href="#" target="_blank" class="text-xs font-bold font-mono text-black underline break-all block">
-                            <i class="fa-solid fa-cloud-arrow-down text-sm"></i> <span id="productLinkText">Akses Link Produk</span>
+                    <!-- PANEL DOWNLOAD LANGSUNG (1x PER TRANSAKSI TANPA MENUJU LINK) -->
+                    <div id="downloadActionBox" class="hidden w-full neo-box p-4 rounded-xl space-y-3 bg-neoCyan">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black font-cyber uppercase bg-white border border-black px-2 py-0.5 rounded">
+                                <i class="fa-solid fa-shield-halved"></i> 1x Download / Transaksi
+                            </span>
+                            <span id="downloadQuotaBadge" class="text-[10px] font-mono font-black bg-neoYellow border border-black px-2 py-0.5 rounded">
+                                Kuota: 0/1
+                            </span>
+                        </div>
+                        <p id="downloadStatusText" class="text-xs font-bold text-black leading-relaxed">
+                            Memulai download file produk secara otomatis...
+                        </p>
+                        <button type="button" id="btnDownloadProduct" onclick="handleManualOneTimeDownload()" 
+                                class="neo-btn w-full bg-neoYellow text-black font-cyber font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-down text-sm"></i> Download Produk
+                        </button>
+                    </div>
+
+                    <!-- PANEL KHUSUS LINK WHATSAPP / TELEGRAM -->
+                    <div id="chatAdminActionBox" class="hidden w-full neo-box p-4 rounded-xl space-y-3 bg-neoYellow">
+                        <div class="inline-flex items-center gap-1.5 bg-white border-2 border-black px-2.5 py-0.5 rounded-md text-[10px] font-black font-cyber uppercase">
+                            <i id="chatPlatformBadgeIcon" class="fa-brands fa-whatsapp"></i>
+                            <span id="chatPlatformBadgeText">WHATSAPP ADMIN</span>
+                        </div>
+                        <p id="chatSpecialDescription" class="text-xs font-black font-cyber text-black leading-relaxed">
+                            Lanjut chat admin mengenai produk
+                        </p>
+                        <a id="chatAdminLinkBtn" href="#" target="_blank" rel="noopener noreferrer" 
+                           class="neo-btn w-full bg-neoGreen text-black font-cyber font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                            <i id="chatBtnIcon" class="fa-brands fa-whatsapp text-base"></i>
+                            <span id="chatBtnText">Lanjut ke WhatsApp</span>
                         </a>
                     </div>
 
@@ -750,6 +746,9 @@
         let CURRENT_ORDER_ID = '';
         let CURRENT_QTY = 1;
         let ACTIVE_VOUCHER = null;
+
+        let ACTIVE_SUCCESS_ORDER_ID = null;
+        const DOWNLOAD_STATE_MAP = {};
 
         let currentSelectedRating = 0;
         let CURRENT_LOGGED_USER = null;
@@ -1602,6 +1601,7 @@
             CURRENT_ORDER_ID = generateUniqueOrderId();
             CURRENT_QTY = 1;
             ACTIVE_VOUCHER = null;
+            ACTIVE_SUCCESS_ORDER_ID = null;
 
             const hargaFinal = SELECTED_PRODUCT.harga_diskon || SELECTED_PRODUCT.harga;
 
@@ -1618,6 +1618,18 @@
             updateTotalPrice();
 
             selectCyberPayment('saldo');
+
+            // Reset Step 3 UI State
+            document.getElementById('downloadActionBox').classList.add('hidden');
+            document.getElementById('chatAdminActionBox').classList.add('hidden');
+            const quotaBadge = document.getElementById('downloadQuotaBadge');
+            if (quotaBadge) quotaBadge.innerText = 'Kuota: 0/1';
+            const btnDownload = document.getElementById('btnDownloadProduct');
+            if (btnDownload) {
+                btnDownload.disabled = false;
+                btnDownload.className = 'neo-btn w-full bg-neoYellow text-black font-cyber font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2';
+                btnDownload.innerHTML = `<i class="fa-solid fa-cloud-arrow-down text-sm"></i> Download Produk`;
+            }
 
             document.getElementById('orderForm').classList.remove('hidden');
             document.getElementById('paymentStep3').classList.add('hidden');
@@ -1695,31 +1707,226 @@
                 return;
             }
 
-            const calc = calculateFinalTotal();
-            const res = await fetch('/api/store/pay-with-balance', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productId: SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id,
-                    qty: CURRENT_QTY,
-                    voucherCode: ACTIVE_VOUCHER ? ACTIVE_VOUCHER.code : null
-                })
-            });
+            const btnPay = document.getElementById('btnPaySaldo');
+            if (btnPay) {
+                btnPay.disabled = true;
+                btnPay.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses Pembayaran...`;
+            }
 
-            const result = await res.json();
-            if (result.status && result.data) {
-                fetchProduk();
-                onPaymentSuccess(result.data.productLink || SELECTED_PRODUCT.link || "#");
-            } else {
-                Swal.fire({ icon: 'error', title: 'PEMBAYARAN GAGAL', text: result.message, customClass: { popup: 'cyber-swal' } });
+            try {
+                const res = await fetch('/api/store/pay-with-balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productId: SELECTED_PRODUCT.Id || SELECTED_PRODUCT._id,
+                        qty: CURRENT_QTY,
+                        voucherCode: ACTIVE_VOUCHER ? ACTIVE_VOUCHER.code : null
+                    })
+                });
+
+                const result = await res.json();
+                if (result.status && result.data) {
+                    if (typeof result.data.remainingBalance === 'number') {
+                        CURRENT_LOGGED_USER.saldo = result.data.remainingBalance;
+                        const balLabel = document.getElementById('userBalanceOptionLabel');
+                        if (balLabel) {
+                            balLabel.innerText = `Saldo Tersedia: ${formatRupiah(result.data.remainingBalance)}`;
+                        }
+                    }
+                    fetchProduk();
+                    onPaymentSuccess(result.data);
+                } else {
+                    Swal.fire({ icon: 'error', title: 'PEMBAYARAN GAGAL', text: result.message, customClass: { popup: 'cyber-swal' } });
+                }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'KESALAHAN SERVER', text: 'Gagal menghubungi server pembayaran.', customClass: { popup: 'cyber-swal' } });
+            } finally {
+                if (btnPay) {
+                    btnPay.disabled = false;
+                    btnPay.innerHTML = `<i class="fa-solid fa-wallet"></i> Bayar Pakai Saldo`;
+                }
             }
         }
 
-        function onPaymentSuccess(productLink) {
+        function onPaymentSuccess(paymentData) {
             document.getElementById('orderForm').classList.add('hidden');
             document.getElementById('paymentStep3').classList.remove('hidden');
-            document.getElementById('productDownloadLink').href = productLink;
-            document.getElementById('productLinkText').innerText = productLink;
+
+            const downloadBox = document.getElementById('downloadActionBox');
+            const chatBox = document.getElementById('chatAdminActionBox');
+
+            ACTIVE_SUCCESS_ORDER_ID = paymentData.orderId;
+
+            if (paymentData.linkType === 'whatsapp' || paymentData.linkType === 'telegram') {
+                // Tampilkan tombol & deskripsi khusus WhatsApp / Telegram
+                downloadBox.classList.add('hidden');
+                chatBox.classList.remove('hidden');
+
+                const isTelegram = paymentData.linkType === 'telegram';
+                const chatBtn = document.getElementById('chatAdminLinkBtn');
+                const badgeIcon = document.getElementById('chatPlatformBadgeIcon');
+                const badgeText = document.getElementById('chatPlatformBadgeText');
+                const descEl = document.getElementById('chatSpecialDescription');
+                const btnIcon = document.getElementById('chatBtnIcon');
+                const btnText = document.getElementById('chatBtnText');
+
+                descEl.innerText = paymentData.specialDescription || 'Lanjut chat admin mengenai produk';
+                chatBtn.href = paymentData.chatUrl || '#';
+
+                if (isTelegram) {
+                    chatBox.className = 'w-full neo-box p-4 rounded-xl space-y-3 bg-neoCyan';
+                    badgeIcon.className = 'fa-brands fa-telegram text-xs';
+                    badgeText.innerText = 'TELEGRAM ADMIN';
+                    chatBtn.className = 'neo-btn w-full bg-white text-black font-cyber font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2';
+                    btnIcon.className = 'fa-brands fa-telegram text-base';
+                    btnText.innerText = 'Lanjut ke Telegram';
+                } else {
+                    chatBox.className = 'w-full neo-box p-4 rounded-xl space-y-3 bg-neoYellow';
+                    badgeIcon.className = 'fa-brands fa-whatsapp text-xs';
+                    badgeText.innerText = 'WHATSAPP ADMIN';
+                    chatBtn.className = 'neo-btn w-full bg-neoGreen text-black font-cyber font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2';
+                    btnIcon.className = 'fa-brands fa-whatsapp text-base';
+                    btnText.innerText = 'Lanjut ke WhatsApp';
+                }
+            } else {
+                // Langsung download file tanpa menuju linknya (1x per transaksi)
+                chatBox.classList.add('hidden');
+                downloadBox.classList.remove('hidden');
+
+                DOWNLOAD_STATE_MAP[paymentData.orderId] = {
+                    downloading: false,
+                    completed: false
+                };
+
+                triggerOneTimeDownload(paymentData.orderId, true);
+            }
+        }
+
+        function handleManualOneTimeDownload() {
+            if (!ACTIVE_SUCCESS_ORDER_ID) return;
+            triggerOneTimeDownload(ACTIVE_SUCCESS_ORDER_ID, false);
+        }
+
+        async function triggerOneTimeDownload(orderId, isAuto = false) {
+            if (!orderId) return;
+            const state = DOWNLOAD_STATE_MAP[orderId] || { downloading: false, completed: false };
+            DOWNLOAD_STATE_MAP[orderId] = state;
+
+            const btn = document.getElementById('btnDownloadProduct');
+            const statusText = document.getElementById('downloadStatusText');
+            const quotaBadge = document.getElementById('downloadQuotaBadge');
+
+            if (state.completed) {
+                if (!isAuto) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'KUOTA HABIS',
+                        text: 'Download hanya berlaku 1 kali per transaksi.',
+                        customClass: { popup: 'cyber-swal' }
+                    });
+                }
+                return;
+            }
+
+            if (state.downloading) return;
+            state.downloading = true;
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-sm"></i> Sedang Mendownload...`;
+            }
+            if (statusText) {
+                statusText.innerText = 'Mengunduh file produk langsung ke perangkat Anda...';
+            }
+
+            try {
+                const res = await fetch(`/api/store/download/${encodeURIComponent(orderId)}`);
+
+                if (!res.ok) {
+                    let errJson = {};
+                    try { errJson = await res.json(); } catch (e) {}
+
+                    if (errJson.alreadyDownloaded) {
+                        state.completed = true;
+                        state.downloading = false;
+                        if (quotaBadge) quotaBadge.innerText = 'Kuota: 1/1';
+                        if (statusText) statusText.innerText = 'Kuota download (1x per transaksi) sudah digunakan.';
+                        if (btn) {
+                            btn.disabled = true;
+                            btn.classList.add('opacity-60', 'cursor-not-allowed');
+                            btn.innerHTML = `<i class="fa-solid fa-circle-check text-sm"></i> Sudah Didownload (1/1)`;
+                        }
+                        if (!isAuto) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'SUDAH DIDOWNLOAD',
+                                text: errJson.message || 'Download hanya berlaku 1 kali per transaksi.',
+                                customClass: { popup: 'cyber-swal' }
+                            });
+                        }
+                        return;
+                    }
+
+                    throw new Error(errJson.message || 'Gagal mengunduh file produk.');
+                }
+
+                let filename = res.headers.get('X-Download-Filename') || '';
+                if (!filename) {
+                    const disp = res.headers.get('Content-Disposition') || '';
+                    const match = disp.match(/filename="?([^";\n]+)"?/i);
+                    if (match && match[1]) filename = match[1];
+                }
+                if (!filename) {
+                    const baseName = (SELECTED_PRODUCT?.nama || 'produk-arulzxd')
+                        .replace(/[^a-zA-Z0-9._-]+/g, '-')
+                        .toLowerCase();
+                    filename = `${baseName}.zip`;
+                }
+
+                const blob = await res.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+
+                const tempLink = document.createElement('a');
+                tempLink.style.display = 'none';
+                tempLink.href = blobUrl;
+                tempLink.download = filename;
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+
+                setTimeout(() => window.URL.revokeObjectURL(blobUrl), 5000);
+
+                state.completed = true;
+                state.downloading = false;
+
+                if (quotaBadge) quotaBadge.innerText = 'Kuota: 1/1';
+                if (statusText) {
+                    statusText.innerText = `File "${filename}" berhasil terdownload! (Maksimal 1x download per transaksi).`;
+                }
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.remove('bg-neoYellow');
+                    btn.classList.add('bg-neoGreen', 'opacity-75', 'cursor-not-allowed');
+                    btn.innerHTML = `<i class="fa-solid fa-circle-check text-sm"></i> Berhasil Didownload (1/1)`;
+                }
+            } catch (err) {
+                state.downloading = false;
+                if (statusText) {
+                    statusText.innerText = 'Klik tombol di bawah untuk mengunduh file produk (1x kesempatan).';
+                }
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-down text-sm"></i> Download Produk (1x)`;
+                }
+                if (!isAuto) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'DOWNLOAD GAGAL',
+                        text: err.message || 'Gagal mengunduh file produk.',
+                        customClass: { popup: 'cyber-swal' }
+                    });
+                }
+            }
         }
 
         function shareProduk(index) {
@@ -1758,27 +1965,6 @@
         }
 
         initStorePage();
-
-        let currentProgress = 0;
-        const progressFill = document.getElementById('loader-progress-fill');
-        const percentageText = document.getElementById('loader-percentage');
-        const loaderOverlay = document.getElementById('cyber-loader-overlay');
-
-        function updateProgress(targetVal) {
-            currentProgress = Math.min(Math.max(currentProgress, targetVal), 100);
-            if (progressFill) progressFill.style.width = currentProgress + '%';
-            if (percentageText) percentageText.innerText = Math.floor(currentProgress) + '%';
-        }
-
-        const progressInterval = setInterval(() => {
-            if (currentProgress < 85) updateProgress(currentProgress + Math.random() * 12 + 5);
-        }, 120);
-
-        window.addEventListener('load', () => {
-            clearInterval(progressInterval);
-            updateProgress(100);
-            setTimeout(() => { if (loaderOverlay) loaderOverlay.classList.add('fade-out'); }, 400);
-        });
     </script>
 </body>
 </html>

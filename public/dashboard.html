@@ -6,11 +6,8 @@
     <meta name="theme-color" content="#FFDE59">
     <title>ArulzXD Store - Marketplace Source Code & Layanan Digital</title>
     <meta name="description" content="ArulzXD Store: Marketplace penyedia Source Code, Script, dan Layanan Digital Premium otomatis 24/7.">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://arulzxd.biz.id/">
-    <link rel="alternate" type="application/rss+xml" title="Katalog Produk ArulzXD Store" href="https://arulzxd.biz.id/rss.xml">
 
-    <!-- Favicon (Tetap memakai icon yang ada + dukungan Google Favicon Crawler) -->
+    <!-- Favicon & Icons -->
     <link rel="icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
     <link rel="shortcut icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
     <link rel="apple-touch-icon" href="https://cdn.larasxd.my.id/files/1wh5do.png">
@@ -24,7 +21,7 @@
     <meta property="og:description" content="Marketplace penyedia Source Code, Script, dan Layanan Digital Premium otomatis 24/7.">
     <meta property="og:image" content="https://cdn.larasxd.my.id/files/7TZ5vL.jpg">
     <meta property="og:image:secure_url" content="https://cdn.larasxd.my.id/files/7TZ5vL.jpg">
-    <meta property="og:image:type" content="image/jpg">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="ArulzXD Store - Marketplace Source Code & Layanan Digital">
@@ -37,93 +34,14 @@
     <meta name="twitter:image" content="https://cdn.larasxd.my.id/files/7TZ5vL.jpg">
     <meta name="twitter:image:alt" content="ArulzXD Store - Marketplace Source Code & Layanan Digital">
 
+    <!-- Styles & Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@0.1.1/dist/chartjs-chart-financial.min.js"></script>
-
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Organization",
-          "@id": "https://arulzxd.biz.id/#organization",
-          "name": "ArulzXD Store",
-          "url": "https://arulzxd.biz.id",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://cdn.larasxd.my.id/files/1wh5do.png",
-            "width": 512,
-            "height": 512
-          },
-          "description": "Marketplace penyedia Source Code, Script, dan Layanan Digital Premium otomatis 24/7.",
-          "areaServed": {
-            "@type": "Country",
-            "name": "Indonesia"
-          },
-          "knowsLanguage": "id",
-          "contactPoint": {
-            "@type": "ContactPoint",
-            "contactType": "customer support",
-            "email": "haqqi.official13@gmail.com",
-            "availableLanguage": ["id"]
-          }
-        },
-        {
-          "@type": "WebSite",
-          "@id": "https://arulzxd.biz.id/#website",
-          "url": "https://arulzxd.biz.id",
-          "name": "ArulzXD Store",
-          "alternateName": ["ArulzXD", "Arulz Store", "arulzxd.biz.id"],
-          "publisher": {
-            "@id": "https://arulzxd.biz.id/#organization"
-          },
-          "inLanguage": "id",
-          "description": "Marketplace penyedia Source Code, Script, dan Layanan Digital Premium otomatis 24/7."
-        },
-        {
-          "@type": "ItemList",
-          "itemListElement": [
-            {
-              "@type": "SiteNavigationElement",
-              "position": 1,
-              "name": "Katalog Toko",
-              "url": "https://arulzxd.biz.id/store"
-            },
-            {
-              "@type": "SiteNavigationElement",
-              "position": 2,
-              "name": "Masuk & Daftar Akun",
-              "url": "https://arulzxd.biz.id/login"
-            },
-            {
-              "@type": "SiteNavigationElement",
-              "position": 3,
-              "name": "Deposit Saldo",
-              "url": "https://arulzxd.biz.id/deposit"
-            },
-            {
-              "@type": "SiteNavigationElement",
-              "position": 4,
-              "name": "Riwayat Transaksi",
-              "url": "https://arulzxd.biz.id/riwayat"
-            },
-            {
-              "@type": "SiteNavigationElement",
-              "position": 5,
-              "name": "Kebijakan Privasi",
-              "url": "https://arulzxd.biz.id/privacy"
-            }
-          ]
-        }
-      ]
-    }
-    </script>
 
     <script>
         tailwind.config = {
@@ -168,7 +86,7 @@
             box-shadow: 2px 2px 0px #000000;
         }
 
-        /* FLUID CURVED NOTCH BOTTOM NAVIGATION BAR */
+        /* BOTTOM NAVIGATION BAR */
         .bottom-nav-fixed {
             position: fixed;
             bottom: 20px;
@@ -237,7 +155,6 @@
             transition: all 0.3s ease;
         }
 
-        /* AKTIF ACCENT & NOTCH POP-UP */
         .nav-item-btn.active .nav-icon-box {
             transform: translateY(-22px);
             background-color: #FFDE59;
@@ -245,9 +162,7 @@
             box-shadow: 3px 3px 0px #000000;
         }
 
-        .nav-item-btn.active i {
-            font-size: 20px;
-        }
+        .nav-item-btn.active i { font-size: 20px; }
 
         .nav-item-btn.active span {
             color: #000000;
@@ -255,7 +170,6 @@
             transform: translateY(-2px);
         }
 
-        /* Indicator Dot di bawah ikon aktif */
         .nav-item-btn.active::after {
             content: '';
             position: absolute;
@@ -286,7 +200,7 @@
     <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
 
         <!-- WELCOME BANNER -->
-        <div class="p-6 sm:p-8 neo-box rounded-2xl bg-neoCyan relative overflow-hidden">
+        <section class="p-6 sm:p-8 neo-box rounded-2xl bg-neoCyan relative overflow-hidden">
             <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <span class="inline-flex items-center gap-1.5 bg-white border-2 border-black text-black text-xs font-black px-3 py-1 rounded-md uppercase font-cyber shadow-[2px_2px_0px_#000] mb-3">
@@ -296,60 +210,60 @@
                         Selamat Datang, <span id="dashUsername" class="underline decoration-wavy decoration-black">Pengguna</span>!
                     </h1>
                     <p class="text-xs sm:text-sm font-bold text-black mt-2 max-w-xl">
-                        Pantau analitik toko, transaksi harian, pengguna aktif, dan status marketplace secara instan.
+                        Pantau analitik toko, transaksi harian, pengguna aktif, dan status marketplace ArulzXD Store secara instan.
                     </p>
                 </div>
                 <a href="/store" class="neo-btn bg-neoYellow text-black font-cyber font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2">
                     <i class="fa-solid fa-store"></i> Belanja Sekarang
                 </a>
             </div>
-        </div>
+        </section>
 
         <!-- STATS CARDS -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
+        <section aria-label="Statistik Marketplace" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
             <div class="neo-box p-4 rounded-xl">
                 <div class="flex items-center justify-between font-bold text-xs uppercase font-cyber mb-2">
                     <span>Pengguna</span>
                     <i class="fa-solid fa-users text-lg"></i>
                 </div>
-                <h3 id="statTotalUsers" class="text-2xl font-black font-cyber">0</h3>
+                <h2 id="statTotalUsers" class="text-2xl font-black font-cyber">0</h2>
             </div>
             <div class="neo-box p-4 rounded-xl bg-neoPink">
                 <div class="flex items-center justify-between font-bold text-xs uppercase font-cyber mb-2">
                     <span>Produk</span>
                     <i class="fa-solid fa-box-open text-lg"></i>
                 </div>
-                <h3 id="statTotalProducts" class="text-2xl font-black font-cyber">0</h3>
+                <h2 id="statTotalProducts" class="text-2xl font-black font-cyber">0</h2>
             </div>
             <div class="neo-box p-4 rounded-xl bg-neoYellow">
                 <div class="flex items-center justify-between font-bold text-xs uppercase font-cyber mb-2">
                     <span>Pesanan</span>
                     <i class="fa-solid fa-cart-shopping text-lg"></i>
                 </div>
-                <h3 id="statTotalTrx" class="text-2xl font-black font-cyber">0</h3>
+                <h2 id="statTotalTrx" class="text-2xl font-black font-cyber">0</h2>
             </div>
             <div class="neo-box p-4 rounded-xl bg-neoGreen">
                 <div class="flex items-center justify-between font-bold text-xs uppercase font-cyber mb-2">
                     <span>Lunas</span>
                     <i class="fa-solid fa-circle-check text-lg"></i>
                 </div>
-                <h3 id="statSuccessTrx" class="text-2xl font-black font-cyber">0</h3>
+                <h2 id="statSuccessTrx" class="text-2xl font-black font-cyber">0</h2>
             </div>
             <div class="neo-box p-4 rounded-xl bg-neoCyan">
                 <div class="flex items-center justify-between font-bold text-xs uppercase font-cyber mb-2">
                     <span>Hari Ini</span>
                     <i class="fa-solid fa-calendar-day text-lg"></i>
                 </div>
-                <h3 id="statTrxToday" class="text-2xl font-black font-cyber">0</h3>
+                <h2 id="statTrxToday" class="text-2xl font-black font-cyber">0</h2>
             </div>
             <div class="neo-box p-4 rounded-xl">
                 <div class="flex items-center justify-between font-bold text-xs uppercase font-cyber mb-2">
                     <span>Kemarin</span>
                     <i class="fa-solid fa-clock-rotate-left text-lg"></i>
                 </div>
-                <h3 id="statTrxYesterday" class="text-2xl font-black font-cyber">0</h3>
+                <h2 id="statTrxYesterday" class="text-2xl font-black font-cyber">0</h2>
             </div>
-        </div>
+        </section>
 
         <!-- LEGENDA GRAFIK -->
         <div class="neo-box p-3.5 rounded-xl flex flex-wrap items-center justify-between gap-4 text-xs font-mono font-bold">
@@ -369,13 +283,11 @@
         </div>
 
         <!-- CHART CONTAINER -->
-        <div class="w-full neo-box p-5 rounded-2xl space-y-4">
+        <section class="w-full neo-box p-5 rounded-2xl space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-3 border-black pb-3">
-                <div>
-                    <h3 class="text-sm font-black font-cyber uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-arrow-trend-up"></i> Analitik Pasar (OHLC)
-                    </h3>
-                </div>
+                <h3 class="text-sm font-black font-cyber uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-trend-up"></i> Analitik Pasar (OHLC)
+                </h3>
                 <div class="flex items-center gap-1 bg-neoBg p-1 rounded-xl border-2 border-black self-start sm:self-auto">
                     <button id="btnDaily" onclick="updateChartFilter('daily')" class="neo-btn px-3 py-1 rounded-lg text-[11px] font-black font-cyber bg-neoYellow">HARIAN</button>
                     <button id="btnWeekly" onclick="updateChartFilter('weekly')" class="neo-btn px-3 py-1 rounded-lg text-[11px] font-black font-cyber bg-white">MINGGUAN</button>
@@ -385,10 +297,10 @@
             <div class="h-80 relative">
                 <canvas id="lineChart"></canvas>
             </div>
-        </div>
+        </section>
 
         <!-- TRANSAKSI TABEL -->
-        <div class="neo-box p-5 rounded-2xl space-y-4">
+        <section class="neo-box p-5 rounded-2xl space-y-4">
             <div class="flex items-center justify-between border-b-3 border-black pb-3">
                 <h3 class="text-sm font-black font-cyber uppercase tracking-wider flex items-center gap-2">
                     <i class="fa-solid fa-list-check"></i> Status Transaksi Langsung
@@ -415,11 +327,11 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
 
     </main>
 
-    <!-- FOOTER SEO -->
+    <!-- FOOTER SITELINKS & SEO -->
     <footer class="max-w-6xl mx-auto px-4 mt-4 mb-4 text-center">
         <div class="neo-box p-4 rounded-2xl bg-white flex flex-wrap items-center justify-center gap-4 text-xs font-black font-cyber">
             <a href="/store" class="hover:underline">Katalog Toko</a>
@@ -431,8 +343,6 @@
             <a href="/riwayat" class="hover:underline">Riwayat Transaksi</a>
             <span>•</span>
             <a href="/privacy" class="hover:underline">Kebijakan Privasi</a>
-            <span>•</span>
-            <a href="/rss.xml" class="hover:underline">RSS Feed</a>
         </div>
     </footer>
 

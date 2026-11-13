@@ -3,16 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Riwayat Transaksi - ArulzXD Store</title>
-    <!-- Perbaikan Favicon & Apple Touch Icon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
-    <link rel="shortcut icon" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
-    <link rel="apple-touch-icon" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
-    
+    <meta name="theme-color" content="#FFDE59">
+    <title>Riwayat Transaksi & Pesanan - ArulzXD Store</title>
+    <meta name="description" content="Pantau status transaksi, invoice pembayaran QRIS, dan riwayat deposit saldo Anda di ArulzXD Store.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://arulzxd.biz.id/riwayat">
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
+    <link rel="shortcut icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://cdn.larasxd.my.id/files/1wh5do.png">
+
+    <!-- Open Graph / Facebook / WhatsApp / Telegram -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="ArulzXD Store">
+    <meta property="og:url" content="https://arulzxd.biz.id/riwayat">
+    <meta property="og:title" content="Riwayat Transaksi & Pesanan - ArulzXD Store">
+    <meta property="og:description" content="Pantau status transaksi, invoice pembayaran QRIS, dan riwayat deposit saldo Anda di ArulzXD Store.">
+    <meta property="og:image" content="https://cdn.larasxd.my.id/files/7TZ5vL.jpg">
+    <meta property="og:image:secure_url" content="https://cdn.larasxd.my.id/files/7TZ5vL.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://arulzxd.biz.id/riwayat">
+    <meta name="twitter:title" content="Riwayat Transaksi & Pesanan - ArulzXD Store">
+    <meta name="twitter:description" content="Pantau status transaksi, invoice pembayaran QRIS, dan riwayat deposit saldo Anda di ArulzXD Store.">
+    <meta name="twitter:image" content="https://cdn.larasxd.my.id/files/7TZ5vL.jpg">
+
+    <!-- Styles & Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -35,7 +62,7 @@
     </script>
     <style>
         body { background-color: #F4F0EA; color: #000000; overflow-x: hidden; }
-        
+
         .neo-box {
             background-color: #FFFFFF;
             border: 3px solid #000000;
@@ -56,13 +83,13 @@
             box-shadow: 2px 2px 0px #000000;
         }
 
-        /* FLUID CURVED NOTCH BOTTOM NAVIGATION BAR */
+        /* BOTTOM NAVIGATION BAR */
         .bottom-nav-fixed {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: calc(100% - 32px);
+            width: 92%;
             max-width: 440px;
             height: 64px;
             z-index: 9999;
@@ -144,119 +171,205 @@
             background-color: #000000;
             border-radius: 50%;
         }
+
+        .swal2-popup.cyber-swal {
+            background: #FFFFFF !important;
+            border: 3px solid #000000 !important;
+            border-radius: 20px !important;
+            color: #000000 !important;
+            box-shadow: 6px 6px 0px #000000 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
     </style>
 </head>
 <body class="font-sans antialiased text-black min-h-screen pb-36">
 
-<!-- FLOATING LIVE CHAT WIDGET POP-UP (RESPONSIVE FIX) -->
-<div id="liveChatWidgetContainer">
-    <div id="floatingChatWindow" class="fixed bottom-20 right-4 sm:right-6 z-[99999] hidden w-[calc(100vw-2rem)] max-w-[360px] h-[420px] max-h-[calc(100vh-100px)] bg-white border-3 border-black rounded-2xl shadow-[6px_6px_0px_#000] overflow-hidden flex flex-col transition-all duration-300">
-        
-        <!-- HEADER WINDOW -->
-        <div class="bg-neoYellow p-3 border-b-3 border-black flex items-center justify-between shrink-0">
-            <div class="flex items-center gap-2.5">
-                <div class="relative">
-                    <div class="w-8 h-8 rounded-full bg-white text-black border-2 border-black flex items-center justify-center font-bold text-xs shadow-[2px_2px_0px_#000]">
-                        <i class="fa-solid fa-headset"></i>
+    <!-- FLOATING LIVE CHAT WIDGET POP-UP -->
+    <div id="liveChatWidgetContainer">
+        <div id="floatingChatWindow" class="fixed bottom-20 right-4 sm:right-6 z-[99999] hidden w-[calc(100vw-2rem)] max-w-[360px] h-[420px] max-h-[calc(100vh-100px)] bg-white border-3 border-black rounded-2xl shadow-[6px_6px_0px_#000] overflow-hidden flex-col transition-all duration-300">
+            
+            <div class="bg-neoYellow p-3 border-b-3 border-black flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="relative">
+                        <div class="w-8 h-8 rounded-full bg-white text-black border-2 border-black flex items-center justify-center font-bold text-xs shadow-[2px_2px_0px_#000]">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-neoGreen border border-black rounded-full"></span>
                     </div>
-                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-neoGreen border border-black rounded-full"></span>
+                    <div>
+                        <h3 class="text-xs font-black font-cyber text-black">Customer Support</h3>
+                        <p class="text-[9px] text-black font-mono font-bold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-neoGreen animate-pulse"></span> Online 24/7
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="text-xs font-black font-cyber text-black">Customer Support</h3>
-                    <p class="text-[9px] text-black font-mono font-bold flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-neoGreen animate-pulse"></span> Online 24/7
-                    </p>
-                </div>
+                <button onclick="toggleChatWidget()" class="text-black font-black text-base transition p-1 hover:scale-110">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
-            <button onclick="toggleChatWidget()" class="text-black font-black text-base transition p-1 hover:scale-110">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+
+            <div id="widgetChatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 bg-neoBg scroll-smooth">
+                <div class="text-center text-[11px] text-slate-600 font-mono my-2 animate-pulse font-bold">Memuat pesan...</div>
+            </div>
+
+            <form id="widgetChatForm" onsubmit="sendWidgetMessage(event)" class="p-2.5 bg-white border-t-3 border-black flex items-center gap-2 shrink-0">
+                <input type="text" id="widgetChatInput" required placeholder="Tuliskan pesan Anda..." 
+                       class="flex-1 bg-neoBg border-2 border-black rounded-xl px-3 py-2 text-xs text-black font-bold placeholder-slate-500 focus:outline-none">
+                <button type="submit" class="neo-btn w-9 h-9 rounded-xl bg-neoYellow text-black flex items-center justify-center shrink-0 font-black">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+
         </div>
-
-        <!-- AREA CHAT MESSAGES -->
-        <div id="widgetChatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 bg-neoBg scroll-smooth">
-            <div class="text-center text-[11px] text-slate-600 font-mono my-2 animate-pulse font-bold">Memuat pesan...</div>
-        </div>
-
-        <!-- FORM KIRIM PESAN -->
-        <form id="widgetChatForm" onsubmit="sendWidgetMessage(event)" class="p-2.5 bg-white border-t-3 border-black flex items-center gap-2 shrink-0">
-            <input type="text" id="widgetChatInput" required placeholder="Tuliskan pesan Anda..." 
-                   class="flex-1 bg-neoBg border-2 border-black rounded-xl px-3 py-2 text-xs text-black font-bold placeholder-slate-500 focus:outline-none">
-            <button type="submit" class="neo-btn w-9 h-9 rounded-xl bg-neoYellow text-black flex items-center justify-center shrink-0 font-black">
-                <i class="fa-solid fa-paper-plane text-xs"></i>
-            </button>
-        </form>
-
     </div>
-</div>
 
     <!-- TOP NAVBAR -->
-    <nav class="sticky top-0 z-40 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
+    <header class="sticky top-0 z-40 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
         <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/store" class="text-2xl font-black font-cyber tracking-tight text-black">
-                Arulz<span class="bg-black text-white px-2 py-0.5 ml-1 rounded-md">Store</span>
+            <a href="/store" class="text-2xl font-black font-cyber tracking-tight text-black flex items-center gap-2">
+                <i class="fa-solid fa-bolt text-black text-xl"></i>
+                <span>Arulz<span class="bg-black text-white px-2 py-0.5 ml-1 rounded-md">Store</span></span>
             </a>
-            <button onclick="loadTransactions()" class="neo-btn bg-white text-black font-cyber font-black px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5">
-                <i class="fa-solid fa-rotate-right"></i> Refresh
+            <button type="button" onclick="loadRiwayatTransactions()" class="neo-btn bg-white text-black font-cyber font-black px-3.5 py-1.5 rounded-xl text-xs uppercase flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate"></i> Refresh
             </button>
         </div>
-    </nav>
+    </header>
 
-    <!-- MAIN CONTAINER (DISESUAIKAN KE MAX-W-6XL SEPERTI DEPOSIT.HTML) -->
-    <main class="max-w-6xl mx-auto px-4 py-6 w-full space-y-5">
-        <div class="p-6 neo-box rounded-2xl bg-neoCyan flex items-center justify-between">
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-1 space-y-6">
+
+        <!-- HERO HEADER -->
+        <section class="neo-box p-6 rounded-2xl bg-neoCyan flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h1 class="text-xl sm:text-3xl font-black text-black font-cyber flex items-center gap-2">
+                <h1 class="text-xl sm:text-3xl font-black font-cyber text-black flex items-center gap-2">
                     <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi
                 </h1>
-                <p class="text-xs sm:text-sm font-bold text-black mt-1">Seluruh daftar transaksi akun Anda tersimpan permanen di database.</p>
+                <p class="text-xs sm:text-sm font-bold text-black mt-1">
+                    Cek status pembayaran, detail invoice, dan riwayat deposit saldo Anda.
+                </p>
             </div>
-        </div>
+            <div class="bg-white border-3 border-black px-4 py-3 rounded-xl shadow-[4px_4px_0px_#000] flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-neoYellow border-2 border-black flex items-center justify-center font-black">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-black font-cyber uppercase block">Total Riwayat</span>
+                    <span id="totalHistoryBadge" class="text-base font-black font-cyber">0 Transaksi</span>
+                </div>
+            </div>
+        </section>
 
-        <!-- LIST TRANSAKSI -->
-        <div id="historyList" class="space-y-3">
-            <div class="neo-box rounded-xl p-4 text-center text-xs font-cyber font-black bg-white animate-pulse">
-                Memuat riwayat transaksi dari server...
+        <!-- FILTER & SEARCH BAR -->
+        <section class="neo-box p-4 rounded-2xl bg-white flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2">
+                <button type="button" onclick="setStatusFilter('all', this)" class="filter-tab neo-btn bg-neoYellow px-3.5 py-2 rounded-xl text-xs font-cyber font-black uppercase">
+                    Semua
+                </button>
+                <button type="button" onclick="setStatusFilter('lunas', this)" class="filter-tab neo-btn bg-white px-3.5 py-2 rounded-xl text-xs font-cyber font-black uppercase">
+                    Lunas
+                </button>
+                <button type="button" onclick="setStatusFilter('pending', this)" class="filter-tab neo-btn bg-white px-3.5 py-2 rounded-xl text-xs font-cyber font-black uppercase">
+                    Pending
+                </button>
+                <button type="button" onclick="setStatusFilter('batal', this)" class="filter-tab neo-btn bg-white px-3.5 py-2 rounded-xl text-xs font-cyber font-black uppercase">
+                    Batal
+                </button>
             </div>
-        </div>
+
+            <div class="relative flex-1 sm:max-w-xs">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-600"></i>
+                <input type="text" id="historySearchInput" oninput="renderFilteredHistory()" placeholder="Cari Order ID atau nama transaksi..." 
+                       class="w-full bg-neoBg border-2 border-black rounded-xl pl-9 pr-3.5 py-2 text-xs font-bold text-black placeholder-slate-500 focus:outline-none">
+            </div>
+        </section>
+
+        <!-- DAFTAR RIWAYAT TRANSAKSI -->
+        <section id="historyListContainer" class="space-y-4">
+            <div class="neo-box p-8 rounded-2xl bg-white text-center font-mono font-bold text-xs">
+                <i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Memuat riwayat transaksi Anda...
+            </div>
+        </section>
+
     </main>
 
-    <!-- CURVED ANIMATED BOTTOM NAV BAR -->
-    <div class="bottom-nav-fixed">
+    <!-- MODAL DETAIL INVOICE (TANPA AKSES PRODUK) -->
+    <div id="invoiceDetailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="neo-box w-full max-w-lg rounded-2xl bg-white p-5 sm:p-6 space-y-4 relative my-auto">
+            <button type="button" onclick="closeInvoiceModal()" class="w-8 h-8 rounded-lg border-2 border-black bg-neoBg hover:bg-neoPink flex items-center justify-center absolute top-4 right-4 text-black font-black text-sm transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="border-b-3 border-black pb-3">
+                <span id="modalStatusBadge" class="inline-block bg-neoGreen border-2 border-black px-2.5 py-0.5 rounded-md text-[10px] font-black font-cyber uppercase">
+                    LUNAS
+                </span>
+                <h3 id="modalProductTitle" class="text-lg font-black font-cyber mt-1.5">Detail Pesanan</h3>
+                <p class="text-[11px] font-mono font-bold text-slate-600">Order ID: <span id="modalOrderId">-</span></p>
+            </div>
+
+            <div class="bg-neoBg border-2 border-black rounded-xl p-3.5 space-y-2 text-xs font-bold">
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Tanggal Transaksi</span>
+                    <span id="modalDate" class="font-mono">-</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Metode Pembayaran</span>
+                    <span id="modalMethod" class="uppercase font-cyber">-</span>
+                </div>
+                <div class="flex justify-between border-t-2 border-black pt-2 text-sm font-black font-cyber">
+                    <span>Total Pembayaran</span>
+                    <span id="modalAmount">Rp 0</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+                <button type="button" id="modalRecheckBtn" onclick="recheckModalOrder()" class="hidden neo-btn flex-1 bg-neoGreen text-black font-cyber font-black py-2.5 rounded-xl text-xs uppercase flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-rotate"></i> Cek Status Bayar
+                </button>
+                <button type="button" onclick="closeInvoiceModal()" class="neo-btn flex-1 bg-white text-black font-cyber font-black py-2.5 rounded-xl text-xs uppercase">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIXED BOTTOM NAV BAR -->
+    <nav aria-label="Navigasi Utama" class="bottom-nav-fixed">
         <div class="bottom-nav-bg"></div>
         <div class="nav-items-wrapper">
-            <a href="/dashboard" class="nav-item-btn">
+            <a href="/" title="Beranda" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-house"></i>
                 </div>
                 <span>Home</span>
             </a>
-            <a href="/store" class="nav-item-btn">
+            <a href="/store" title="Katalog Toko" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-bag-shopping"></i>
                 </div>
                 <span>Toko</span>
             </a>
-            <a href="/deposit" class="nav-item-btn">
+            <a href="/deposit" title="Deposit Saldo" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-wallet"></i>
                 </div>
                 <span>Deposit</span>
             </a>
-            <a href="/riwayat" class="nav-item-btn active">
+            <a href="/riwayat" title="Riwayat Transaksi" class="nav-item-btn active">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                 </div>
                 <span>Riwayat</span>
             </a>
-            <a href="/profile" class="nav-item-btn">
+            <a href="/profile" id="nav-auth-link" title="Profil Akun" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-regular fa-user"></i>
                 </div>
                 <span id="nav-auth-label">Profil</span>
             </a>
         </div>
-    </div>
+    </nav>
 
     <!-- FLOATING LIVE CHAT BUTTON -->
     <button id="floatingChatToggleBtn" onclick="toggleChatWidget()" title="Bantuan & Live Chat" class="fixed bottom-24 right-5 z-[99990] flex items-center justify-center w-12 h-12 rounded-full bg-neoYellow border-3 border-black text-black shadow-[4px_4px_0px_#000] hover:scale-110 transition-transform duration-200 font-black">
@@ -265,112 +378,208 @@
     </button>
 
     <script>
+        let allTransactions = [];
+        let currentStatusFilter = 'all';
+        let activeModalOrderId = '';
+        let widgetChatInterval = null;
+
         function formatRupiah(angka) {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(angka || 0);
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
         }
 
-        async function loadTransactions() {
-            const listEl = document.getElementById('historyList');
-            
-            let localOrders = JSON.parse(localStorage.getItem('my_orders_history') || '[]');
-            const activeOrder = localStorage.getItem('active_order_id');
-            if (activeOrder && !localOrders.includes(activeOrder)) localOrders.push(activeOrder);
+        function normalizeStatusGroup(rawStatus) {
+            const s = (rawStatus || 'pending').toLowerCase();
+            if (['settlement', 'success', 'paid', 'settled', 'lunas'].includes(s)) return 'lunas';
+            if (['cancelled', 'failed', 'expired', 'expire', 'batal'].includes(s)) return 'batal';
+            return 'pending';
+        }
 
+        function setStatusFilter(filterVal, btnEl) {
+            currentStatusFilter = filterVal;
+            document.querySelectorAll('.filter-tab').forEach(btn => {
+                btn.classList.remove('bg-neoYellow');
+                btn.classList.add('bg-white');
+            });
+            if (btnEl) {
+                btnEl.classList.remove('bg-white');
+                btnEl.classList.add('bg-neoYellow');
+            }
+            renderFilteredHistory();
+        }
+
+        async function loadRiwayatTransactions() {
+            const container = document.getElementById('historyListContainer');
             try {
-                const res = await fetch(`/api/user/transactions?orderIds=${localOrders.join(',')}`);
-                const data = await res.json();
-
-                if (!res.ok || !data.status || !data.transactions || data.transactions.length === 0) {
-                    listEl.innerHTML = `
-                        <div class="neo-box rounded-2xl p-8 text-center space-y-3 bg-white">
-                            <i class="fa-solid fa-receipt text-5xl text-black"></i>
-                            <h3 class="text-sm font-black font-cyber">Belum Ada Riwayat Transaksi</h3>
-                            <p class="text-xs font-bold text-slate-600 max-w-sm mx-auto">Anda belum melakukan transaksi. Pesanan atau deposit Anda akan tersimpan secara permanen di akun Anda.</p>
-                            <a href="/store" class="neo-btn inline-block bg-neoYellow text-black font-cyber font-black px-4 py-2 rounded-xl text-xs uppercase">
-                                Belanja Sekarang
-                            </a>
-                        </div>
-                    `;
+                const userRes = await fetch('/api/user-status');
+                const userData = await userRes.json();
+                if (!userData.loggedIn) {
+                    window.location.href = '/login';
                     return;
                 }
 
-                listEl.innerHTML = data.transactions.map(trx => {
-                    const status = (trx.status || 'pending').toLowerCase();
-                    let badgeClass = 'bg-neoYellow text-black border-2 border-black';
-                    let statusLabel = 'PENDING';
+                const res = await fetch('/api/my-transactions');
+                const data = await res.json();
 
-                    if (['settlement','success','paid','settled'].includes(status)) {
-                        badgeClass = 'bg-neoGreen text-black border-2 border-black';
-                        statusLabel = 'BERHASIL / LUNAS';
-                    } else if (['cancelled','failed','expired'].includes(status)) {
-                        badgeClass = 'bg-neoPink text-black border-2 border-black';
-                        statusLabel = 'DIBATALKAN';
-                    }
-
-                    const typeTag = trx.type === 'DEPOSIT' 
-                        ? `<span class="text-[10px] bg-neoCyan text-black border border-black font-black px-2 py-0.5 rounded mr-2 uppercase">DEPOSIT</span>` 
-                        : `<span class="text-[10px] bg-neoYellow text-black border border-black font-black px-2 py-0.5 rounded mr-2 uppercase">PEMBELIAN</span>`;
-
-                    const namaProduk = trx.itemDetails?.nama || (trx.type === 'DEPOSIT' ? 'Deposit Saldo' : 'Produk Store');
-                    const harga = trx.amount || trx.itemDetails?.harga || 0;
-                    const dateStr = trx.createdAt ? new Date(trx.createdAt).toLocaleString('id-ID') : '-';
-
-                    let linkBtn = '';
-                    if (trx.type !== 'DEPOSIT' && ['settlement','success','paid','settled'].includes(status) && (trx.productLink || trx.itemDetails?.link)) {
-                        const link = trx.productLink || trx.itemDetails?.link;
-                        linkBtn = `
-                            <a href="${link}" target="_blank" class="neo-btn text-xs bg-neoCyan text-black font-black px-3 py-1.5 rounded-lg inline-flex items-center gap-1 mt-2 font-cyber">
-                                <i class="fa-solid fa-cloud-arrow-down"></i> Akses Produk
-                            </a>
-                        `;
-                    }
-
-                    return `
-                        <div class="neo-box rounded-xl p-4 bg-white space-y-2">
-                            <div class="flex items-center justify-between border-b-2 border-black pb-2">
-                                <span class="text-[11px] font-mono font-bold">Order ID: <strong class="text-black font-black">${trx.orderId}</strong></span>
-                                <span class="text-[10px] font-black font-cyber px-2.5 py-0.5 rounded-full ${badgeClass} uppercase">${statusLabel}</span>
-                            </div>
-                            <div class="flex items-start justify-between gap-3 pt-1">
-                                <div>
-                                    <h4 class="text-sm font-black font-cyber text-black flex items-center">${typeTag}${namaProduk}</h4>
-                                    <p class="text-[11px] font-bold text-slate-600 mt-1">Waktu: ${dateStr}</p>
-                                    ${linkBtn}
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-xs font-bold text-slate-600 block">Total Tagihan:</span>
-                                    <span class="text-sm font-black font-cyber text-black">${formatRupiah(harga)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-            } catch(err) {
-                listEl.innerHTML = `<div class="neo-box p-4 bg-neoPink text-center text-xs font-black font-cyber">Gagal memuat data transaksi.</div>`;
+                if (data.status && Array.isArray(data.transactions)) {
+                    allTransactions = data.transactions;
+                    document.getElementById('totalHistoryBadge').innerText = `${allTransactions.length} Transaksi`;
+                    renderFilteredHistory();
+                } else {
+                    allTransactions = [];
+                    renderFilteredHistory();
+                }
+            } catch (err) {
+                container.innerHTML = `
+                    <div class="neo-box p-6 rounded-2xl bg-neoPink text-center text-xs font-black font-cyber">
+                        Gagal memuat riwayat transaksi. Silakan coba lagi.
+                    </div>
+                `;
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadTransactions();
-            fetch('/api/user-status')
-                .then(res => res.json())
-                .then(data => {
-                    const authLabel = document.getElementById('nav-auth-label');
-                    if (data.loggedIn && data.user) {
-                        if (authLabel) authLabel.innerText = 'Profil';
-                    } else {
-                        if (authLabel) authLabel.innerText = 'Login';
-                    }
-                })
-                .catch(err => console.error(err));
-        });
+        function renderFilteredHistory() {
+            const container = document.getElementById('historyListContainer');
+            const keyword = (document.getElementById('historySearchInput')?.value || '').trim().toLowerCase();
 
-        let widgetChatInterval = null;
+            const filtered = allTransactions.filter(trx => {
+                const group = normalizeStatusGroup(trx.status);
+                const matchStatus = currentStatusFilter === 'all' || group === currentStatusFilter;
+                const orderIdStr = (trx.orderId || '').toLowerCase();
+                const isDeposit = (trx.type || '').toUpperCase() === 'DEPOSIT';
+                const prodNameStr = (trx.productName || trx.produk || (isDeposit ? 'Deposit Saldo Akun' : 'Pembelian Produk')).toLowerCase();
+                const matchKeyword = !keyword || orderIdStr.includes(keyword) || prodNameStr.includes(keyword);
+                return matchStatus && matchKeyword;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="neo-box p-8 rounded-2xl bg-white text-center space-y-3">
+                        <div class="w-12 h-12 rounded-2xl bg-neoYellow border-2 border-black mx-auto flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+                        <h3 class="text-sm font-black font-cyber uppercase">Tidak Ada Transaksi Ditemukan</h3>
+                        <p class="text-xs font-bold text-slate-600">Belum ada riwayat pesanan yang sesuai dengan filter saat ini.</p>
+                        <a href="/store" class="neo-btn inline-flex items-center gap-2 bg-neoYellow px-5 py-2.5 rounded-xl text-xs font-cyber font-black uppercase">
+                            <i class="fa-solid fa-store"></i> Belanja di Toko
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(trx => {
+                const group = normalizeStatusGroup(trx.status);
+                let badgeClass = 'bg-neoYellow text-black';
+                let badgeLabel = 'PENDING';
+                let badgeIcon = 'fa-spinner fa-spin';
+
+                if (group === 'lunas') {
+                    badgeClass = 'bg-neoGreen text-black';
+                    badgeLabel = 'LUNAS';
+                    badgeIcon = 'fa-circle-check';
+                } else if (group === 'batal') {
+                    badgeClass = 'bg-neoPink text-black';
+                    badgeLabel = 'BATAL';
+                    badgeIcon = 'fa-circle-xmark';
+                }
+
+                const isDeposit = (trx.type || '').toUpperCase() === 'DEPOSIT';
+                const title = trx.productName || trx.produk || (isDeposit ? 'Deposit Saldo Akun' : 'Pembelian Produk');
+                const dateStr = trx.createdAt
+                    ? new Date(trx.createdAt).toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : '-';
+
+                return `
+                    <article class="neo-box p-4 sm:p-5 rounded-2xl bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="space-y-1.5">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="inline-flex items-center gap-1 text-[10px] font-black font-cyber px-2.5 py-0.5 rounded-md border-2 border-black ${badgeClass}">
+                                    <i class="fa-solid ${badgeIcon}"></i> ${badgeLabel}
+                                </span>
+                                <span class="text-[11px] font-mono font-bold text-slate-600">#${trx.orderId || '-'}</span>
+                            </div>
+                            <h2 class="text-sm sm:text-base font-black font-cyber text-black">${title}</h2>
+                            <p class="text-[11px] font-bold text-slate-600">
+                                <i class="fa-regular fa-clock mr-1"></i> ${dateStr} · Metode: <span class="uppercase text-black">${trx.paymentMethod || 'QRIS / Saldo'}</span>
+                            </p>
+                        </div>
+
+                        <div class="flex sm:flex-col items-center sm:items-end justify-between gap-2 border-t-2 sm:border-t-0 border-black pt-3 sm:pt-0">
+                            <span class="text-base sm:text-lg font-black font-cyber text-black">${formatRupiah(trx.amount || 0)}</span>
+                            <button type="button" onclick="openInvoiceModal('${trx.orderId}')" class="neo-btn bg-neoCyan text-black font-cyber font-black px-4 py-2 rounded-xl text-xs uppercase flex items-center gap-1.5">
+                                <i class="fa-solid fa-file-invoice"></i> Detail Invoice
+                            </button>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function openInvoiceModal(orderId) {
+            const trx = allTransactions.find(t => t.orderId === orderId);
+            if (!trx) return;
+
+            activeModalOrderId = trx.orderId;
+            const group = normalizeStatusGroup(trx.status);
+
+            const badgeEl = document.getElementById('modalStatusBadge');
+            badgeEl.className = 'inline-block border-2 border-black px-2.5 py-0.5 rounded-md text-[10px] font-black font-cyber uppercase ';
+            if (group === 'lunas') {
+                badgeEl.className += 'bg-neoGreen text-black';
+                badgeEl.innerText = 'LUNAS / SELESAI';
+            } else if (group === 'batal') {
+                badgeEl.className += 'bg-neoPink text-black';
+                badgeEl.innerText = 'BATAL / KEDALUWARSA';
+            } else {
+                badgeEl.className += 'bg-neoYellow text-black';
+                badgeEl.innerText = 'MENUNGGU PEMBAYARAN';
+            }
+
+            const isDeposit = (trx.type || '').toUpperCase() === 'DEPOSIT';
+            document.getElementById('modalProductTitle').innerText = trx.productName || trx.produk || (isDeposit ? 'Deposit Saldo Akun' : 'Pembelian Produk');
+            document.getElementById('modalOrderId').innerText = trx.orderId || '-';
+            document.getElementById('modalAmount').innerText = formatRupiah(trx.amount || 0);
+            document.getElementById('modalMethod').innerText = trx.paymentMethod || 'QRIS / Saldo';
+            document.getElementById('modalDate').innerText = trx.createdAt
+                ? new Date(trx.createdAt).toLocaleString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                : '-';
+
+            const recheckBtn = document.getElementById('modalRecheckBtn');
+            if (group === 'pending') {
+                recheckBtn.classList.remove('hidden');
+            } else {
+                recheckBtn.classList.add('hidden');
+            }
+
+            const modal = document.getElementById('invoiceDetailModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeInvoiceModal() {
+            const modal = document.getElementById('invoiceDetailModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function recheckModalOrder() {
+            if (!activeModalOrderId) return;
+            try {
+                const res = await fetch(`/transactions/${activeModalOrderId}?refresh=1`);
+                const data = await res.json();
+                await loadRiwayatTransactions();
+                openInvoiceModal(activeModalOrderId);
+
+                const st = (data.data?.status || 'pending').toUpperCase();
+                Swal.fire({
+                    icon: 'info',
+                    title: `STATUS: ${st}`,
+                    timer: 1600,
+                    showConfirmButton: false,
+                    customClass: { popup: 'cyber-swal' }
+                });
+            } catch (err) {}
+        }
 
         function toggleChatWidget() {
             const windowEl = document.getElementById('floatingChatWindow');
@@ -378,10 +587,12 @@
 
             if (isHidden) {
                 windowEl.classList.remove('hidden');
+                windowEl.classList.add('flex');
                 loadWidgetMessages();
                 if (!widgetChatInterval) widgetChatInterval = setInterval(loadWidgetMessages, 3000);
             } else {
                 windowEl.classList.add('hidden');
+                windowEl.classList.remove('flex');
                 if (widgetChatInterval) {
                     clearInterval(widgetChatInterval);
                     widgetChatInterval = null;
@@ -451,6 +662,8 @@
                 loadWidgetMessages();
             } catch(e) {}
         }
+
+        document.addEventListener('DOMContentLoaded', loadRiwayatTransactions);
     </script>
 </body>
 </html>

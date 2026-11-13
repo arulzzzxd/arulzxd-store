@@ -3,34 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Autentikasi - ArulzXD STORE</title>
-        <!-- Open Graph / Facebook / WhatsApp / Telegram -->
+    <meta name="theme-color" content="#FFDE59">
+    <title>Masuk & Daftar Akun - ArulzXD Store</title>
+    <meta name="description" content="Masuk atau daftar akun ArulzXD Store untuk menikmati layanan digital premium, source code, dan transaksi otomatis 24/7.">
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
+    <link rel="shortcut icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://cdn.larasxd.my.id/files/1wh5do.png">
+
+    <!-- Open Graph / Facebook / WhatsApp / Telegram -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.arulzxd.biz.id/login">
-    <meta property="og:title" content="Autentikasi & Portal Masuk - ArulzXD Store">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="ArulzXD Store">
+    <meta property="og:url" content="https://arulzxd.biz.id/login">
+    <meta property="og:title" content="Masuk & Daftar Akun - ArulzXD Store">
     <meta property="og:description" content="Masuk atau daftar akun ArulzXD Store untuk menikmati layanan digital premium secara otomatis dan aman.">
     <meta property="og:image" content="https://cdn.larasxd.my.id/files/Jnaxmr52s6YfY9K2.jpg">
     <meta property="og:image:secure_url" content="https://cdn.larasxd.my.id/files/Jnaxmr52s6YfY9K2.jpg">
-    <meta property="og:image:type" content="image/jpg">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://www.arulzxd.biz.id/login">
-    <meta name="twitter:title" content="Autentikasi & Portal Masuk - ArulzXD Store">
+    <meta name="twitter:url" content="https://arulzxd.biz.id/login">
+    <meta name="twitter:title" content="Masuk & Daftar Akun - ArulzXD Store">
     <meta name="twitter:description" content="Masuk atau daftar akun ArulzXD Store untuk menikmati layanan digital premium secara otomatis dan aman.">
     <meta name="twitter:image" content="https://cdn.larasxd.my.id/files/Jnaxmr52s6YfY9K2.jpg">
 
-    <!-- Perbaikan Favicon & Apple Touch Icon -->
-    <link rel="icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
-    <link rel="canonical" href="https://www.arulzxd.biz.id/login">
-    <meta name="description" content="Masuk atau daftar akun ArulzXD Store untuk menikmati layanan digital premium secara otomatis dan aman.">
-
+    <!-- Styles & Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <script>
         tailwind.config = {
             theme: { 
@@ -182,63 +189,17 @@
             90% { clip: rect(0, 0, 0, 0); transform: none; }
             100% { clip: rect(0, 0, 0, 0); transform: none; }
         }
-
-        #cyber-loader-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            background-color: #F5F2EB;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
-        }
-        #cyber-loader-overlay.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
-
-        .animated-dots::after {
-            content: '';
-            display: inline-block;
-            width: 1.5em;
-            text-align: left;
-            animation: dotsAnimation 1.5s steps(4, end) infinite;
-        }
-        @keyframes dotsAnimation {
-            0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
-        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 antialiased text-black">
 
-    <!-- LOADER OVERLAY -->
-    <div id="cyber-loader-overlay">
-        <div class="neo-box p-6 rounded-2xl flex flex-col items-center bg-white">
-            <img src="https://files.catbox.moe/kdowze.png" alt="Logo" class="w-20 h-20 rounded-full border-3 border-black mb-4 shadow-[4px_4px_0px_#000]">
-            <div id="loader-title-text" class="text-base font-black tracking-wider uppercase font-cyber mb-1">
-                Memuat Halaman Portal<span class="animated-dots"></span>
-            </div>
-            <div class="text-[11px] font-bold font-mono tracking-wider uppercase bg-neoYellow border-2 border-black px-2 py-0.5">
-                SYSTEM INITIALIZING
-            </div>
-            <div class="w-64 mt-6">
-                <div class="flex items-center justify-between text-xs font-black font-cyber mb-1">
-                    <span>STATUS</span>
-                    <span id="loader-percentage">0%</span>
-                </div>
-                <div class="w-full h-4 bg-white rounded-none border-3 border-black p-0.5">
-                    <div id="loader-progress-fill" class="h-full bg-neoCyan w-0 border-r-2 border-black"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- MAIN PORTAL AUTHENTICATION CARD -->
-    <div class="neo-box p-5 sm:p-7 rounded-2xl w-full max-w-md bg-white relative overflow-hidden flex flex-col justify-start my-auto z-10 space-y-3.5">
+    <main class="neo-box p-5 sm:p-7 rounded-2xl w-full max-w-md bg-white relative overflow-hidden flex flex-col justify-start my-auto z-10 space-y-3.5">
         
         <!-- HEADER PORTAL -->
-        <div class="text-center relative z-10 pt-1 pb-2 border-b-3 border-black">
+        <header class="text-center relative z-10 pt-1 pb-2 border-b-3 border-black">
             <h1 class="text-2xl sm:text-3xl font-black font-cyber tracking-tight uppercase leading-none">
-                <span class="brutal-glitch" data-text="ARULZXD-STORE">ARULZXD-STORE</span>
+                <a href="/" class="brutal-glitch" data-text="ARULZXD-STORE">ARULZXD-STORE</a>
             </h1>
             <div class="mt-2 flex items-center justify-center">
                 <span class="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-slate-800 tracking-wider uppercase bg-white border-2 border-black px-3 py-0.5 rounded-full shadow-[2px_2px_0px_#000]">
@@ -246,20 +207,11 @@
                     AUTHENTICATION PORTAL
                 </span>
             </div>
-        </div>
+        </header>
 
         <!-- BANNER ASPECT 16:9 PRESISI -->
         <div class="relative w-full aspect-video rounded-xl border-3 border-black shadow-[3px_3px_0px_#000] overflow-hidden bg-black shrink-0">
-            <!-- Menampilkan GIF / Gambar Banner -->
-            <img src="https://cdn.larasxd.my.id/files/gmNmPPTi.gif" alt="Banner ArulzXD" class="w-full h-full object-cover pointer-events-none opacity-90">
-
-            <!-- Opsi Video MP4 (Jika Menggunakan Video) -->
-            <!--
-            <video autoplay loop muted playsinline class="w-full h-full object-cover pointer-events-none opacity-90">
-                <source src="https://arulz-xd.my.id/files/F803Z7.mp4" type="video/mp4">
-            </video>
-            -->
-            
+            <img src="https://cdn.larasxd.my.id/files/gmNmPPTi.gif" alt="Banner ArulzXD Store" class="w-full h-full object-cover pointer-events-none opacity-90">
             <div class="absolute bottom-2 left-2 bg-black/75 backdrop-blur-sm text-white text-[9px] font-cyber font-bold px-2 py-0.5 rounded border border-white/30 flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-neoGreen animate-pulse"></span> ARULZXD OFFICIAL
             </div>
@@ -267,14 +219,14 @@
 
         <!-- TAB NAVIGATION -->
         <div class="grid grid-cols-3 gap-2">
-            <button id="tab-login" onclick="switchTab('signin')" class="tab-nav-btn active py-2 text-xs font-black font-cyber uppercase tracking-wider text-black rounded-xl">
+            <button type="button" id="tab-login" onclick="switchTab('signin')" class="tab-nav-btn active py-2 text-xs font-black font-cyber uppercase tracking-wider text-black rounded-xl">
                 LOGIN
             </button>
-            <button id="tab-register" onclick="switchTab('signup')" class="tab-nav-btn py-2 text-xs font-black font-cyber uppercase tracking-wider text-black rounded-xl">
+            <button type="button" id="tab-register" onclick="switchTab('signup')" class="tab-nav-btn py-2 text-xs font-black font-cyber uppercase tracking-wider text-black rounded-xl">
                 REGISTER
             </button>
-            <button id="tab-forgot" onclick="switchTab('forgot')" class="tab-nav-btn py-2 text-xs font-black font-cyber uppercase tracking-wider text-black rounded-xl">
-                RESET PW
+            <button type="button" id="tab-forgot" onclick="switchTab('forgot')" class="tab-nav-btn py-2 text-xs font-black font-cyber uppercase tracking-wider text-black rounded-xl">
+                RESET PASSWORD
             </button>
         </div>
 
@@ -282,7 +234,7 @@
         <div id="signin-form" class="space-y-3 relative z-10">
             <form id="loginForm" action="/auth/login" method="POST" class="space-y-2.5">
                 <div>
-                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-1">
+                    <label for="login-username" class="block text-[11px] font-black uppercase font-cyber text-black mb-1">
                         USERNAME / EMAIL
                     </label>
                     <div class="relative">
@@ -293,7 +245,7 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-1">
+                    <label for="login-password" class="block text-[11px] font-black uppercase font-cyber text-black mb-1">
                         PASSWORD
                     </label>
                     <div class="relative">
@@ -326,10 +278,10 @@
 
             <div class="space-y-2">
                 <a id="btnGithubAuth" href="/auth/github" class="neo-btn btn-disabled flex items-center justify-center gap-2.5 bg-neoCyan text-black py-2.5 rounded-xl text-xs font-black font-cyber uppercase w-full">
-                    <i class="fa-brands fa-github text-lg leading-none"></i> DAFTAR DENGAN GITHUB
+                    <i class="fa-brands fa-github text-lg leading-none"></i> LANJUTKAN DENGAN GITHUB
                 </a>
                 <a id="btnGoogleAuth" href="/auth/google" class="neo-btn btn-disabled flex items-center justify-center gap-2.5 bg-white text-black py-2.5 rounded-xl text-xs font-black font-cyber uppercase w-full">
-                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-5 h-5 object-contain" alt="Google"> DAFTAR DENGAN GOOGLE
+                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-5 h-5 object-contain" alt="Google"> LANJUTKAN DENGAN GOOGLE
                 </a>
             </div>
         </div>
@@ -338,15 +290,15 @@
         <div id="signup-form" class="space-y-3 relative z-10 hidden-form">
             <form id="registerForm" action="/auth/register" method="POST" class="space-y-2.5">
                 <div>
-                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5">NAMA LENGKAP / USERNAME</label>
-                    <input type="text" name="username" required placeholder="Nama kamu" class="neo-input w-full bg-white rounded-xl px-3.5 py-2 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                    <label for="register-username" class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5">NAMA LENGKAP / USERNAME</label>
+                    <input type="text" id="register-username" name="username" required placeholder="Nama kamu" class="neo-input w-full bg-white rounded-xl px-3.5 py-2 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5">EMAIL ADDRESS</label>
-                    <input type="email" id="register-email" name="email" required placeholder="emailkamu.com" class="neo-input w-full bg-white rounded-xl px-3.5 py-2 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                    <label for="register-email" class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5">EMAIL ADDRESS</label>
+                    <input type="email" id="register-email" name="email" required placeholder="emailkamu@gmail.com" class="neo-input w-full bg-white rounded-xl px-3.5 py-2 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5">PASSWORD</label>
+                    <label for="register-password" class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5">PASSWORD</label>
                     <div class="relative">
                         <input id="register-password" type="password" name="password" required placeholder="Min. 8 karakter" class="neo-input w-full bg-white rounded-xl pl-3.5 pr-12 py-2 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
                         <button type="button" onclick="togglePassword('register-password', 'eye-icon-register')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-black hover:text-amber-600 transition text-sm">
@@ -356,7 +308,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5 flex items-center justify-between">
+                    <label for="referralCodeInput" class="block text-[11px] font-black uppercase font-cyber text-black mb-0.5 flex items-center justify-between">
                         <span>KODE REFERAL</span>
                         <span class="text-[9px] bg-neoGreen text-black border border-black font-bold px-1 rounded lowercase">(Bonus Rp 500)</span>
                     </label>
@@ -397,20 +349,20 @@
         <div id="forgot-form" class="space-y-3 relative z-10 hidden-form">
             <form id="forgotForm" class="space-y-2.5">
                 <div>
-                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-1">EMAIL ADDRESS TERDAFTAR</label>
+                    <label for="forgot-email" class="block text-[11px] font-black uppercase font-cyber text-black mb-1">EMAIL ADDRESS TERDAFTAR</label>
                     <div class="flex gap-2">
-                        <input type="email" id="forgot-email" name="email" required placeholder="emailkamu.com" class="neo-input w-full bg-white rounded-xl px-3.5 py-2.5 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
+                        <input type="email" id="forgot-email" name="email" required placeholder="emailkamu@gmail.com" class="neo-input w-full bg-white rounded-xl px-3.5 py-2.5 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
                         <button type="button" onclick="requestForgotPasswordOTP()" class="neo-btn bg-neoCyan text-black text-xs font-black font-cyber px-3 py-2.5 rounded-xl uppercase whitespace-nowrap">KIRIM OTP</button>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-1">KODE OTP 6 DIGIT</label>
-                    <input type="text" id="forgot-otp" maxLength="6" placeholder="123456" class="neo-input w-full bg-white rounded-xl px-3.5 py-2.5 text-xs font-mono font-black tracking-widest text-black placeholder-slate-400 focus:outline-none transition">
+                    <label for="forgot-otp" class="block text-[11px] font-black uppercase font-cyber text-black mb-1">KODE OTP 6 DIGIT</label>
+                    <input type="text" id="forgot-otp" maxlength="6" placeholder="123456" class="neo-input w-full bg-white rounded-xl px-3.5 py-2.5 text-xs font-mono font-black tracking-widest text-black placeholder-slate-400 focus:outline-none transition">
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-black uppercase font-cyber text-black mb-1">PASSWORD BARU</label>
+                    <label for="forgot-new-password" class="block text-[11px] font-black uppercase font-cyber text-black mb-1">PASSWORD BARU</label>
                     <div class="relative">
                         <input type="password" id="forgot-new-password" placeholder="••••••••" class="neo-input w-full bg-white rounded-xl pl-3.5 pr-12 py-2.5 text-xs font-bold text-black placeholder-slate-400 focus:outline-none transition">
                         <button type="button" onclick="togglePassword('forgot-new-password', 'eye-icon-forgot')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-black hover:text-amber-600 transition text-sm">
@@ -423,14 +375,23 @@
             </form>
         </div>
 
-        <!-- FOOTER BADGES -->
-        <div class="pt-2.5 mt-2 border-t-2 border-black flex items-center justify-around text-[9px] sm:text-[10px] font-black font-cyber text-black">
-            <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-neoGreen"></i> 100% Aman</span>
-            <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-neoYellow"></i> Otomatis</span>
-            <span class="flex items-center gap-1"><i class="fa-solid fa-headset text-neoCyan"></i> Fast Response</span>
-        </div>
+        <!-- FOOTER BADGES & NAVIGASI -->
+        <footer class="pt-2.5 mt-2 border-t-2 border-black space-y-2">
+            <div class="flex items-center justify-around text-[9px] sm:text-[10px] font-black font-cyber text-black">
+                <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-neoGreen"></i> 100% Aman</span>
+                <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-neoYellow"></i> Otomatis</span>
+                <span class="flex items-center gap-1"><i class="fa-solid fa-headset text-neoCyan"></i> Fast Response</span>
+            </div>
+            <div class="flex items-center justify-center gap-3 text-[10px] font-bold text-slate-600">
+                <a href="/" class="hover:underline text-black">Beranda</a>
+                <span>•</span>
+                <a href="/store" class="hover:underline text-black">Katalog Toko</a>
+                <span>•</span>
+                <a href="/privacy" class="hover:underline text-black">Kebijakan Privasi</a>
+            </div>
+        </footer>
 
-    </div>
+    </main>
 
     <script>
         const swalConfig = {
@@ -455,10 +416,8 @@
         function handleUsernameInput(val) {
             if (isUsernameVisible) {
                 rawUsernameInput = val;
-            } else {
-                if (!val.includes('***')) {
-                    rawUsernameInput = val;
-                }
+            } else if (!val.includes('***')) {
+                rawUsernameInput = val;
             }
         }
 
@@ -934,41 +893,6 @@
                 });
             }
         });
-
-        let currentProgress = 0;
-        const progressFill = document.getElementById('loader-progress-fill');
-        const percentageText = document.getElementById('loader-percentage');
-        const loaderOverlay = document.getElementById('cyber-loader-overlay');
-
-        function updateProgress(targetVal) {
-            currentProgress = Math.min(Math.max(currentProgress, targetVal), 100);
-            if (progressFill) progressFill.style.width = currentProgress + '%';
-            if (percentageText) percentageText.innerText = Math.floor(currentProgress) + '%';
-        }
-
-        const progressInterval = setInterval(() => {
-            if (currentProgress < 85) {
-                const increment = Math.random() * 12 + 5;
-                updateProgress(currentProgress + increment);
-            }
-        }, 120);
-
-        window.addEventListener('load', () => {
-            clearInterval(progressInterval);
-            updateProgress(100);
-
-            setTimeout(() => {
-                if (loaderOverlay) loaderOverlay.classList.add('fade-out');
-            }, 400);
-        });
-
-        setTimeout(() => {
-            clearInterval(progressInterval);
-            updateProgress(100);
-            if (loaderOverlay && !loaderOverlay.classList.contains('fade-out')) {
-                loaderOverlay.classList.add('fade-out');
-            }
-        }, 3500);
     </script>
 </body>
 </html>

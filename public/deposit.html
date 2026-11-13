@@ -3,15 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Deposit Saldo - ArulzXD Store</title>
+    <meta name="theme-color" content="#FFDE59">
+    <title>Deposit Saldo Instan - ArulzXD Store</title>
+    <meta name="description" content="Isi ulang saldo akun ArulzXD Store secara otomatis 24/7 menggunakan QRIS All Payment (DANA, OVO, GoPay, ShopeePay, M-Banking).">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://arulzxd.biz.id/deposit">
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
+    <link rel="shortcut icon" href="https://cdn.larasxd.my.id/files/1wh5do.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://cdn.larasxd.my.id/files/1wh5do.png">
+
     <!-- Open Graph / Facebook / WhatsApp / Telegram -->
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="ArulzXD Store">
     <meta property="og:url" content="https://arulzxd.biz.id/deposit">
     <meta property="og:title" content="Deposit Saldo Instan - ArulzXD Store">
     <meta property="og:description" content="Isi ulang saldo akun Anda secara otomatis 24/7 menggunakan QRIS All Payment di ArulzXD Store.">
     <meta property="og:image" content="https://cdn.larasxd.my.id/files/wWSxaeJ0ka.jpg">
     <meta property="og:image:secure_url" content="https://cdn.larasxd.my.id/files/wWSxaeJ0ka.jpg">
-    <meta property="og:image:type" content="image/jpg">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -22,19 +34,13 @@
     <meta name="twitter:description" content="Isi ulang saldo akun Anda secara otomatis 24/7 menggunakan QRIS All Payment di ArulzXD Store.">
     <meta name="twitter:image" content="https://cdn.larasxd.my.id/files/wWSxaeJ0ka.jpg">
 
-    <!-- Favicon & Apple Touch Icon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
-    <link rel="shortcut icon" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
-    <link rel="apple-touch-icon" href="https://cdn.larasxd.my.id/files/Z9zjj0RF7G7ena.png">
-    
-    <meta name="description" content="Isi ulang saldo akun ArulzXD Store secara otomatis 24 jam dengan QRIS All Payment.">
-    
+    <!-- Styles & Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -83,7 +89,7 @@
             box-shadow: 5px 5px 0px #000000 !important;
         }
 
-        /* FLUID CURVED NOTCH BOTTOM NAVIGATION BAR */
+        /* BOTTOM NAVIGATION BAR */
         .bottom-nav-fixed {
             position: fixed;
             bottom: 20px;
@@ -181,7 +187,6 @@
             font-family: 'Plus Jakarta Sans', sans-serif !important;
         }
 
-        /* FIX TAMPILAN QRIS: PRESISI, TAJAM, TIDAK TERPOTONG */
         #depQrcodeContainer {
             display: flex;
             align-items: center;
@@ -207,7 +212,6 @@
     <div id="liveChatWidgetContainer">
         <div id="floatingChatWindow" class="fixed bottom-20 right-4 sm:right-6 z-[99999] hidden w-[calc(100vw-2rem)] max-w-[360px] h-[420px] max-h-[calc(100vh-100px)] bg-white border-3 border-black rounded-2xl shadow-[6px_6px_0px_#000] overflow-hidden flex-col transition-all duration-300">
             
-            <!-- HEADER WINDOW -->
             <div class="bg-neoYellow p-3 border-b-3 border-black flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-2.5">
                     <div class="relative">
@@ -228,12 +232,10 @@
                 </button>
             </div>
 
-            <!-- AREA CHAT MESSAGES -->
             <div id="widgetChatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 bg-neoBg scroll-smooth">
                 <div class="text-center text-[11px] text-slate-600 font-mono my-2 animate-pulse font-bold">Memuat pesan...</div>
             </div>
 
-            <!-- FORM KIRIM PESAN -->
             <form id="widgetChatForm" onsubmit="sendWidgetMessage(event)" class="p-2.5 bg-white border-t-3 border-black flex items-center gap-2 shrink-0">
                 <input type="text" id="widgetChatInput" required placeholder="Tuliskan pesan Anda..." 
                        class="flex-1 bg-neoBg border-2 border-black rounded-xl px-3 py-2 text-xs text-black font-bold placeholder-slate-500 focus:outline-none">
@@ -246,7 +248,7 @@
     </div>
 
     <!-- TOP NAVBAR -->
-    <nav class="sticky top-0 z-40 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
+    <header class="sticky top-0 z-40 bg-neoYellow border-b-3 border-black shadow-[0_4px_0_#000]">
         <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
             <a href="/store" class="text-2xl font-black font-cyber tracking-tight text-black flex items-center gap-2">
                 <i class="fa-solid fa-bolt text-black text-xl"></i>
@@ -258,13 +260,13 @@
                 </span>
             </div>
         </div>
-    </nav>
+    </header>
 
     <!-- MAIN CONTAINER -->
     <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-1 space-y-6">
         
         <!-- HEADER TITLE PAGE -->
-        <div class="p-6 neo-box rounded-2xl bg-neoCyan flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <section class="p-6 neo-box rounded-2xl bg-neoCyan flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
                 <h1 class="text-xl sm:text-3xl font-black font-cyber text-black flex items-center gap-2">
                     <i class="fa-solid fa-wallet"></i> Deposit Saldo Instan
@@ -272,19 +274,18 @@
                 <p class="text-xs sm:text-sm font-bold text-black mt-1">Isi ulang saldo akun Anda secara otomatis 24/7 menggunakan QRIS All Payment.</p>
             </div>
             
-            <!-- WIDGET SALDO AKUN -->
             <div class="bg-white border-3 border-black p-4 rounded-xl flex items-center justify-between md:justify-end gap-4 min-w-[240px] shadow-[4px_4px_0px_#000]">
                 <div class="text-left md:text-right">
                     <span class="text-[10px] font-black font-cyber uppercase tracking-wider block">Saldo Saat Ini</span>
-                    <h3 id="depSaldoVal" class="text-xl sm:text-2xl font-black font-cyber text-black">Rp 0</h3>
+                    <h2 id="depSaldoVal" class="text-xl sm:text-2xl font-black font-cyber text-black">Rp 0</h2>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-neoYellow border-2 border-black flex items-center justify-center text-black text-lg shadow-[2px_2px_0px_#000] shrink-0">
                     <i class="fa-solid fa-coins"></i>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- BANNER TRANSAKSI AKTIF (MUNCUL JIKA MODAL QRIS DITUTUP SEMENTARA) -->
+        <!-- BANNER TRANSAKSI AKTIF -->
         <div id="activeDepositBanner" class="hidden neo-box rounded-2xl bg-neoYellow p-4 flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-white border-2 border-black flex items-center justify-center shrink-0">
@@ -309,7 +310,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
             <!-- KOLOM KIRI: PRESET NOMINAL & FORM -->
-            <div class="lg:col-span-7 neo-box rounded-2xl p-5 sm:p-6 bg-white space-y-6">
+            <section class="lg:col-span-7 neo-box rounded-2xl p-5 sm:p-6 bg-white space-y-6">
                 
                 <div class="flex items-center justify-between border-b-3 border-black pb-3">
                     <h2 class="text-xs sm:text-sm font-black font-cyber text-black uppercase tracking-wider flex items-center gap-2">
@@ -369,7 +370,7 @@
                 <!-- INPUT MANUAL, NOMOR HP PEMBELI & TOMBOL -->
                 <div class="space-y-3 pt-2">
                     <div>
-                        <label class="block text-[11px] font-black font-cyber text-black uppercase tracking-wider mb-1.5">
+                        <label for="customerPhoneInput" class="block text-[11px] font-black font-cyber text-black uppercase tracking-wider mb-1.5">
                             Nomor HP / WhatsApp Pembeli <span class="text-red-600">*</span>
                         </label>
                         <div class="relative">
@@ -383,7 +384,7 @@
                         <p class="text-[10px] font-bold text-slate-600 mt-1">Wajib nomor HP Indonesia asli (08xx / 62xx / +62) untuk validasi penyedia QRIS.</p>
                     </div>
 
-                    <label class="block text-[11px] font-black font-cyber text-black uppercase tracking-wider">
+                    <label for="depositAmountInput" class="block text-[11px] font-black font-cyber text-black uppercase tracking-wider">
                         Atau Ketik Nominal Custom
                     </label>
                     <div class="flex flex-col sm:flex-row items-stretch gap-3">
@@ -412,10 +413,10 @@
                     </div>
                 </div>
 
-            </div>
+            </section>
 
             <!-- KOLOM KANAN: PANDUAN -->
-            <div class="lg:col-span-5 neo-box rounded-2xl p-5 sm:p-6 bg-neoPink space-y-4">
+            <aside class="lg:col-span-5 neo-box rounded-2xl p-5 sm:p-6 bg-neoPink space-y-4">
                 <div class="flex items-center gap-2 pb-3 border-b-3 border-black">
                     <i class="fa-solid fa-shield-halved text-black text-base"></i>
                     <h3 class="text-xs sm:text-sm font-black font-cyber text-black uppercase tracking-wider">Panduan & Ketentuan</h3>
@@ -452,13 +453,13 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </aside>
 
         </div>
 
     </main>
 
-    <!-- MODAL POPUP QRIS DEPOSIT (TAMPILAN DIPERBARUI + TOMBOL DOWNLOAD QRIS) -->
+    <!-- MODAL POPUP QRIS DEPOSIT -->
     <div id="depositModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 overflow-y-auto">
         <div class="neo-box w-full max-w-md rounded-2xl bg-white p-5 space-y-3.5 text-center relative my-auto">
             <button type="button" onclick="closeDepositModal()" class="w-8 h-8 rounded-lg border-2 border-black bg-neoBg hover:bg-neoPink flex items-center justify-center absolute top-4 right-4 text-black font-black text-sm transition">
@@ -473,18 +474,14 @@
                 <p class="text-[11px] font-bold text-slate-600">Simpan gambar QRIS lalu upload di aplikasi E-Wallet / M-Banking</p>
             </div>
 
-            <!-- KARTU QRIS DENGAN QUIET ZONE LEBAR AGAR 100% TERBACA SCANNER -->
             <div class="mx-auto w-fit bg-white rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] overflow-hidden">
-                <!-- Header QRIS -->
                 <div class="bg-neoBg border-b-2 border-black px-4 py-1.5 flex items-center justify-between gap-4">
                     <span class="font-cyber font-black text-xs tracking-wider">QRIS</span>
                     <span class="text-[9px] font-mono font-bold bg-white border border-black px-1.5 py-0.5 rounded">GPN</span>
                 </div>
-                <!-- Area Putih Quiet Zone -->
                 <div class="p-4 bg-white flex items-center justify-center">
                     <div id="depQrcodeContainer"></div>
                 </div>
-                <!-- Footer Nominal & Order ID -->
                 <div class="bg-neoBg border-t-2 border-black px-4 py-2 text-center">
                     <p class="text-[9px] font-black font-cyber uppercase text-slate-600">Total Pembayaran</p>
                     <h4 id="depTotalAmountText" class="text-xl font-black font-cyber text-black leading-tight">Rp 0</h4>
@@ -497,7 +494,6 @@
                 <span>Menunggu Pembayaran Masuk...</span>
             </div>
 
-            <!-- TOMBOL DOWNLOAD QRIS & CEK STATUS -->
             <div class="grid grid-cols-2 gap-2">
                 <button type="button" onclick="downloadQrisImage()" class="neo-btn bg-neoCyan text-black text-xs font-black py-3 rounded-xl uppercase flex items-center justify-center gap-1.5 font-cyber">
                     <i class="fa-solid fa-download"></i> Download QRIS
@@ -518,42 +514,42 @@
         </div>
     </div>
 
-    <!-- CURVED ANIMATED BOTTOM NAV BAR -->
-    <div class="bottom-nav-fixed">
+    <!-- FIXED BOTTOM NAV BAR -->
+    <nav aria-label="Navigasi Utama" class="bottom-nav-fixed">
         <div class="bottom-nav-bg"></div>
         <div class="nav-items-wrapper">
-            <a href="/dashboard" class="nav-item-btn">
+            <a href="/" title="Beranda" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-house"></i>
                 </div>
                 <span>Home</span>
             </a>
-            <a href="/store" class="nav-item-btn">
+            <a href="/store" title="Katalog Toko" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-bag-shopping"></i>
                 </div>
                 <span>Toko</span>
             </a>
-            <a href="/deposit" class="nav-item-btn active">
+            <a href="/deposit" title="Deposit Saldo" class="nav-item-btn active">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-wallet"></i>
                 </div>
                 <span>Deposit</span>
             </a>
-            <a href="/riwayat" class="nav-item-btn">
+            <a href="/riwayat" title="Riwayat Transaksi" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                 </div>
                 <span>Riwayat</span>
             </a>
-            <a href="/profile" class="nav-item-btn">
+            <a href="/profile" title="Profil Akun" class="nav-item-btn">
                 <div class="nav-icon-box">
                     <i class="fa-regular fa-user"></i>
                 </div>
                 <span id="nav-auth-label">Profil</span>
             </a>
         </div>
-    </div>
+    </nav>
 
     <!-- FLOATING LIVE CHAT BUTTON -->
     <button id="floatingChatToggleBtn" onclick="toggleChatWidget()" title="Bantuan & Live Chat" class="fixed bottom-24 right-5 z-[99990] flex items-center justify-center w-12 h-12 rounded-full bg-neoYellow border-3 border-black text-black shadow-[4px_4px_0px_#000] hover:scale-110 transition-transform duration-200 font-black">
@@ -590,7 +586,6 @@
             modal.classList.remove('flex');
         }
 
-        // RENDER QRIS PRESISI & TANGANI PAYLOAD MENTAH MAUPUN URL GAMBAR
         function renderCleanQris(qrValue) {
             currentQrPayload = (qrValue || '').trim();
             const qContainer = document.getElementById('depQrcodeContainer');
@@ -598,7 +593,6 @@
 
             if (!currentQrPayload) return;
 
-            // Jika server mengembalikan URL gambar atau Data URI base64 langsung
             if (currentQrPayload.startsWith('http://') || currentQrPayload.startsWith('https://') || currentQrPayload.startsWith('data:image/')) {
                 const img = document.createElement('img');
                 img.crossOrigin = 'anonymous';
@@ -608,7 +602,6 @@
                 return;
             }
 
-            // Jika payload string QRIS standar (000201...), render resolusi tinggi dengan CorrectLevel.M agar tidak terlalu padat
             new QRCode(qContainer, {
                 text: currentQrPayload,
                 width: 280,
@@ -619,7 +612,6 @@
             });
         }
 
-        // DOWNLOAD QRIS LENGKAP DENGAN QUIET ZONE & INFO NOMINAL AGAR LANGSUNG TERBACA DI E-WALLET
         async function downloadQrisImage() {
             const qContainer = document.getElementById('depQrcodeContainer');
             const sourceCanvas = qContainer.querySelector('canvas');
@@ -643,16 +635,13 @@
             outCanvas.width = W;
             outCanvas.height = H;
 
-            // Background putih bersih
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, W, H);
 
-            // Border luar tipis
             ctx.strokeStyle = '#000000';
             ctx.lineWidth = 6;
             ctx.strokeRect(12, 12, W - 24, H - 24);
 
-            // Header bar kuning
             ctx.fillStyle = '#FFDE59';
             ctx.fillRect(15, 15, W - 30, 86);
             ctx.fillStyle = '#000000';
@@ -662,7 +651,6 @@
             ctx.textAlign = 'center';
             ctx.fillText('QRIS PEMBAYARAN - ARULZXD STORE', W / 2, 68);
 
-            // Gambar QRIS dengan quiet zone putih luas (420x420 di tengah area 600px)
             ctx.imageSmoothingEnabled = false;
             const qrSize = 420;
             const qrX = (W - qrSize) / 2;
@@ -675,13 +663,10 @@
                     ctx.drawImage(sourceImg, qrX, qrY, qrSize, qrSize);
                 }
             } catch (err) {
-                if (sourceImg && sourceImg.src) {
-                    window.open(sourceImg.src, '_blank');
-                }
+                if (sourceImg && sourceImg.src) window.open(sourceImg.src, '_blank');
                 return;
             }
 
-            // Info Nominal & Order ID di bawah QR
             ctx.fillStyle = '#000000';
             ctx.font = 'bold 20px sans-serif';
             ctx.fillText('TOTAL PEMBAYARAN', W / 2, 615);
@@ -701,9 +686,7 @@
                 link.click();
                 document.body.removeChild(link);
             } catch (err) {
-                if (sourceImg && sourceImg.src) {
-                    window.open(sourceImg.src, '_blank');
-                }
+                if (sourceImg && sourceImg.src) window.open(sourceImg.src, '_blank');
             }
         }
 
@@ -1008,7 +991,6 @@
             updateActiveBannerUI();
         }
 
-        /* LOGIKA FLOATING LIVE CHAT WIDGET */
         function toggleChatWidget() {
             const windowEl = document.getElementById('floatingChatWindow');
             const isHidden = windowEl.classList.contains('hidden');
