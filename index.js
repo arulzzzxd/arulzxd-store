@@ -2433,7 +2433,7 @@ app.get('/sitemap.xml', async (req, res) => {
             const lastMod = new Date(p.updatedAt || p.createdAt || Date.now()).toISOString().split('T')[0];
             return `
   <url>
-    <loc>https://www.arulzxd.biz.id/store/${encodeURIComponent(p.Id)}</loc>
+    <loc>https://arulzxd.biz.id/store/${encodeURIComponent(p.Id)}</loc>
     <lastmod>${lastMod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -2443,27 +2443,27 @@ app.get('/sitemap.xml', async (req, res) => {
         const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.arulzxd.biz.id/</loc>
+    <loc>https://arulzxd.biz.id/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.arulzxd.biz.id/store</loc>
+    <loc>https://arulzxd.biz.id/store</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.arulzxd.biz.id/login</loc>
+    <loc>https://arulzxd.biz.id/login</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.arulzxd.biz.id/riwayat</loc>
+    <loc>https://arulzxd.biz.id/riwayat</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.arulzxd.biz.id/privacy</loc>
+    <loc>https://arulzxd.biz.id/privacy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>${productUrls}
@@ -2471,6 +2471,50 @@ app.get('/sitemap.xml', async (req, res) => {
         res.send(xmlContent);
     } catch (e) {
         console.error('Error generate sitemap:', e);
+        res.status(500).send('');
+    }
+});
+
+app.get('/rss.xml', async (req, res) => {
+    res.header('Content-Type', 'application/rss+xml; charset=utf-8');
+    try {
+        const escapeXml = (str) => String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;');
+
+        const products = await ProductV2.find({}).sort({ createdAt: -1 }).limit(30).lean();
+        const itemsXml = products.map(p => {
+            const pubDate = new Date(p.createdAt || Date.now()).toUTCString();
+            const link = `https://arulzxd.biz.id/store/${encodeURIComponent(p.Id)}`;
+            const desc = p.deskripsi || `Beli ${p.nama} di ArulzXD Store dengan pengiriman otomatis 24/7.`;
+            return `
+    <item>
+      <title>${escapeXml(p.nama)}</title>
+      <link>${link}</link>
+      <guid isPermaLink="true">${link}</guid>
+      <pubDate>${pubDate}</pubDate>
+      <description>${escapeXml(desc)}</description>
+      <category>${escapeXml(p.kategori || 'Produk Digital')}</category>
+    </item>`;
+        }).join('');
+
+        const rssContent = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ArulzXD Store - Marketplace</title>
+    <link>https://arulzxd.biz.id/store</link>
+    <description>Marketplace penyedia Source Code, Script, dan Layanan Digital Premium otomatis 24/7.</description>
+    <language>id</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <atom:link href="https://arulzxd.biz.id/rss.xml" rel="self" type="application/rss+xml" />${itemsXml}
+  </channel>
+</rss>`;
+        res.send(rssContent);
+    } catch (e) {
+        console.error('Error generate RSS:', e);
         res.status(500).send('');
     }
 });
